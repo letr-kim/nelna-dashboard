@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>상담 인입 분석 대시보드</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#f5f5f2;color:#1a1a1a;font-size:14px}
+.page{max-width:1200px;margin:0 auto;padding:24px 20px}
+.page-header{margin-bottom:24px}
+.page-title{font-size:22px;font-weight:600}
+.page-sub{font-size:13px;color:#888;margin-top:4px}
+.kpi-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px}
+.kpi{background:#fff;border-radius:10px;padding:14px 16px;border:0.5px solid #e5e5e0}
+.kpi-label{font-size:11px;color:#888;margin-bottom:6px}
+.kpi-value{font-size:26px;font-weight:700;color:#1a1a1a;line-height:1}
+.kpi-sub{font-size:11px;color:#aaa;margin-top:5px}
+.kpi.blue .kpi-value{color:#2563eb}.kpi.green .kpi-value{color:#16a34a}
+.kpi.red .kpi-value{color:#dc2626}.kpi.amber .kpi-value{color:#d97706}
+.kpi.purple .kpi-value{color:#7c3aed}
+.section{margin-bottom:28px}
+.section-title{font-size:15px;font-weight:600;margin-bottom:14px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.badge{font-size:11px;font-weight:500;padding:2px 8px;border-radius:10px;background:#f0f0ed;color:#666}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.card{background:#fff;border-radius:10px;padding:18px;border:0.5px solid #e5e5e0}
+.card-title{font-size:12px;font-weight:600;color:#666;margin-bottom:14px;text-transform:uppercase;letter-spacing:.05em}
+.chart-wrap{position:relative;height:240px}
+.chart-wrap-lg{position:relative;height:280px}
+.chart-wrap-md{position:relative;height:220px}
+.alf-box{background:#f8f7ff;border-radius:8px;padding:12px 16px;border:1px solid #e5e0ff;margin-bottom:14px}
+.alf-box-row{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px}
+.alf-stat{text-align:center}
+.alf-stat-num{font-size:22px;font-weight:700;color:#7c3aed}
+.alf-stat-label{font-size:11px;color:#888;margin-top:2px}
+.alf-verify{font-size:12px;color:#6d28d9;background:#f0ebff;padding:4px 10px;border-radius:12px}
+.def-box{background:#fafaf8;border:0.5px solid #e5e5e0;border-radius:8px;padding:10px 14px;font-size:12px;color:#666;margin-bottom:14px;line-height:1.7}
+.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl th{padding:8px 10px;text-align:left;font-size:11px;font-weight:600;color:#888;border-bottom:1px solid #f0f0ee;background:#fafaf8}
+.tbl td{padding:9px 10px;border-bottom:0.5px solid #f0f0ee;color:#333;line-height:1.4}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:#fafaf8}
+.upload-btn{background:#fff;border:0.5px solid #e5e5e0;border-radius:8px;padding:7px 12px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#555;font-family:inherit;line-height:1}
+.upload-btn:hover{background:#f5f5f2;border-color:#c8c8c3}
+.upload-btn:disabled{opacity:.6;cursor:not-allowed}
+.upload-status{font-size:11px;color:#888;margin-top:5px;text-align:right;min-height:14px}
+@media(max-width:700px){.kpi-row{grid-template-columns:1fr 1fr}.grid-2{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="page">
+
+<div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px">
+  <div>
+    <div class="page-title">📊 상담 인입 분석 대시보드</div>
+    <div class="page-sub" id="pageSub"></div>
+  </div>
+  <div style="flex-shrink:0;padding-top:2px">
+    <input type="file" id="xlsxInput" accept=".xlsx" style="display:none">
+    <button id="uploadBtn" class="upload-btn" onclick="document.getElementById('xlsxInput').click()">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+      엑셀 업로드
+    </button>
+    <div class="upload-status" id="uploadStatus"></div>
+  </div>
+</div>
+
+<!-- ① KPI -->
+<div class="section">
+  <div class="section-title">전체 상담 현황 <span class="badge">금주 기준</span></div>
+  <div class="kpi-row">
+    <div class="kpi blue"><div class="kpi-label">총 인입수</div><div class="kpi-value" id="kTot"></div><div class="kpi-sub" id="kTotSub"></div></div>
+    <div class="kpi"><div class="kpi-label">상담원 배정</div><div class="kpi-value" id="kAgent"></div><div class="kpi-sub" id="kAgentSub"></div></div>
+    <div class="kpi amber"><div class="kpi-label">평균 응대시간</div><div class="kpi-value" id="kAvg"></div><div class="kpi-sub">상담원 첫 응답부터 종료까지</div></div>
+  </div>
+  <div class="kpi-row">
+    <div class="kpi green"><div class="kpi-label">알프 단독 해결</div><div class="kpi-value" id="kSolo"></div><div class="kpi-sub" id="kSoloSub"></div></div>
+    <div class="kpi red"><div class="kpi-label">알프 미해결 (이관)</div><div class="kpi-value" id="kEsc"></div><div class="kpi-sub" id="kEscSub"></div></div>
+    <div class="kpi purple"><div class="kpi-label">알프 관여율</div><div class="kpi-value" id="kInvolve"></div><div class="kpi-sub" id="kInvolveSub"></div></div>
+    <div class="kpi"><div class="kpi-label">주간 증감</div><div class="kpi-value" id="kDiff"></div><div class="kpi-sub">직전주 대비</div></div>
+  </div>
+  <div class="alf-box">
+    <div class="alf-box-row">
+      <div class="alf-stat"><div class="alf-stat-num" style="color:#2563eb" id="bTotal"></div><div class="alf-stat-label">총 인입</div></div>
+      <div style="font-size:18px;color:#ccc">=</div>
+      <div class="alf-stat"><div class="alf-stat-num" style="color:#16a34a" id="bSolo"></div><div class="alf-stat-label">알프 단독해결</div></div>
+      <div style="font-size:18px;color:#ccc">+</div>
+      <div class="alf-stat"><div class="alf-stat-num" style="color:#dc2626" id="bEsc"></div><div class="alf-stat-label">알프 이관</div></div>
+      <div style="font-size:18px;color:#ccc">+</div>
+      <div class="alf-stat"><div class="alf-stat-num" style="color:#d97706" id="bAgent"></div><div class="alf-stat-label">상담원 배정</div></div>
+      <div style="font-size:18px;color:#ccc">+</div>
+      <div class="alf-stat" style="text-align:center">
+        <div class="alf-stat-num" style="color:#aaa" id="bEtc"></div>
+        <div class="alf-stat-label" style="color:#aaa">문의 미진행</div>
+        <div style="font-size:10px;color:#bbb;margin-top:3px;max-width:120px;line-height:1.4;text-align:center">채팅창 아이콘 클릭 후<br>추가 문의 없이 종료</div>
+      </div>
+      <div class="alf-verify" id="bVerify"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ② 유입 패턴 -->
+<div class="section">
+  <div class="section-title">문의 유입 패턴 <span class="badge">Inquiry Pattern</span></div>
+  <div class="grid-2" style="margin-bottom:14px">
+    <div class="card">
+      <div class="card-title">요일별 문의 건수 (직전주 vs 금주)</div>
+      <div class="chart-wrap"><canvas id="dowChart"></canvas></div>
+      <div style="font-size:11px;color:#aaa;margin-top:8px" id="dowNote"></div>
+      <div style="margin-top:14px;padding-top:14px;border-top:0.5px solid #f0f0ee">
+        <div style="font-size:11px;font-weight:600;color:#888;margin-bottom:10px">제품별 문의 순위</div>
+        <table class="tbl">
+          <thead><tr><th>순위</th><th>제품</th><th style="text-align:right">직전주</th><th style="text-align:right">금주</th><th style="text-align:right">증감</th></tr></thead>
+          <tbody id="prodRankDow"><tr><td style="color:#aaa">1위</td><td style="font-weight:500">타이머</td><td style="text-align:right;color:#aaa">19건</td><td style="text-align:right;font-weight:600">20건</td><td style="text-align:right;font-weight:600;color:#dc2626">+1건</td></tr><tr><td style="color:#aaa">2위</td><td style="font-weight:500">디지털</td><td style="text-align:right;color:#aaa">33건</td><td style="text-align:right;font-weight:600">19건</td><td style="text-align:right;font-weight:600;color:#16a34a">-14건</td></tr><tr><td style="color:#aaa">3위</td><td style="font-weight:500">키링캠</td><td style="text-align:right;color:#aaa">11건</td><td style="text-align:right;font-weight:600">9건</td><td style="text-align:right;font-weight:600;color:#16a34a">-2건</td></tr><tr><td style="color:#aaa">4위</td><td style="font-weight:500">펜슬</td><td style="text-align:right;color:#aaa">7건</td><td style="text-align:right;font-weight:600">5건</td><td style="text-align:right;font-weight:600;color:#16a34a">-2건</td></tr><tr><td style="color:#aaa">5위</td><td style="font-weight:500">데일리 케이블</td><td style="text-align:right;color:#aaa">1건</td><td style="text-align:right;font-weight:600">2건</td><td style="text-align:right;font-weight:600;color:#dc2626">+1건</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">전체 상담 유입 태그 TOP 10</div>
+      <div class="chart-wrap"><canvas id="tagChart"></canvas></div>
+      <div style="margin-top:12px;padding-top:12px;border-top:0.5px solid #f0f0ee;display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        <div>
+          <div style="font-size:11px;font-weight:600;color:#888;margin-bottom:8px">교환 제품 순위</div>
+          <table class="tbl">
+            <thead><tr><th>제품</th><th style="text-align:right">건수</th></tr></thead>
+            <tbody id="exchangeBody"></tbody>
+          </table>
+        </div>
+        <div>
+          <div style="font-size:11px;font-weight:600;color:#888;margin-bottom:8px">반품 제품 순위</div>
+          <table class="tbl">
+            <thead><tr><th>제품</th><th style="text-align:right">건수</th></tr></thead>
+            <tbody id="returnBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ③ 알프 단독해결율 비교 -->
+<div class="section">
+  <div class="section-title">알프 단독해결율 비교 <span class="badge">직전주 vs 금주 · 전체 인입 대비</span></div>
+  <div class="card" style="max-width:600px">
+    <div style="display:flex;gap:24px;align-items:flex-end;margin-bottom:20px">
+      <div style="flex:1;text-align:center">
+        <div style="font-size:12px;color:#888;margin-bottom:8px">직전주 <span style="color:#aaa;font-size:11px" id="prevAlfPeriod"></span></div>
+        <div style="font-size:42px;font-weight:700;color:#94a3b8;line-height:1" id="prevRate"></div>
+        <div style="font-size:12px;color:#aaa;margin-top:6px" id="prevAlfDetail"></div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:center;padding-bottom:20px">
+        <div style="font-size:18px;color:#ccc">→</div>
+        <div style="font-size:13px;font-weight:600;margin-top:6px" id="diffBadge"></div>
+      </div>
+      <div style="flex:1;text-align:center">
+        <div style="font-size:12px;color:#888;margin-bottom:8px">금주 <span style="color:#aaa;font-size:11px" id="currAlfPeriod"></span></div>
+        <div style="font-size:42px;font-weight:700;color:#7c3aed;line-height:1" id="currRate"></div>
+        <div style="font-size:12px;color:#aaa;margin-top:6px" id="currAlfDetail"></div>
+      </div>
+    </div>
+    <div style="background:#f5f5f2;border-radius:8px;padding:10px 14px;font-size:12px;color:#666">각 주 전체 인입 상담 건수 대비 알프가 단독으로 해결한 비율입니다.</div>
+  </div>
+</div>
+
+<!-- ④ 알프 단독해결 주요 문의 -->
+<div class="section">
+  <div class="section-title">알프 단독해결 주요 문의 <span class="badge">직전주 vs 금주 TOP 5</span></div>
+  <div class="card" style="margin-bottom:14px">
+    <div class="chart-wrap-lg"><canvas id="soloTagChart"></canvas></div>
+    <div style="font-size:11px;color:#aaa;margin-top:8px" id="soloNote"></div>
+  </div>
+  <div class="card">
+    <div style="font-size:12px;font-weight:600;color:#555;margin-bottom:10px">💡 금주에 알프가 새로 잘 처리한 유형</div>
+    <div style="font-size:12px;color:#666;margin-bottom:12px;line-height:1.8" id="soloInsight"></div>
+    <div id="soloNewItems" style="display:flex;flex-direction:column;gap:8px"></div>
+  </div>
+</div>
+
+<!-- ⑤ 알프 미해결 분석 -->
+<div class="section">
+  <div class="section-title">알프 미해결 분석 <span class="badge" id="alfBadge"></span></div>
+  <div class="def-box"><strong>기준:</strong> 알프가 응대하다가 상담원이 배정된 상담 전체</div>
+  <div class="card"><div class="card-title">이관 사유 태그 TOP 10</div><div class="chart-wrap-md"><canvas id="alfUnresChart"></canvas></div></div>
+</div>
+
+<!-- ⑧ 2026 KPI 목표 비교 -->
+<div class="section">
+  <div class="section-title">2026 KPI 목표 비교 <span class="badge">채널별 · 3주 합산 기준</span></div>
+
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+    <div class="card">
+      <div class="card-title">관여율 추이 & 목표</div>
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:12px;font-size:11px;color:#888;flex-wrap:wrap">
+        <span style="display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:10px;height:3px;background:#999;border-radius:2px"></span>통합</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:10px;height:3px;background:#7F77DD;border-radius:2px"></span>채널톡</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:10px;height:3px;background:#1D9E75;border-radius:2px"></span>네이버톡톡</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:14px;border-top:2px dashed #E24B4A"></span>목표 80%</span>
+      </div>
+      <div style="position:relative;width:100%;height:220px"><canvas id="kpiChart1"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">관여대비해결율 추이 & 목표</div>
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:12px;font-size:11px;color:#888;flex-wrap:wrap">
+        <span style="display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:10px;height:3px;background:#999;border-radius:2px"></span>통합</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:10px;height:3px;background:#7F77DD;border-radius:2px"></span>채널톡</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:10px;height:3px;background:#1D9E75;border-radius:2px"></span>네이버톡톡</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:14px;border-top:2px dashed #E24B4A"></span>목표 65%</span>
+      </div>
+      <div style="position:relative;width:100%;height:220px"><canvas id="kpiChart2"></canvas></div>
+    </div>
+  </div>
+  <div style="margin-top:20px">
+    <div style="font-size:12px;font-weight:600;color:#666;margin-bottom:12px;text-transform:uppercase;letter-spacing:.05em">채널별 알프 지표 <span style="font-size:11px;font-weight:500;padding:2px 8px;border-radius:10px;background:#f0f0ed;color:#666;text-transform:none;letter-spacing:0">3주 합산 · 04/18~05/08</span></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px">
+    <div class="card">
+      <div class="card-title">통합</div>
+      <table class="tbl">
+        <thead><tr><th>주차</th><th style="text-align:right">총인입</th><th style="text-align:right">관여율</th><th style="text-align:right">단독해결율</th><th style="text-align:right">관여대비해결율</th></tr></thead>
+        <tbody>
+          <tr><td>04/18~04/24</td><td style="text-align:right;color:#aaa">255건</td><td style="text-align:right">72.2%</td><td style="text-align:right">42.0%</td><td style="text-align:right">58.2%</td></tr>
+          <tr><td>04/25~05/01</td><td style="text-align:right;color:#aaa">171건</td><td style="text-align:right">73.7%</td><td style="text-align:right">47.4%</td><td style="text-align:right">64.3%</td></tr>
+          <tr><td>05/02~05/08</td><td style="text-align:right;color:#aaa">114건</td><td style="text-align:right">79.8%</td><td style="text-align:right">41.2%</td><td style="text-align:right">51.6%</td></tr>
+          <tr style="border-top:1.5px solid #e5e5e0;font-weight:600"><td>3주 합산</td><td style="text-align:right;color:#aaa">540건</td><td style="text-align:right;color:#3b82f6">74.3%</td><td style="text-align:right;color:#3b82f6">43.5%</td><td style="text-align:right;color:#3b82f6">58.6%</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card">
+      <div class="card-title">채널톡</div>
+      <table class="tbl">
+        <thead><tr><th>주차</th><th style="text-align:right">총인입</th><th style="text-align:right">관여율</th><th style="text-align:right">단독해결율</th><th style="text-align:right">관여대비해결율</th></tr></thead>
+        <tbody>
+          <tr><td>04/18~04/24</td><td style="text-align:right;color:#aaa">209건</td><td style="text-align:right">77.0%</td><td style="text-align:right">47.4%</td><td style="text-align:right">61.5%</td></tr>
+          <tr><td>04/25~05/01</td><td style="text-align:right;color:#aaa">138건</td><td style="text-align:right">79.7%</td><td style="text-align:right">52.9%</td><td style="text-align:right">66.4%</td></tr>
+          <tr><td>05/02~05/08</td><td style="text-align:right;color:#aaa">89건</td><td style="text-align:right">86.5%</td><td style="text-align:right">47.2%</td><td style="text-align:right">54.5%</td></tr>
+          <tr style="border-top:1.5px solid #e5e5e0;font-weight:600"><td>3주 합산</td><td style="text-align:right;color:#aaa">436건</td><td style="text-align:right;color:#3b82f6">79.8%</td><td style="text-align:right;color:#3b82f6">49.1%</td><td style="text-align:right;color:#3b82f6">61.5%</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card">
+      <div class="card-title">네이버 톡톡</div>
+      <table class="tbl">
+        <thead><tr><th>주차</th><th style="text-align:right">총인입</th><th style="text-align:right">관여율</th><th style="text-align:right">단독해결율</th><th style="text-align:right">관여대비해결율</th></tr></thead>
+        <tbody>
+          <tr><td>04/18~04/24</td><td style="text-align:right;color:#aaa">46건</td><td style="text-align:right">50.0%</td><td style="text-align:right">17.4%</td><td style="text-align:right">34.8%</td></tr>
+          <tr><td>04/25~05/01</td><td style="text-align:right;color:#aaa">33건</td><td style="text-align:right">48.5%</td><td style="text-align:right">24.2%</td><td style="text-align:right">50.0%</td></tr>
+          <tr><td>05/02~05/08</td><td style="text-align:right;color:#aaa">25건</td><td style="text-align:right">56.0%</td><td style="text-align:right">20.0%</td><td style="text-align:right">35.7%</td></tr>
+          <tr style="border-top:1.5px solid #e5e5e0;font-weight:600"><td>3주 합산</td><td style="text-align:right;color:#aaa">104건</td><td style="text-align:right;color:#3b82f6">51.0%</td><td style="text-align:right;color:#3b82f6">20.2%</td><td style="text-align:right;color:#3b82f6">39.6%</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+  </div>
+</div>
+
+
+
+<!-- ⑨ 메모 -->
+<div class="section">
+  <div class="section-title">📝 메모</div>
+  <div class="card">
+    <div style="font-size:12px;color:#aaa;margin-bottom:10px">브라우저를 닫으면 사라집니다. 중요한 내용은 별도로 저장해두세요.</div>
+    <textarea id="memoArea" placeholder="여기에 메모를 입력하세요..." style="width:100%;height:160px;border:0.5px solid #e5e5e0;border-radius:8px;padding:12px;font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:13px;color:#1a1a1a;background:#fafaf8;resize:vertical;outline:none;line-height:1.7"></textarea>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
+      <span style="font-size:11px;color:#aaa" id="memoCount">0자</span>
+      <button onclick="document.getElementById('memoArea').value='';document.getElementById('memoCount').textContent='0자'" style="font-size:12px;color:#aaa;background:none;border:0.5px solid #e0e0db;border-radius:5px;padding:4px 12px;cursor:pointer">지우기</button>
+    </div>
+  </div>
+</div>
+
+</div><script>
+Chart.register(ChartDataLabels);
+Chart.defaults.font.family="'Apple SD Gothic Neo','Malgun Gothic',sans-serif";
+Chart.defaults.font.size=12;Chart.defaults.color='#666';
+const D={"total":156,"agent_assigned":66,"avg_response_min":25.8,"alf_triggered":123,"alf_solo":79,"alf_escalated":43,"agent_only":23,"workflow_only":11,"curr_solo_rate":50.6,"prev_solo_rate":40.4,"prev_total":114,"prev_total_real":114,"prev_alf_solo":46,"curr_dow":[25,33,24,25,28,11,10],"prev_dow":[20,10,25,20,24,4,11],"top10_tags":[{"tag":"디지털/사용문의/가계부","total":21,"alf":15,"agent":6},{"tag":"교환","total":13,"alf":0,"agent":13},{"tag":"실물/제품문의/필름","total":10,"alf":10,"agent":0},{"tag":"실물/제품문의/입고품절","total":7,"alf":3,"agent":4},{"tag":"실물/이상주장/타이머","total":7,"alf":4,"agent":3},{"tag":"디지털/오류문의/가계부","total":6,"alf":2,"agent":4},{"tag":"결제/결제문의/기타","total":6,"alf":6,"agent":0},{"tag":"와디즈","total":5,"alf":0,"agent":5},{"tag":"실물/이상주장/키링캠","total":4,"alf":0,"agent":4},{"tag":"반품","total":4,"alf":0,"agent":4}],"alf_unresolved_tags":[{"tag":"디지털/사용문의/가계부","count":5},{"tag":"교환","count":5},{"tag":"실물/이상주장/키링캠","count":4},{"tag":"반품","count":4},{"tag":"미수거재발송","count":4},{"tag":"디지털/오류문의/가계부","count":3},{"tag":"와디즈","count":3},{"tag":"실물/이상주장/타이머","count":3},{"tag":"실물/이상주장/낼나펜슬","count":2},{"tag":"실물/제품문의/입고품절","count":2}],"inc_tags":[{"tag":"디지털/사용문의/가계부","curr":21,"prev":11,"delta":10},{"tag":"실물/제품문의/필름","curr":10,"prev":2,"delta":8},{"tag":"결제/결제문의/기타","curr":6,"prev":1,"delta":5},{"tag":"와디즈","curr":5,"prev":0,"delta":5},{"tag":"디지털/오류문의/가계부","curr":6,"prev":3,"delta":3},{"tag":"실물/이상주장/키링캠","curr":4,"prev":1,"delta":3},{"tag":"미수거재발송","curr":5,"prev":3,"delta":2},{"tag":"실물/제품문의/입고품절","curr":7,"prev":6,"delta":1}],"curr_solo_top5":[{"tag":"디지털/사용문의/가계부","curr":15,"prev":7},{"tag":"실물/제품문의/필름","curr":10,"prev":1},{"tag":"결제/결제문의/기타","curr":6,"prev":1},{"tag":"실물/이상주장/타이머","curr":4,"prev":5},{"tag":"배송/배송문의/일정문의","curr":3,"prev":0}],"prev_solo_top5":[{"tag":"디지털/사용문의/가계부","curr":7,"prev":7},{"tag":"실물/제품문의/입고품절","curr":5,"prev":5},{"tag":"실물/이상주장/타이머","curr":5,"prev":5},{"tag":"예스24","curr":2,"prev":2},{"tag":"쿠폰/사용문의/다운로드","curr":2,"prev":2}],"prod_ranking":[{"name":"디지털","total":31,"prev":19,"delta":12},{"name":"낼나 타이머","total":16,"prev":20,"delta":-4},{"name":"낼나 키링캠","total":9,"prev":9,"delta":0},{"name":"낼나 펜슬","total":7,"prev":5,"delta":2},{"name":"데일리 케이블","total":2,"prev":2,"delta":0}],"curr_dates":"05/07 ~ 05/15","prev_dates":"05/02 ~ 05/08","channelio_solo":79,"channelio_triggered":123,"channelio_rate":64.2,"no_alf_direct":19,"no_alf_reopen":3,"no_alf_total":33,"no_alf_agent":22,"no_alf_work":11,"no_alf_tags":[{"tag":"교환","count":4},{"tag":"와디즈","count":2},{"tag":"고객반품/교환/고객사유","count":2},{"tag":"실물/제품문의/입고품절","count":2},{"tag":"취소문의","count":2},{"tag":"배송/배송문의/누락오배송(구성품누락)","count":1},{"tag":"배송/배송문의/합배송","count":1},{"tag":"실물/제품문의/키링캠","count":1},{"tag":"실물/이상주장/기타","count":1},{"tag":"철회","count":1}],"exchange_products":[{"product":"타이머-기능정지","count":4},{"product":"타이머버터-외관부품","count":1},{"product":"낼나펜슬","count":1},{"product":"타이머클래식-기능사운드","count":1},{"product":"필름(와디즈)","count":1}],"return_products":[{"product":"케이블스트랩세트","count":1},{"product":"키링캠","count":1}],"mon_top6":[],"mon_agent":0,"mon_alf_esc":0,"mon_direct":0,"mon_pct":0,"mon_date":"","mon_prev":0,"mon_curr":0};
+
+// ── 집계 헬퍼 (process.py 미러) ──────────────────────────────────────────
+function normTag(raw){
+  const tag=String(raw).trim();
+  if(!tag||tag==='nan')return null;
+  if(tag==='알프'||tag==='모워크플로')return null;
+  if(tag.includes('테스트')||tag.includes('중복'))return null;
+  if(tag.includes('교환반품')){
+    const p=tag.split('/'),s=p[1]||'';
+    if(s.includes('맞교환')||(s.includes('교환')&&!s.includes('반품'))||s.includes('미수거재발송'))return'교환';
+    if(s.includes('반품'))return'반품';
+    if(s.includes('철회'))return'철회';
+    if(s.includes('차액환불'))return'차액환불';
+    if(s.includes('진행상황'))return'교환';
+    return'교환반품';
+  }
+  if(tag.includes('디지털')){
+    const p=tag.split('/'),s=p[1]||'',sub=p[2]||'';
+    if(s.includes('사용문의'))return sub?`디지털/사용문의/${sub}`:'디지털/사용문의';
+    if(s.includes('오류문의'))return sub?`디지털/오류문의/${sub}`:'디지털/오류문의';
+    if(s.includes('제품문의'))return'디지털/제품문의';
+    return'디지털';
+  }
+  if(tag.includes('취소')){
+    const p=tag.split('/'),s=p[1]||'';
+    if(s.includes('취소문의'))return'취소문의';
+  }
+  return tag;
+}
+function iterTags(tagsStr){
+  const r=[];
+  for(const raw of String(tagsStr).split(',')){const nt=normTag(raw);if(nt)r.push(nt);}
+  return r;
+}
+function isTrue(v){
+  if(v===true||v===1)return true;
+  if(typeof v==='string')return['true','1','yes'].includes(v.toLowerCase().trim());
+  return false;
+}
+function hasVal(v){return v!==''&&v!==null&&v!==undefined;}
+function parseDate(v){
+  if(v instanceof Date)return v;
+  if(typeof v==='string'&&v)return new Date(v);
+  return null;
+}
+function calcDateRange(rows){
+  const dates=rows.map(r=>parseDate(r.createdAt)).filter(d=>d&&!isNaN(d));
+  if(!dates.length)return'날짜 없음';
+  const ts=dates.map(d=>d.getTime());
+  const min=new Date(Math.min(...ts)),max=new Date(Math.max(...ts));
+  const fmt=d=>`${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}`;
+  return`${fmt(min)} ~ ${fmt(max)}`;
+}
+function calcDowCounts(rows){
+  const c=[0,0,0,0,0,0,0];
+  rows.forEach(r=>{const d=parseDate(r.createdAt);if(d&&!isNaN(d))c[(d.getDay()+6)%7]++;});
+  return c;
+}
+function calcTop10Tags(rows,soloIds){
+  const counts={};
+  rows.forEach(r=>{
+    const isAlf=soloIds.has(String(r.id||''));
+    if(r.tags==null)return;
+    for(const nt of iterTags(r.tags)){
+      if(!counts[nt])counts[nt]={tag:nt,total:0,alf:0,agent:0};
+      counts[nt].total++;
+      if(isAlf)counts[nt].alf++;else counts[nt].agent++;
+    }
+  });
+  return Object.values(counts).sort((a,b)=>b.total-a.total).slice(0,10);
+}
+function calcSoloTop5(rows,soloIds,prevSoloMap){
+  const counts={};
+  rows.filter(r=>soloIds.has(String(r.id||''))).forEach(r=>{
+    if(r.tags==null)return;
+    for(const nt of iterTags(r.tags))counts[nt]=(counts[nt]||0)+1;
+  });
+  return Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,5)
+    .map(([tag,curr])=>({tag,curr,prev:prevSoloMap[tag]||0}));
+}
+function calcUnresolvedTags(rows,escIds){
+  const counts={};
+  rows.filter(r=>escIds.has(String(r.id||''))).forEach(r=>{
+    if(r.tags==null)return;
+    for(const nt of iterTags(r.tags))counts[nt]=(counts[nt]||0)+1;
+  });
+  return Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,10)
+    .map(([tag,count])=>({tag,count}));
+}
+function calcNoAlfTags(rows,noAlfAgentIds){
+  const counts={};
+  rows.filter(r=>noAlfAgentIds.has(String(r.id||''))).forEach(r=>{
+    if(r.tags==null)return;
+    for(const nt of iterTags(r.tags))counts[nt]=(counts[nt]||0)+1;
+  });
+  return Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,10)
+    .map(([tag,count])=>({tag,count}));
+}
+function calcProdRanking(rows,prevProdMap){
+  const products={'낼나 타이머':0,'디지털':0,'낼나 키링캠':0,'낼나 펜슬':0,'데일리 케이블':0};
+  rows.forEach(r=>{
+    const t=String(r.tags||'');
+    if(t.includes('타이머'))products['낼나 타이머']++;
+    if(t.includes('디지털'))products['디지털']++;
+    if(t.includes('키링캠'))products['낼나 키링캠']++;
+    if(t.includes('낼나펜슬')||t.includes('펜슬'))products['낼나 펜슬']++;
+    if(t.includes('데일리케이블'))products['데일리 케이블']++;
+  });
+  return Object.entries(products)
+    .map(([name,total])=>({name,total,prev:prevProdMap[name]||0,delta:total-(prevProdMap[name]||0)}))
+    .sort((a,b)=>b.total-a.total).slice(0,5);
+}
+function calcExchangeReturn(rows){
+  function md(d){
+    if(d.includes('타이머')&&d.includes('기능정지'))return'타이머-기능정지';
+    if(d.includes('케이블커버'))return'케이블커버';
+    if(d.includes('낼나펜슬')||(d.includes('펜슬')&&!d.includes('케이블')))return'낼나펜슬';
+    if(d.includes('데일리케이블'))return'데일리케이블';
+    return d;
+  }
+  const exc={},ret={};
+  rows.forEach(r=>{
+    String(r.tags||'').split(',').forEach(rawTag=>{
+      const tag=rawTag.trim();
+      if(!tag.includes('교환반품'))return;
+      const parts=tag.split('/');
+      if(parts.length<2)return;
+      const s=parts[1].trim();
+      const detail=parts.length>=3?md(parts[2].trim()):'';
+      if(!detail)return;
+      if(s.includes('맞교환')||(s.includes('교환')&&!s.includes('반품'))||s.includes('미수거재발송'))exc[detail]=(exc[detail]||0)+1;
+      else if(s.includes('반품'))ret[detail]=(ret[detail]||0)+1;
+    });
+  });
+  return[
+    Object.entries(exc).sort((a,b)=>b[1]-a[1]).map(([product,count])=>({product,count})),
+    Object.entries(ret).sort((a,b)=>b[1]-a[1]).map(([product,count])=>({product,count}))
+  ];
+}
+function incTagsVsPrev(currTags,prevTags){
+  const pm=Object.fromEntries(prevTags.map(t=>[t.tag,t.total]));
+  return currTags.filter(t=>t.total>(pm[t.tag]||0))
+    .map(t=>({tag:t.tag,curr:t.total,prev:pm[t.tag]||0,delta:t.total-(pm[t.tag]||0)}))
+    .sort((a,b)=>b.delta-a.delta);
+}
+
+// ── 엑셀 행 → 새 D 객체 ─────────────────────────────────────────────────
+function processExcel(rows,prevD){
+  const clean=rows.filter(r=>!String(r.tags||'').includes('테스트'));
+  const total=clean.length;
+  if(!total)throw new Error('테스트 제외 후 데이터가 없습니다');
+  const soloIds=new Set(),escIds=new Set(),agentIds=new Set(),workflowIds=new Set();
+  let alfCnt=0;
+  clean.forEach(r=>{
+    const id=String(r.id||'');
+    const alfTrig=isTrue(r.alfTriggered);
+    if(alfTrig)alfCnt++;
+    const assigned=hasVal(r.assigneeId)&&String(r.assigneeId).trim()!=='';
+    const gs=String(r.goalState||'');
+    if(gs==='waiting'&&alfTrig&&!assigned)soloIds.add(id);
+    else if(gs==='notAchieved'&&alfTrig&&assigned)escIds.add(id);
+    else if(assigned)agentIds.add(id);
+    else workflowIds.add(id);
+  });
+  const alfSolo=soloIds.size,alfEsc=escIds.size,agentOnly=agentIds.size,workflowOnly=workflowIds.size;
+  const agentRows=clean.filter(r=>agentIds.has(String(r.id||''))||escIds.has(String(r.id||'')));
+  const times=agentRows.map(r=>parseFloat(r.firstMemberHandlingTimeInOperation)).filter(v=>!isNaN(v));
+  const avgMin=times.length?+(times.reduce((a,b)=>a+b,0)/times.length/60).toFixed(1):0;
+  const noAlfRows=clean.filter(r=>!isTrue(r.alfTriggered));
+  const noAlfAgt=noAlfRows.filter(r=>hasVal(r.assigneeId)&&String(r.assigneeId).trim()!=='');
+  const noAlfReopen=noAlfAgt.filter(r=>isTrue(r.reopened)).length;
+  const noAlfAgtIds=new Set(noAlfAgt.map(r=>String(r.id||'')));
+  const prevTotal=prevD.total||0,prevAlfSolo=prevD.alf_solo||0;
+  const prevSoloMap=Object.fromEntries((prevD.curr_solo_top5||[]).map(t=>[t.tag,t.curr]));
+  const prevProdMap=Object.fromEntries((prevD.prod_ranking||[]).map(p=>[p.name,p.total]));
+  const t10=calcTop10Tags(clean,soloIds);
+  const[excProds,retProds]=calcExchangeReturn(clean);
+  return{
+    total,agent_assigned:alfEsc+agentOnly,avg_response_min:avgMin,
+    alf_triggered:alfCnt,alf_solo:alfSolo,alf_escalated:alfEsc,
+    agent_only:agentOnly,workflow_only:workflowOnly,
+    curr_solo_rate:+(alfSolo/total*100).toFixed(1),
+    prev_solo_rate:prevTotal?+(prevAlfSolo/prevTotal*100).toFixed(1):0,
+    prev_total:prevTotal,prev_total_real:prevTotal,prev_alf_solo:prevAlfSolo,
+    curr_dow:calcDowCounts(clean),prev_dow:prevD.curr_dow||[0,0,0,0,0,0,0],
+    top10_tags:t10,alf_unresolved_tags:calcUnresolvedTags(clean,escIds),
+    inc_tags:incTagsVsPrev(t10,prevD.top10_tags||[]),
+    curr_solo_top5:calcSoloTop5(clean,soloIds,prevSoloMap),
+    prev_solo_top5:prevD.curr_solo_top5||[],
+    prod_ranking:calcProdRanking(clean,prevProdMap),
+    curr_dates:calcDateRange(clean),prev_dates:prevD.curr_dates||'-',
+    channelio_solo:alfSolo,channelio_triggered:alfCnt,
+    channelio_rate:alfCnt?+(alfSolo/alfCnt*100).toFixed(1):0,
+    no_alf_direct:noAlfAgt.length-noAlfReopen,no_alf_reopen:noAlfReopen,
+    no_alf_total:noAlfRows.length,no_alf_agent:noAlfAgt.length,
+    no_alf_work:noAlfRows.length-noAlfAgt.length,
+    no_alf_tags:calcNoAlfTags(clean,noAlfAgtIds),
+    exchange_products:excProds,return_products:retProds,
+    mon_top6:[],mon_agent:0,mon_alf_esc:0,mon_direct:0,mon_pct:0,
+    mon_date:'',mon_prev:0,mon_curr:0
+  };
+}
+
+// ── 차트/수치 전체 렌더 ──────────────────────────────────────────────────
+function destroyChart(id){const ch=Chart.getChart(document.getElementById(id));if(ch)ch.destroy();}
+
+function renderProdTable(products){
+  if(!products||!products.length)
+    return'<tr><td colspan="2" style="color:#aaa;text-align:center">데이터 없음</td></tr>';
+  return products.map(p=>`<tr><td>${p.product}</td><td style="text-align:right;font-weight:600">${p.count}건</td></tr>`).join('');
+}
+
+function renderDashboard(d){
+  document.getElementById('pageSub').textContent='금주: '+d.curr_dates+' · 직전주: '+d.prev_dates+' · 테스트 건 제외';
+  document.getElementById('kTot').textContent=d.total;
+  document.getElementById('kTotSub').textContent='테스트 건 제외';
+  document.getElementById('kAgent').textContent=d.agent_assigned;
+  document.getElementById('kAgentSub').textContent='전체의 '+Math.round(d.agent_assigned/d.total*100)+'%';
+  document.getElementById('kAvg').innerHTML=d.avg_response_min+'<span style="font-size:14px;font-weight:400">분</span>';
+  document.getElementById('kSolo').textContent=d.alf_solo;
+  document.getElementById('kSoloSub').textContent='전체의 '+(d.alf_solo/d.total*100).toFixed(1)+'%';
+  document.getElementById('kEsc').textContent=d.alf_escalated;
+  document.getElementById('kEscSub').textContent='전체의 '+(d.alf_escalated/d.total*100).toFixed(1)+'%';
+  document.getElementById('kInvolve').textContent=+(d.alf_triggered/d.total*100).toFixed(1)+'%';
+  document.getElementById('kInvolveSub').textContent=d.alf_triggered+'건 / 전체 '+d.total+'건';
+  const diff=d.total-d.prev_total;
+  const diffEl=document.getElementById('kDiff');
+  diffEl.textContent=(diff>0?'+':'')+diff+'건';
+  diffEl.style.color=diff>0?'#dc2626':diff<0?'#16a34a':'#1a1a1a';
+  document.getElementById('bTotal').textContent=d.total;
+  document.getElementById('bSolo').textContent=d.alf_solo;
+  document.getElementById('bEsc').textContent=d.alf_escalated;
+  document.getElementById('bAgent').textContent=d.agent_only;
+  document.getElementById('bEtc').textContent=d.workflow_only;
+  document.getElementById('bVerify').textContent='✓ '+d.alf_solo+' + '+d.alf_escalated+' + '+d.agent_only+' + '+d.workflow_only+' = '+(d.alf_solo+d.alf_escalated+d.agent_only+d.workflow_only);
+  document.getElementById('alfBadge').textContent=d.alf_escalated+'건';
+  document.getElementById('dowNote').textContent='직전주: '+d.prev_dates+' / 금주: '+d.curr_dates;
+  const dowMax=Math.max(...d.curr_dow,...d.prev_dow)*1.35|0||10;
+  destroyChart('dowChart');
+  new Chart(document.getElementById('dowChart'),{type:'bar',
+    data:{labels:['월','화','수','목','금','토','일'],datasets:[
+      {label:'직전주',data:d.prev_dow,backgroundColor:'#d1d5db',borderRadius:4,
+        datalabels:{anchor:'end',align:'end',color:'#6b7280',font:{size:11,weight:'600'},formatter:v=>v===0?'':v+'건'}},
+      {label:'금주',data:d.curr_dow,backgroundColor:'#3b82f6',borderRadius:4,
+        datalabels:{anchor:'end',align:'end',color:'#1d4ed8',font:{size:11,weight:'600'},formatter:v=>v===0?'':v+'건'}}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'bottom'},tooltip:{callbacks:{label:c=>c.dataset.label+': '+c.parsed.y+'건'}}},
+      scales:{y:{beginAtZero:true,grid:{color:'#f0f0ee'},max:dowMax},x:{grid:{display:false}}}}
+  });
+  const t10=d.top10_tags;
+  destroyChart('tagChart');
+  new Chart(document.getElementById('tagChart'),{type:'bar',
+    data:{labels:t10.map(t=>t.tag),datasets:[
+      {label:'알프',data:t10.map(t=>t.alf),backgroundColor:'#818cf8',borderRadius:3,
+        datalabels:{anchor:'center',align:'center',color:'#fff',font:{size:11,weight:'700'},formatter:v=>v===0?'':v}},
+      {label:'상담원',data:t10.map(t=>t.agent),backgroundColor:'#fb923c',borderRadius:3,
+        datalabels:{labels:{
+          inner:{anchor:'center',align:'center',color:'#fff',font:{size:11,weight:'700'},formatter:v=>v===0?'':v},
+          total:{anchor:'end',align:'end',color:'#333',font:{size:12,weight:'700'},formatter:(v,c)=>t10[c.dataIndex].total+'건'}}}}]},
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,layout:{padding:{right:40}},
+      plugins:{legend:{position:'bottom'},tooltip:{callbacks:{label:c=>c.dataset.label+': '+c.parsed.x+'건'}}},
+      scales:{x:{beginAtZero:true,stacked:true,grid:{color:'#f0f0ee'}},
+        y:{stacked:true,grid:{display:false},ticks:{font:{size:10},color:'#555'}}}}
+  });
+  document.getElementById('prodRankDow').innerHTML=d.prod_ranking.map((p,i)=>{
+    const delta=p.delta,dStr=(delta>0?'+':'')+delta+'건';
+    const dColor=delta>0?'#dc2626':delta<0?'#16a34a':'#888';
+    return`<tr>
+      <td style="color:#aaa">${i+1}위</td>
+      <td style="font-weight:500">${p.name.replace('낼나 ','')}</td>
+      <td style="text-align:right;color:#aaa">${p.prev}건</td>
+      <td style="text-align:right;font-weight:600">${p.total}건</td>
+      <td style="text-align:right;font-weight:600;color:${dColor}">${dStr}</td>
+    </tr>`;
+  }).join('');
+  document.getElementById('exchangeBody').innerHTML=renderProdTable(d.exchange_products||[]);
+  document.getElementById('returnBody').innerHTML=renderProdTable(d.return_products||[]);
+  const prevTR=d.prev_total_real?+(d.prev_alf_solo/d.prev_total_real*100).toFixed(1):0;
+  const currTR=+(d.alf_solo/d.total*100).toFixed(1);
+  document.getElementById('prevAlfPeriod').textContent='('+d.prev_dates+')';
+  document.getElementById('currAlfPeriod').textContent='('+d.curr_dates+')';
+  document.getElementById('prevRate').textContent=prevTR+'%';
+  document.getElementById('currRate').textContent=currTR+'%';
+  document.getElementById('prevAlfDetail').textContent=d.prev_alf_solo+'건 / 전체 '+d.prev_total_real+'건';
+  document.getElementById('currAlfDetail').textContent=d.alf_solo+'건 / 전체 '+d.total+'건';
+  const rd=+(currTR-prevTR).toFixed(1);
+  const diffEl2=document.getElementById('diffBadge');
+  diffEl2.textContent=(rd>0?'+':'')+rd+'%p';
+  diffEl2.style.color=rd>0?'#16a34a':rd<0?'#dc2626':'#888';
+  const cs=d.curr_solo_top5,ps=d.prev_solo_top5;
+  const p5=ps[4]?.tag,c5=cs[4]?.tag;
+  document.getElementById('soloNote').textContent=(p5!==c5)?'* 5위: 직전주 '+p5+'('+(ps[4]?.prev||0)+'건) · 금주 '+c5+'('+(cs[4]?.curr||0)+'건)':'';
+  const soloMax=cs.length?Math.max(...cs.map(t=>Math.max(t.curr,t.prev||0)))*1.4|0:10;
+  destroyChart('soloTagChart');
+  new Chart(document.getElementById('soloTagChart'),{type:'bar',
+    data:{labels:cs.map(t=>t.tag),datasets:[
+      {label:'직전주',data:cs.map(t=>t.prev),backgroundColor:'#d1d5db',borderRadius:4,
+        datalabels:{anchor:'end',align:'top',color:'#6b7280',font:{size:11,weight:'600'},formatter:v=>v===0?'':v+'건'}},
+      {label:'금주',data:cs.map(t=>t.curr),backgroundColor:'#16a34a',borderRadius:4,
+        datalabels:{anchor:'end',align:'top',color:'#15803d',font:{size:11,weight:'600'},formatter:v=>v===0?'':v+'건'}}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:28}},
+      plugins:{legend:{position:'bottom'},tooltip:{callbacks:{label:c=>c.dataset.label+': '+c.parsed.y+'건'}}},
+      scales:{y:{beginAtZero:true,grid:{color:'#f0f0ee'},max:soloMax},x:{grid:{display:false},ticks:{font:{size:11}}}}}
+  });
+  const newItems=cs.filter(t=>t.curr>t.prev).sort((a,b)=>(b.curr-b.prev)-(a.curr-a.prev)).slice(0,3);
+  document.getElementById('soloInsight').textContent='단순문의 증가와 함께 알프가 이전보다 다양한 유형을 잘 처리하고 있습니다.';
+  document.getElementById('soloNewItems').innerHTML=newItems.map(t=>{
+    const delta=t.curr-t.prev,isNew=t.prev===0;
+    return`<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#f0fdf4;border-radius:8px;border-left:3px solid #16a34a">
+      <span style="font-size:12px;color:#333">${t.tag}</span>
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:12px;color:#aaa">${t.prev}건 →</span>
+        <span style="font-size:15px;font-weight:700;color:#16a34a">${t.curr}건</span>
+        <span style="font-size:11px;background:#dcfce7;color:#16a34a;padding:2px 7px;border-radius:10px;font-weight:600">${isNew?'🆕 신규':'+'+delta+'건'}</span>
+      </div>
+    </div>`;
+  }).join('');
+  const aufT=d.alf_unresolved_tags;
+  const unresMax=aufT.length?Math.max(...aufT.map(t=>t.count))*1.4|0:10;
+  destroyChart('alfUnresChart');
+  new Chart(document.getElementById('alfUnresChart'),{type:'bar',
+    data:{labels:aufT.map(t=>t.tag),datasets:[{data:aufT.map(t=>t.count),backgroundColor:'#f87171',borderRadius:3}]},
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},
+        datalabels:{anchor:'end',align:'end',color:'#b91c1c',font:{size:11,weight:'700'},formatter:v=>v+'건'}},
+      scales:{x:{beginAtZero:true,grid:{color:'#f0f0ee'},max:unresMax},y:{grid:{display:false},ticks:{font:{size:10}}}}}
+  });
+}
+
+// ── KPI 목표 차트 (고정 데이터) ──────────────────────────────────────────
+(function(){
+  const isDark=matchMedia('(prefers-color-scheme: dark)').matches;
+  const textC=isDark?'#aaa':'#888';
+  const gridC=isDark?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.06)';
+  const labels=['4월4주','4월5주','5월1주','5월2주','연말목표'];
+  // 통합 최신 주차는 D에서 계산
+  const totInvRate=+(D.alf_triggered/D.total*100).toFixed(1);
+  const totSolRate=+(D.alf_solo/D.alf_triggered*100).toFixed(1);
+  function mkOpts(yMin,yMax){
+    return{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:false},datalabels:{display:false},
+        tooltip:{callbacks:{label:c=>c.parsed.y===null?'':c.dataset.label+': '+c.parsed.y+'%'}}},
+      scales:{
+        x:{ticks:{color:textC,font:{size:11}},grid:{color:gridC}},
+        y:{min:yMin,max:yMax,ticks:{color:textC,font:{size:11},callback:v=>v+'%'},grid:{color:gridC}}}};
+  }
+  new Chart(document.getElementById('kpiChart1'),{type:'line',
+    data:{labels,datasets:[
+      {label:'통합',data:[75.8,77,73.7,totInvRate,null],borderColor:'#999',pointBackgroundColor:'#999',pointRadius:4,tension:0.3,borderWidth:2,fill:false},
+      {label:'채널톡',data:[83.1,86.5,79.7,84.3,null],borderColor:'#7F77DD',pointBackgroundColor:'#7F77DD',pointRadius:4,tension:0.3,borderWidth:2,fill:false},
+      {label:'네이버톡톡',data:[63.6,50,48.5,55.2,null],borderColor:'#1D9E75',pointBackgroundColor:'#1D9E75',pointRadius:4,tension:0.3,borderWidth:2,fill:false},
+      {label:'목표',data:[80,80,80,80,80],borderColor:'#E24B4A',borderDash:[6,4],pointRadius:0,tension:0,borderWidth:1.5,fill:false}
+    ]},options:mkOpts(30,100)});
+  new Chart(document.getElementById('kpiChart2'),{type:'line',
+    data:{labels,datasets:[
+      {label:'통합',data:[73.2,61.5,65.6,totSolRate,null],borderColor:'#999',pointBackgroundColor:'#999',pointRadius:4,tension:0.3,borderWidth:2,fill:false},
+      {label:'채널톡',data:[82.7,61.5,66.4,67.3,null],borderColor:'#7F77DD',pointBackgroundColor:'#7F77DD',pointRadius:4,tension:0.3,borderWidth:2,fill:false},
+      {label:'네이버톡톡',data:[57.1,34.8,50,43.8,null],borderColor:'#1D9E75',pointBackgroundColor:'#1D9E75',pointRadius:4,tension:0.3,borderWidth:2,fill:false},
+      {label:'목표',data:[65,65,65,65,65],borderColor:'#E24B4A',borderDash:[6,4],pointRadius:0,tension:0,borderWidth:1.5,fill:false}
+    ]},options:mkOpts(20,95)});
+})();
+
+// ── 파일 업로드 ─────────────────────────────────────────────────────────
+document.getElementById('xlsxInput').addEventListener('change',function(e){
+  const file=e.target.files[0];
+  if(!file)return;
+  const status=document.getElementById('uploadStatus');
+  const btn=document.getElementById('uploadBtn');
+  status.textContent='처리 중...';
+  status.style.color='#888';
+  btn.disabled=true;
+  const reader=new FileReader();
+  reader.onload=function(ev){
+    try{
+      const wb=XLSX.read(ev.target.result,{type:'array',cellDates:true});
+      const ws=wb.Sheets[wb.SheetNames[0]];
+      const rows=XLSX.utils.sheet_to_json(ws,{defval:''});
+      if(!rows.length)throw new Error('데이터가 없습니다');
+      const newD=processExcel(rows,D);
+      renderDashboard(newD);
+      status.textContent='✓ '+file.name;
+      status.style.color='#16a34a';
+    }catch(err){
+      status.textContent='오류: '+err.message;
+      status.style.color='#dc2626';
+    }finally{
+      btn.disabled=false;
+      e.target.value='';
+    }
+  };
+  reader.onerror=function(){
+    status.textContent='파일 읽기 실패';
+    status.style.color='#dc2626';
+    btn.disabled=false;
+    e.target.value='';
+  };
+  reader.readAsArrayBuffer(file);
+});
+
+// 초기 렌더
+renderDashboard(D);
+
+// 메모
+document.getElementById('memoArea').addEventListener('input',function(){
+  document.getElementById('memoCount').textContent=this.value.length+'자';
+});
+
+</script>
+</body>
+</html>
