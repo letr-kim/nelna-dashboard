@@ -43,29 +43,84 @@ body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#f5
 .tbl td{padding:9px 10px;border-bottom:0.5px solid #f0f0ee;color:#333;line-height:1.4}
 .tbl tr:last-child td{border-bottom:none}
 .tbl tr:hover td{background:#fafaf8}
-.upload-btn{background:#fff;border:0.5px solid #e5e5e0;border-radius:8px;padding:7px 12px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;font-size:12px;color:#555;font-family:inherit;line-height:1}
-.upload-btn:hover{background:#f5f5f2;border-color:#c8c8c3}
-.upload-btn:disabled{opacity:.6;cursor:not-allowed}
-.upload-status{font-size:11px;color:#888;margin-top:5px;text-align:right;min-height:14px}
 @media(max-width:700px){.kpi-row{grid-template-columns:1fr 1fr}.grid-2{grid-template-columns:1fr}}
+.upload-btn{position:fixed;top:20px;right:24px;z-index:100;display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #e5e5e0;border-radius:10px;padding:8px 14px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.08);font-size:13px;color:#555;transition:all 0.2s}
+.upload-btn:hover{background:#f5f5f2;border-color:#ccc}
+.upload-btn svg{width:18px;height:18px;color:#7c3aed}
+.week-select-wrap{position:fixed;top:20px;right:200px;z-index:100}
+.week-select{background:#fff;border:1px solid #e5e5e0;border-radius:10px;padding:8px 14px;font-size:13px;color:#555;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.08);outline:none;appearance:none;padding-right:28px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
+.upload-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:200;align-items:center;justify-content:center}
+.upload-overlay.show{display:flex}
+.upload-modal{background:#fff;border-radius:16px;padding:32px;width:480px;max-width:90vw;text-align:center}
+.upload-modal h3{font-size:17px;font-weight:600;margin-bottom:8px}
+.upload-modal p{font-size:13px;color:#888;margin-bottom:24px;line-height:1.6}
+.upload-drop{border:2px dashed #d1d5db;border-radius:12px;padding:40px 20px;cursor:pointer;transition:all 0.2s}
+.upload-drop:hover,.upload-drop.drag{border-color:#7c3aed;background:#f8f7ff}
+.upload-drop svg{width:40px;height:40px;color:#7c3aed;margin:0 auto 12px}
+.upload-drop p{font-size:13px;color:#888}
+.upload-drop strong{color:#7c3aed}
+.upload-progress{display:none;margin-top:16px;font-size:13px;color:#7c3aed}
+.upload-close{margin-top:20px;background:none;border:0.5px solid #e0e0db;border-radius:8px;padding:8px 20px;cursor:pointer;font-size:13px;color:#888}
+.token-modal{background:#fff;border-radius:16px;padding:32px;width:440px;max-width:90vw}
+.token-modal h3{font-size:17px;font-weight:600;margin-bottom:8px}
+.token-modal p{font-size:13px;color:#888;margin-bottom:20px;line-height:1.6}
+.token-input{width:100%;border:1px solid #e5e5e0;border-radius:8px;padding:10px 14px;font-size:13px;outline:none;margin-bottom:12px}
+.token-input:focus{border-color:#7c3aed}
+.token-save{width:100%;background:#7c3aed;color:#fff;border:none;border-radius:8px;padding:11px;font-size:14px;font-weight:600;cursor:pointer}
+.token-save:hover{background:#6d28d9}
+
 </style>
 </head>
 <body>
+<!-- 주차 선택 드롭다운 -->
+<div class="week-select-wrap">
+  <select class="week-select" id="weekSelect" onchange="loadWeekData(this.value)">
+    <option value="">📅 주차 선택</option>
+  </select>
+</div>
+
+<!-- 업로드 버튼 -->
+<button class="upload-btn" onclick="checkTokenAndUpload()">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+  엑셀 업로드
+</button>
+
+<!-- GitHub Token 입력 모달 -->
+<div class="upload-overlay" id="tokenOverlay">
+  <div class="token-modal">
+    <h3>🔑 GitHub 연동 설정</h3>
+    <p>엑셀 업로드 후 데이터를 GitHub에 자동 저장하려면<br>Personal Access Token이 필요해요.<br><span style="color:#aaa;font-size:12px">토큰은 이 기기 브라우저에만 저장되며 외부에 노출되지 않아요.</span></p>
+    <input class="token-input" id="tokenInput" type="password" placeholder="ghp_xxxxxxxxxxxx">
+    <button class="token-save" onclick="saveToken()">저장하고 계속하기</button>
+    <div style="margin-top:10px">
+      <button class="upload-close" onclick="document.getElementById('tokenOverlay').classList.remove('show');document.getElementById('uploadOverlay').classList.add('show')">토큰 없이 업로드만 하기</button>
+    </div>
+  </div>
+</div>
+
+<!-- 업로드 모달 -->
+<div class="upload-overlay" id="uploadOverlay">
+  <div class="upload-modal">
+    <h3>📊 금주 데이터 업로드</h3>
+    <p>전체상담건 엑셀 파일(.xlsx) 1개를 업로드하면<br>대시보드가 자동으로 업데이트됩니다.</p>
+    <div class="upload-drop" id="uploadDrop" onclick="document.getElementById('fileInput').click()"
+      ondragover="event.preventDefault();this.classList.add('drag')"
+      ondragleave="this.classList.remove('drag')"
+      ondrop="event.preventDefault();this.classList.remove('drag');handleFile(event.dataTransfer.files[0])">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+      <p><strong>클릭하거나 파일을 드래그</strong>하세요<br>전체상담건_닉네임삭제.xlsx</p>
+    </div>
+    <input type="file" id="fileInput" accept=".xlsx" style="display:none" onchange="handleFile(this.files[0])">
+    <div class="upload-progress" id="uploadProgress">⏳ 데이터 처리 중...</div>
+    <button class="upload-close" onclick="document.getElementById('uploadOverlay').classList.remove('show')">닫기</button>
+  </div>
+</div>
+
 <div class="page">
 
-<div class="page-header" style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px">
-  <div>
-    <div class="page-title">📊 상담 인입 분석 대시보드</div>
-    <div class="page-sub" id="pageSub"></div>
-  </div>
-  <div style="flex-shrink:0;padding-top:2px">
-    <input type="file" id="xlsxInput" accept=".xlsx" style="display:none">
-    <button id="uploadBtn" class="upload-btn" onclick="document.getElementById('xlsxInput').click()">
-      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-      엑셀 업로드
-    </button>
-    <div class="upload-status" id="uploadStatus"></div>
-  </div>
+<div class="page-header">
+  <div class="page-title">📊 상담 인입 분석 대시보드</div>
+  <div class="page-sub" id="pageSub"></div>
 </div>
 
 <!-- ① KPI -->
@@ -180,64 +235,63 @@ body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#f5
   </div>
 </div>
 
-<!-- ⑤ 알프 미해결 분석 -->
+<!-- ⑤ 알프 미관여 분석 -->
+<div class="section">
+  <div class="section-title">알프 미관여 분석 <span class="badge">23건</span></div>
+  <div class="def-box">
+    알프가 관여하지 못한 건은 총 <strong>23건</strong>으로, <strong>상담원 배정 20건</strong>과 <strong>문의 미진행 3건</strong>으로 나뉩니다.<br>
+    알프 개입 없이 바로 1:1 상담으로 시작된 케이스로, 재오픈 상담·외부 채널 유입·수동 배정 등이 주요 원인입니다.
+  </div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">상담원 배정 20건 · 태그 TOP10</div>
+      <table class="tbl">
+        <thead><tr><th>태그</th><th style="text-align:right">건수</th></tr></thead>
+        <tbody id="noAlfTagsBody"></tbody>
+      </table>
+    </div>
+    <div class="card">
+      <div class="card-title">💡 알프 미관여 주요 원인</div>
+      <div style="display:flex;flex-direction:column;gap:10px;font-size:12px;color:#555;line-height:1.8">
+        <div style="padding:10px 14px;background:#fafaf8;border-radius:8px;border-left:3px solid #6366f1">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+            <span style="font-weight:600;color:#1a1a1a">상담원 직접 연결</span>
+            <span style="font-weight:700;color:#6366f1">16건</span>
+          </div>
+          처음부터 알프 워크플로우 없이 상담원으로 바로 연결된 케이스 (외부 채널 유입 포함 가능)
+        </div>
+        <div style="padding:10px 14px;background:#fafaf8;border-radius:8px;border-left:3px solid #d97706">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+            <span style="font-weight:600;color:#1a1a1a">재오픈 상담</span>
+            <span style="font-weight:700;color:#d97706">3건</span>
+          </div>
+          이전 종료 상담을 고객이 다시 열면 알프를 거치지 않고 상담원에게 바로 연결
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ⑥ 알프 미해결 분석 -->
 <div class="section">
   <div class="section-title">알프 미해결 분석 <span class="badge" id="alfBadge"></span></div>
   <div class="def-box"><strong>기준:</strong> 알프가 응대하다가 상담원이 배정된 상담 전체</div>
   <div class="card"><div class="card-title">이관 사유 태그 TOP 10</div><div class="chart-wrap-md"><canvas id="alfUnresChart"></canvas></div></div>
 </div>
 
-<!-- ⑧ 2026 KPI 목표 비교 -->
+<!-- ⑦ 3주 합산 채널별 알프 지표 -->
 <div class="section">
-  <div class="section-title">2026 KPI 목표 비교 <span class="badge">채널별 · 3주 합산 기준</span></div>
-
-
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
-    <div class="card">
-      <div class="card-title">관여율 추이 & 목표</div>
-      <div style="display:flex;align-items:center;gap:14px;margin-bottom:12px;font-size:11px;color:#888;flex-wrap:wrap">
-        <span style="display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:10px;height:3px;background:#999;border-radius:2px"></span>통합</span>
-        <span style="display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:10px;height:3px;background:#7F77DD;border-radius:2px"></span>채널톡</span>
-        <span style="display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:10px;height:3px;background:#1D9E75;border-radius:2px"></span>네이버톡톡</span>
-        <span style="display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:14px;border-top:2px dashed #E24B4A"></span>목표 80%</span>
-      </div>
-      <div style="position:relative;width:100%;height:220px"><canvas id="kpiChart1"></canvas></div>
-    </div>
-    <div class="card">
-      <div class="card-title">관여대비해결율 추이 & 목표</div>
-      <div style="display:flex;align-items:center;gap:14px;margin-bottom:12px;font-size:11px;color:#888;flex-wrap:wrap">
-        <span style="display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:10px;height:3px;background:#999;border-radius:2px"></span>통합</span>
-        <span style="display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:10px;height:3px;background:#7F77DD;border-radius:2px"></span>채널톡</span>
-        <span style="display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:10px;height:3px;background:#1D9E75;border-radius:2px"></span>네이버톡톡</span>
-        <span style="display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:14px;border-top:2px dashed #E24B4A"></span>목표 65%</span>
-      </div>
-      <div style="position:relative;width:100%;height:220px"><canvas id="kpiChart2"></canvas></div>
-    </div>
-  </div>
-  <div style="margin-top:20px">
-    <div style="font-size:12px;font-weight:600;color:#666;margin-bottom:12px;text-transform:uppercase;letter-spacing:.05em">채널별 알프 지표 <span style="font-size:11px;font-weight:500;padding:2px 8px;border-radius:10px;background:#f0f0ed;color:#666;text-transform:none;letter-spacing:0">3주 합산 · 04/18~05/08</span></div>
-  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px">
-    <div class="card">
-      <div class="card-title">통합</div>
-      <table class="tbl">
-        <thead><tr><th>주차</th><th style="text-align:right">총인입</th><th style="text-align:right">관여율</th><th style="text-align:right">단독해결율</th><th style="text-align:right">관여대비해결율</th></tr></thead>
-        <tbody>
-          <tr><td>04/18~04/24</td><td style="text-align:right;color:#aaa">255건</td><td style="text-align:right">72.2%</td><td style="text-align:right">42.0%</td><td style="text-align:right">58.2%</td></tr>
-          <tr><td>04/25~05/01</td><td style="text-align:right;color:#aaa">171건</td><td style="text-align:right">73.7%</td><td style="text-align:right">47.4%</td><td style="text-align:right">64.3%</td></tr>
-          <tr><td>05/02~05/08</td><td style="text-align:right;color:#aaa">114건</td><td style="text-align:right">79.8%</td><td style="text-align:right">41.2%</td><td style="text-align:right">51.6%</td></tr>
-          <tr style="border-top:1.5px solid #e5e5e0;font-weight:600"><td>3주 합산</td><td style="text-align:right;color:#aaa">540건</td><td style="text-align:right;color:#3b82f6">74.3%</td><td style="text-align:right;color:#3b82f6">43.5%</td><td style="text-align:right;color:#3b82f6">58.6%</td></tr>
-        </tbody>
-      </table>
-    </div>
+  <div class="section-title">채널별 알프 지표 <span class="badge">3주 합산 · 04/18~05/08</span></div>
+  <div class="grid-2">
     <div class="card">
       <div class="card-title">채널톡</div>
       <table class="tbl">
         <thead><tr><th>주차</th><th style="text-align:right">총인입</th><th style="text-align:right">관여율</th><th style="text-align:right">단독해결율</th><th style="text-align:right">관여대비해결율</th></tr></thead>
         <tbody>
-          <tr><td>04/18~04/24</td><td style="text-align:right;color:#aaa">209건</td><td style="text-align:right">77.0%</td><td style="text-align:right">47.4%</td><td style="text-align:right">61.5%</td></tr>
           <tr><td>04/25~05/01</td><td style="text-align:right;color:#aaa">138건</td><td style="text-align:right">79.7%</td><td style="text-align:right">52.9%</td><td style="text-align:right">66.4%</td></tr>
           <tr><td>05/02~05/08</td><td style="text-align:right;color:#aaa">89건</td><td style="text-align:right">86.5%</td><td style="text-align:right">47.2%</td><td style="text-align:right">54.5%</td></tr>
-          <tr style="border-top:1.5px solid #e5e5e0;font-weight:600"><td>3주 합산</td><td style="text-align:right;color:#aaa">436건</td><td style="text-align:right;color:#3b82f6">79.8%</td><td style="text-align:right;color:#3b82f6">49.1%</td><td style="text-align:right;color:#3b82f6">61.5%</td></tr>
+          <tr><td>05/09~05/15</td><td style="text-align:right;color:#aaa">127건</td><td style="text-align:right">84.3%</td><td style="text-align:right">56.7%</td><td style="text-align:right">67.3%</td></tr>
+          <tr style="border-top:1.5px solid #e5e5e0;font-weight:600"><td>3주 합산</td><td style="text-align:right;color:#aaa">354건</td><td style="text-align:right;color:#3b82f6">83.1%</td><td style="text-align:right;color:#3b82f6">52.5%</td><td style="text-align:right;color:#3b82f6">63.2%</td></tr>
         </tbody>
       </table>
     </div>
@@ -246,15 +300,106 @@ body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#f5
       <table class="tbl">
         <thead><tr><th>주차</th><th style="text-align:right">총인입</th><th style="text-align:right">관여율</th><th style="text-align:right">단독해결율</th><th style="text-align:right">관여대비해결율</th></tr></thead>
         <tbody>
-          <tr><td>04/18~04/24</td><td style="text-align:right;color:#aaa">46건</td><td style="text-align:right">50.0%</td><td style="text-align:right">17.4%</td><td style="text-align:right">34.8%</td></tr>
           <tr><td>04/25~05/01</td><td style="text-align:right;color:#aaa">33건</td><td style="text-align:right">48.5%</td><td style="text-align:right">24.2%</td><td style="text-align:right">50.0%</td></tr>
           <tr><td>05/02~05/08</td><td style="text-align:right;color:#aaa">25건</td><td style="text-align:right">56.0%</td><td style="text-align:right">20.0%</td><td style="text-align:right">35.7%</td></tr>
-          <tr style="border-top:1.5px solid #e5e5e0;font-weight:600"><td>3주 합산</td><td style="text-align:right;color:#aaa">104건</td><td style="text-align:right;color:#3b82f6">51.0%</td><td style="text-align:right;color:#3b82f6">20.2%</td><td style="text-align:right;color:#3b82f6">39.6%</td></tr>
+          <tr><td>05/09~05/15</td><td style="text-align:right;color:#aaa">29건</td><td style="text-align:right">55.2%</td><td style="text-align:right">24.1%</td><td style="text-align:right">43.8%</td></tr>
+          <tr style="border-top:1.5px solid #e5e5e0;font-weight:600"><td>3주 합산</td><td style="text-align:right;color:#aaa">87건</td><td style="text-align:right;color:#3b82f6">52.9%</td><td style="text-align:right;color:#3b82f6">22.9%</td><td style="text-align:right;color:#3b82f6">43.5%</td></tr>
         </tbody>
       </table>
     </div>
   </div>
 </div>
+
+<!-- ⑧ 2026 KPI 목표 비교 -->
+<div class="section">
+  <div class="section-title">2026 KPI 목표 비교 <span class="badge">채널별 · 3주 합산 기준</span></div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px">
+    <div style="background:#f5f5f2;border-radius:8px;padding:14px;text-align:center">
+      <div style="font-size:11px;color:#888;margin-bottom:4px">전체 상담건</div>
+      <div style="font-size:22px;font-weight:600;color:#1a1a1a">540건</div>
+      <div style="font-size:11px;color:#aaa;margin-top:2px">04/25 ~ 05/15 (3주)</div>
+    </div>
+    <div style="background:#f5f5f2;border-radius:8px;padding:14px;text-align:center">
+      <div style="font-size:11px;color:#888;margin-bottom:4px">채널톡 관여율</div>
+      <div style="font-size:22px;font-weight:600;color:#1a1a1a">83.1%</div>
+      <div style="font-size:11px;color:#aaa;margin-top:2px">294 / 354건</div>
+    </div>
+    <div style="background:#f5f5f2;border-radius:8px;padding:14px;text-align:center">
+      <div style="font-size:11px;color:#888;margin-bottom:4px">채널톡 관여대비해결율</div>
+      <div style="font-size:22px;font-weight:600;color:#1a1a1a">63.2%</div>
+      <div style="font-size:11px;color:#aaa;margin-top:2px">224 / 354건 (관여건 대비)</div>
+    </div>
+    <div style="background:#f5f5f2;border-radius:8px;padding:14px;text-align:center">
+      <div style="font-size:11px;color:#888;margin-bottom:4px">네이버톡톡 관여율</div>
+      <div style="font-size:22px;font-weight:600;color:#1a1a1a">52.9%</div>
+      <div style="font-size:11px;color:#aaa;margin-top:2px">46 / 87건</div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+    <div class="card">
+      <div class="card-title">채널톡 — 관여대비해결율 추이 & 목표</div>
+      <div style="font-size:11px;color:#aaa;margin-bottom:8px">관여건 대비 알프 해결율</div>
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:10px;font-size:11px;color:#888">
+        <span style="display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:10px;height:3px;background:#378ADD;border-radius:2px"></span>실제</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:14px;border-top:2px dashed #E24B4A"></span>목표 70%</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;margin-bottom:6px;padding:0 4px">
+        <div style="text-align:center">
+          <div style="font-size:18px;font-weight:500;color:#378ADD">82.7%</div>
+          <div style="font-size:10px;color:#aaa">4월 4주</div>
+        </div>
+        <div style="text-align:center">
+          <div style="font-size:18px;font-weight:500;color:#378ADD">61.5%</div>
+          <div style="font-size:10px;color:#aaa">4월 5주</div>
+        </div>
+        <div style="text-align:center">
+          <div style="font-size:18px;font-weight:500;color:#378ADD">54.5%</div>
+          <div style="font-size:10px;color:#aaa">5월 1주</div>
+        </div>
+        <div style="text-align:center">
+          <div style="font-size:18px;font-weight:500;color:#378ADD">67.3%</div>
+          <div style="font-size:10px;color:#aaa">5월 2주</div>
+        </div>
+        <div style="text-align:center">
+          <div style="font-size:18px;font-weight:500;color:#E24B4A">70%</div>
+          <div style="font-size:10px;color:#aaa">연말 목표</div>
+        </div>
+      </div>
+      <div style="position:relative;width:100%;height:200px"><canvas id="kpiChart1" role="img" aria-label="채널톡 관여대비해결율: 4월5주 61.5%, 5월1주 54.5%, 목표 70%">채널톡 관여대비해결율 추이</canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">네이버톡톡 — 관여율 & 관여대비해결율 추이 & 목표</div>
+      <div style="font-size:11px;color:#aaa;margin-bottom:8px">관여율 목표 65% / 관여대비해결율 목표 55%</div>
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:10px;font-size:11px;color:#888">
+        <span style="display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:10px;height:3px;background:#1D9E75;border-radius:2px"></span>관여율</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:10px;height:3px;background:#7F77DD;border-radius:2px"></span>관여대비해결율</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:14px;border-top:2px dashed #E24B4A"></span>목표</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;gap:4px;margin-bottom:6px;padding:0 4px">
+        <div style="text-align:center">
+          <div style="font-size:11px;font-weight:500;color:#1D9E75">관여 63.6% / 해결 57.1%</div>
+          <div style="font-size:10px;color:#aaa">4월 4주</div>
+        </div>
+        <div style="text-align:center">
+          <div style="font-size:11px;font-weight:500;color:#1D9E75">관여 50% / 해결 34.8%</div>
+          <div style="font-size:10px;color:#aaa">4월 5주</div>
+        </div>
+        <div style="text-align:center">
+          <div style="font-size:11px;font-weight:500;color:#1D9E75">관여 56% / 해결 35.7%</div>
+          <div style="font-size:10px;color:#aaa">5월 1주</div>
+        </div>
+        <div style="text-align:center">
+          <div style="font-size:11px;font-weight:500;color:#1D9E75">관여 55.2% / 해결 43.8%</div>
+          <div style="font-size:10px;color:#aaa">5월 2주</div>
+        </div>
+        <div style="text-align:center">
+          <div style="font-size:11px;font-weight:500;color:#E24B4A">관여 65% / 해결 55%</div>
+          <div style="font-size:10px;color:#aaa">연말 목표</div>
+        </div>
+      </div>
+      <div style="position:relative;width:100%;height:200px"><canvas id="kpiChart2" role="img" aria-label="네이버톡톡 관여율/관여대비해결율 추이와 목표">네이버톡톡 추이</canvas></div>
+    </div>
   </div>
 </div>
 
@@ -273,420 +418,283 @@ body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#f5
   </div>
 </div>
 
-</div><script>
+</div>
+<script>
 Chart.register(ChartDataLabels);
 Chart.defaults.font.family="'Apple SD Gothic Neo','Malgun Gothic',sans-serif";
 Chart.defaults.font.size=12;Chart.defaults.color='#666';
-const D={"total":156,"agent_assigned":66,"avg_response_min":25.8,"alf_triggered":123,"alf_solo":79,"alf_escalated":43,"agent_only":23,"workflow_only":11,"curr_solo_rate":50.6,"prev_solo_rate":40.4,"prev_total":114,"prev_total_real":114,"prev_alf_solo":46,"curr_dow":[25,33,24,25,28,11,10],"prev_dow":[20,10,25,20,24,4,11],"top10_tags":[{"tag":"디지털/사용문의/가계부","total":21,"alf":15,"agent":6},{"tag":"교환","total":13,"alf":0,"agent":13},{"tag":"실물/제품문의/필름","total":10,"alf":10,"agent":0},{"tag":"실물/제품문의/입고품절","total":7,"alf":3,"agent":4},{"tag":"실물/이상주장/타이머","total":7,"alf":4,"agent":3},{"tag":"디지털/오류문의/가계부","total":6,"alf":2,"agent":4},{"tag":"결제/결제문의/기타","total":6,"alf":6,"agent":0},{"tag":"와디즈","total":5,"alf":0,"agent":5},{"tag":"실물/이상주장/키링캠","total":4,"alf":0,"agent":4},{"tag":"반품","total":4,"alf":0,"agent":4}],"alf_unresolved_tags":[{"tag":"디지털/사용문의/가계부","count":5},{"tag":"교환","count":5},{"tag":"실물/이상주장/키링캠","count":4},{"tag":"반품","count":4},{"tag":"미수거재발송","count":4},{"tag":"디지털/오류문의/가계부","count":3},{"tag":"와디즈","count":3},{"tag":"실물/이상주장/타이머","count":3},{"tag":"실물/이상주장/낼나펜슬","count":2},{"tag":"실물/제품문의/입고품절","count":2}],"inc_tags":[{"tag":"디지털/사용문의/가계부","curr":21,"prev":11,"delta":10},{"tag":"실물/제품문의/필름","curr":10,"prev":2,"delta":8},{"tag":"결제/결제문의/기타","curr":6,"prev":1,"delta":5},{"tag":"와디즈","curr":5,"prev":0,"delta":5},{"tag":"디지털/오류문의/가계부","curr":6,"prev":3,"delta":3},{"tag":"실물/이상주장/키링캠","curr":4,"prev":1,"delta":3},{"tag":"미수거재발송","curr":5,"prev":3,"delta":2},{"tag":"실물/제품문의/입고품절","curr":7,"prev":6,"delta":1}],"curr_solo_top5":[{"tag":"디지털/사용문의/가계부","curr":15,"prev":7},{"tag":"실물/제품문의/필름","curr":10,"prev":1},{"tag":"결제/결제문의/기타","curr":6,"prev":1},{"tag":"실물/이상주장/타이머","curr":4,"prev":5},{"tag":"배송/배송문의/일정문의","curr":3,"prev":0}],"prev_solo_top5":[{"tag":"디지털/사용문의/가계부","curr":7,"prev":7},{"tag":"실물/제품문의/입고품절","curr":5,"prev":5},{"tag":"실물/이상주장/타이머","curr":5,"prev":5},{"tag":"예스24","curr":2,"prev":2},{"tag":"쿠폰/사용문의/다운로드","curr":2,"prev":2}],"prod_ranking":[{"name":"디지털","total":31,"prev":19,"delta":12},{"name":"낼나 타이머","total":16,"prev":20,"delta":-4},{"name":"낼나 키링캠","total":9,"prev":9,"delta":0},{"name":"낼나 펜슬","total":7,"prev":5,"delta":2},{"name":"데일리 케이블","total":2,"prev":2,"delta":0}],"curr_dates":"05/07 ~ 05/15","prev_dates":"05/02 ~ 05/08","channelio_solo":79,"channelio_triggered":123,"channelio_rate":64.2,"no_alf_direct":19,"no_alf_reopen":3,"no_alf_total":33,"no_alf_agent":22,"no_alf_work":11,"no_alf_tags":[{"tag":"교환","count":4},{"tag":"와디즈","count":2},{"tag":"고객반품/교환/고객사유","count":2},{"tag":"실물/제품문의/입고품절","count":2},{"tag":"취소문의","count":2},{"tag":"배송/배송문의/누락오배송(구성품누락)","count":1},{"tag":"배송/배송문의/합배송","count":1},{"tag":"실물/제품문의/키링캠","count":1},{"tag":"실물/이상주장/기타","count":1},{"tag":"철회","count":1}],"exchange_products":[{"product":"타이머-기능정지","count":4},{"product":"타이머버터-외관부품","count":1},{"product":"낼나펜슬","count":1},{"product":"타이머클래식-기능사운드","count":1},{"product":"필름(와디즈)","count":1}],"return_products":[{"product":"케이블스트랩세트","count":1},{"product":"키링캠","count":1}],"mon_top6":[],"mon_agent":0,"mon_alf_esc":0,"mon_direct":0,"mon_pct":0,"mon_date":"","mon_prev":0,"mon_curr":0};
+const D={"total": 156, "agent_assigned": 66, "avg_response_min": 25.8, "alf_triggered": 123, "alf_solo": 79, "alf_escalated": 43, "agent_only": 23, "workflow_only": 11, "curr_solo_rate": 50.6, "prev_solo_rate": 40.4, "prev_total": 114, "prev_total_real": 114, "prev_alf_solo": 46, "curr_dow": [25, 33, 24, 25, 28, 11, 10], "prev_dow": [20, 10, 25, 20, 24, 4, 11], "top10_tags": [{"tag": "디지털/사용문의/가계부", "total": 21, "alf": 15, "agent": 6}, {"tag": "실물/제품문의/필름", "total": 10, "alf": 10, "agent": 0}, {"tag": "교환", "total": 8, "alf": 0, "agent": 8}, {"tag": "실물/제품문의/입고품절", "total": 7, "alf": 3, "agent": 4}, {"tag": "실물/이상주장/타이머", "total": 7, "alf": 4, "agent": 3}, {"tag": "디지털/오류문의/가계부", "total": 6, "alf": 2, "agent": 4}, {"tag": "결제/결제문의/기타", "total": 6, "alf": 6, "agent": 0}, {"tag": "와디즈", "total": 5, "alf": 0, "agent": 5}, {"tag": "미수거재발송", "total": 5, "alf": 0, "agent": 5}, {"tag": "실물/이상주장/키링캠", "total": 4, "alf": 0, "agent": 4}], "alf_unresolved_tags": [{"tag": "디지털/사용문의/가계부", "count": 5}, {"tag": "교환", "count": 5}, {"tag": "실물/이상주장/키링캠", "count": 4}, {"tag": "반품", "count": 4}, {"tag": "미수거재발송", "count": 4}, {"tag": "디지털/오류문의/가계부", "count": 3}, {"tag": "와디즈", "count": 3}, {"tag": "실물/이상주장/타이머", "count": 3}, {"tag": "실물/이상주장/낼나펜슬", "count": 2}, {"tag": "실물/제품문의/입고품절", "count": 2}], "inc_tags": [{"tag": "디지털/사용문의/가계부", "curr": 21, "prev": 11, "delta": 10}, {"tag": "실물/제품문의/필름", "curr": 10, "prev": 2, "delta": 8}, {"tag": "디지털/오류문의/가계부", "curr": 6, "prev": 3, "delta": 3}, {"tag": "결제/결제문의/기타", "curr": 6, "prev": 1, "delta": 5}, {"tag": "와디즈", "curr": 5, "prev": 0, "delta": 5}, {"tag": "미수거재발송", "curr": 5, "prev": 3, "delta": 2}, {"tag": "실물/이상주장/키링캠", "curr": 4, "prev": 1, "delta": 3}, {"tag": "실물/제품문의/입고품절", "curr": 7, "prev": 6, "delta": 1}], "curr_solo_top5": [{"tag": "디지털/사용문의/가계부", "curr": 15, "prev": 7}, {"tag": "실물/제품문의/필름", "curr": 10, "prev": 1}, {"tag": "결제/결제문의/기타", "curr": 6, "prev": 1}, {"tag": "실물/이상주장/타이머", "curr": 4, "prev": 5}, {"tag": "배송/배송문의/일정문의", "curr": 3, "prev": 0}], "prev_solo_top5": [{"tag": "디지털/사용문의/가계부", "curr": 15, "prev": 7}, {"tag": "실물/제품문의/필름", "curr": 10, "prev": 0}, {"tag": "결제/결제문의/기타", "curr": 6, "prev": 0}, {"tag": "실물/이상주장/타이머", "curr": 4, "prev": 5}, {"tag": "배송/배송문의/일정문의", "curr": 3, "prev": 0}], "prod_ranking": [{"name": "디지털", "total": 31, "prev": 19, "curr_pct": 19.9, "prev_pct": 16.7, "delta": 12}, {"name": "낼나 타이머", "total": 16, "prev": 20, "curr_pct": 10.3, "prev_pct": 17.5, "delta": -4}, {"name": "낼나 키링캠", "total": 9, "prev": 9, "curr_pct": 5.8, "prev_pct": 7.9, "delta": 0}, {"name": "낼나 펜슬", "total": 7, "prev": 5, "curr_pct": 4.5, "prev_pct": 4.4, "delta": 2}, {"name": "데일리 케이블", "total": 2, "prev": 2, "curr_pct": 1.3, "prev_pct": 1.8, "delta": 0}], "curr_dates": "05/09 ~ 05/15", "prev_dates": "05/02 ~ 05/08", "channelio_solo": 72, "channelio_triggered": 107, "channelio_rate": 67.3, "mon_top6": [], "mon_agent": 0, "mon_alf_esc": 0, "mon_direct": 0, "mon_pct": 0, "mon_date": "", "mon_prev": 0, "mon_curr": 0, "no_alf_direct": 16, "no_alf_reopen": 3, "no_alf_total": 33, "no_alf_agent": 22, "no_alf_work": 11, "no_alf_tags": [{"tag": "교환", "count": 5}, {"tag": "와디즈", "count": 2}, {"tag": "실물/제품문의/입고품절", "count": 2}, {"tag": "취소문의", "count": 2}, {"tag": "배송/배송문의/누락오배송", "count": 1}, {"tag": "배송/배송문의/합배송", "count": 1}, {"tag": "배송/배송문의/일정문의", "count": 1}, {"tag": "미수거재발송", "count": 1}, {"tag": "실물/이상주장/기타", "count": 1}, {"tag": "철회", "count": 1}, {"tag": "디지털/오류문의/가계부", "count": 1}], "exchange_products": [{"product": "타이머-기능정지", "count": 4}, {"product": "타이머버터-외관부품", "count": 1}, {"product": "낼나펜슬", "count": 1}, {"product": "타이머클래식-기능사운드", "count": 1}, {"product": "필름(와디즈)", "count": 1}], "return_products": [{"product": "케이블스트랩세트", "count": 1}, {"product": "키링캠", "count": 1}]};
 
-// ── 집계 헬퍼 (process.py 미러) ──────────────────────────────────────────
+// ─── GitHub 설정 ─────────────────────────────────────────────────────────────
+const GH_OWNER='letr-kim', GH_REPO='nelna-dashboard', GH_BRANCH='main';
+function getToken(){return localStorage.getItem('gh_token');}
+function saveToken(){
+  const t=document.getElementById('tokenInput').value.trim();
+  if(!t)return alert('토큰을 입력해주세요.');
+  localStorage.setItem('gh_token',t);
+  document.getElementById('tokenOverlay').classList.remove('show');
+  document.getElementById('uploadOverlay').classList.add('show');
+}
+function checkTokenAndUpload(){
+  if(getToken()) document.getElementById('uploadOverlay').classList.add('show');
+  else document.getElementById('tokenOverlay').classList.add('show');
+}
+async function saveToGitHub(weekKey,data){
+  const token=getToken(); if(!token)return false;
+  const path='data/'+weekKey+'.json';
+  const content=btoa(unescape(encodeURIComponent(JSON.stringify(data,null,2))));
+  let sha=null;
+  try{
+    const r=await fetch('https://api.github.com/repos/'+GH_OWNER+'/'+GH_REPO+'/contents/'+path,{headers:{Authorization:'token '+token}});
+    if(r.ok){const j=await r.json();sha=j.sha;}
+  }catch(e){}
+  const body={message:'update '+weekKey,content,branch:GH_BRANCH};
+  if(sha)body.sha=sha;
+  const res=await fetch('https://api.github.com/repos/'+GH_OWNER+'/'+GH_REPO+'/contents/'+path,{
+    method:'PUT',headers:{Authorization:'token '+token,'Content-Type':'application/json'},body:JSON.stringify(body)});
+  return res.ok;
+}
+async function loadWeekList(){
+  try{
+    const r=await fetch('https://api.github.com/repos/'+GH_OWNER+'/'+GH_REPO+'/contents/data?ref='+GH_BRANCH,
+      {headers:getToken()?{Authorization:'token '+getToken()}:{}});
+    if(!r.ok)return;
+    const files=await r.json();
+    const sel=document.getElementById('weekSelect');
+    if(!sel.querySelector('option[value="current"]')){
+      const opt=document.createElement('option');
+      opt.value='current';opt.textContent='📌 '+D.curr_dates+' (현재)';
+      sel.appendChild(opt);
+    }
+    files.filter(f=>f.name.endsWith('.json')).sort((a,b)=>b.name.localeCompare(a.name)).forEach(f=>{
+      const key=f.name.replace('.json','');
+      if(!sel.querySelector('option[value="'+key+'"]')){
+        const opt=document.createElement('option');
+        opt.value=key;opt.textContent='📅 '+key;
+        sel.appendChild(opt);
+      }
+    });
+  }catch(e){}
+}
+async function loadWeekData(weekKey){
+  if(!weekKey||weekKey==='current'){renderDashboard();return;}
+  const prog=document.getElementById('uploadProgress');
+  prog.textContent='⏳ 데이터 불러오는 중...';prog.style.display='block';
+  try{
+    const r=await fetch('https://raw.githubusercontent.com/'+GH_OWNER+'/'+GH_REPO+'/'+GH_BRANCH+'/data/'+weekKey+'.json');
+    if(!r.ok)throw new Error('파일 없음');
+    const data=await r.json();
+    Object.assign(D,data);
+    renderDashboard();
+  }catch(e){alert('데이터를 불러올 수 없어요: '+e.message);}
+  finally{prog.style.display='none';}
+}
+
+// ─── 태그 정규화 ──────────────────────────────────────────────────────────────
 function normTag(raw){
-  const tag=String(raw).trim();
+  const tag=raw.trim();
   if(!tag||tag==='nan')return null;
-  if(tag==='알프'||tag==='모워크플로')return null;
+  if(['알프','모워크플로'].includes(tag))return null;
   if(tag.includes('테스트')||tag.includes('중복'))return null;
   if(tag.includes('교환반품')){
     const p=tag.split('/'),s=p[1]||'';
-    if(s.includes('맞교환')||(s.includes('교환')&&!s.includes('반품'))||s.includes('미수거재발송'))return'교환';
-    if(s.includes('반품'))return'반품';
-    if(s.includes('철회'))return'철회';
-    if(s.includes('차액환불'))return'차액환불';
-    if(s.includes('진행상황'))return'교환';
-    return'교환반품';
+    if(s.includes('맞교환')||(s.includes('교환')&&!s.includes('반품')))return '교환';
+    if(s.includes('미수거재발송'))return '미수거재발송';
+    if(s.includes('반품'))return '반품';
+    if(s.includes('진행상황'))return '교환';
+    if(s.includes('철회'))return '철회';
+    return '교환반품';
   }
+  if(tag.includes('고객반품')){const p=tag.split('/'),s=p[1]||'';if(s.includes('교환'))return '교환';if(s.includes('반품'))return '반품';}
   if(tag.includes('디지털')){
     const p=tag.split('/'),s=p[1]||'',sub=p[2]||'';
-    if(s.includes('사용문의'))return sub?`디지털/사용문의/${sub}`:'디지털/사용문의';
-    if(s.includes('오류문의'))return sub?`디지털/오류문의/${sub}`:'디지털/오류문의';
-    if(s.includes('제품문의'))return'디지털/제품문의';
-    return'디지털';
+    if(s.includes('사용문의'))return sub?'디지털/사용문의/'+sub:'디지털/사용문의';
+    if(s.includes('오류문의'))return sub?'디지털/오류문의/'+sub:'디지털/오류문의';
+    if(s.includes('제품문의'))return '디지털/제품문의';
+    return '디지털';
   }
-  if(tag.includes('취소')){
-    const p=tag.split('/'),s=p[1]||'';
-    if(s.includes('취소문의'))return'취소문의';
-  }
+  if(tag.includes('취소')){const p=tag.split('/'),s=p[1]||'';if(s.includes('취소문의'))return '취소문의';}
   return tag;
 }
-function iterTags(tagsStr){
-  const r=[];
-  for(const raw of String(tagsStr).split(',')){const nt=normTag(raw);if(nt)r.push(nt);}
-  return r;
-}
-function isTrue(v){
-  if(v===true||v===1)return true;
-  if(typeof v==='string')return['true','1','yes'].includes(v.toLowerCase().trim());
-  return false;
-}
-function hasVal(v){return v!==''&&v!==null&&v!==undefined;}
-function parseDate(v){
-  if(v instanceof Date)return v;
-  if(typeof v==='string'&&v)return new Date(v);
-  return null;
-}
-function calcDateRange(rows){
-  const dates=rows.map(r=>parseDate(r.createdAt)).filter(d=>d&&!isNaN(d));
-  if(!dates.length)return'날짜 없음';
-  const ts=dates.map(d=>d.getTime());
-  const min=new Date(Math.min(...ts)),max=new Date(Math.max(...ts));
-  const fmt=d=>`${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')}`;
-  return`${fmt(min)} ~ ${fmt(max)}`;
-}
-function calcDowCounts(rows){
-  const c=[0,0,0,0,0,0,0];
-  rows.forEach(r=>{const d=parseDate(r.createdAt);if(d&&!isNaN(d))c[(d.getDay()+6)%7]++;});
-  return c;
-}
-function calcTop10Tags(rows,soloIds){
-  const counts={};
-  rows.forEach(r=>{
-    const isAlf=soloIds.has(String(r.id||''));
-    if(r.tags==null)return;
-    for(const nt of iterTags(r.tags)){
-      if(!counts[nt])counts[nt]={tag:nt,total:0,alf:0,agent:0};
-      counts[nt].total++;
-      if(isAlf)counts[nt].alf++;else counts[nt].agent++;
-    }
-  });
-  return Object.values(counts).sort((a,b)=>b.total-a.total).slice(0,10);
-}
-function calcSoloTop5(rows,soloIds,prevSoloMap){
-  const counts={};
-  rows.filter(r=>soloIds.has(String(r.id||''))).forEach(r=>{
-    if(r.tags==null)return;
-    for(const nt of iterTags(r.tags))counts[nt]=(counts[nt]||0)+1;
-  });
-  return Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,5)
-    .map(([tag,curr])=>({tag,curr,prev:prevSoloMap[tag]||0}));
-}
-function calcUnresolvedTags(rows,escIds){
-  const counts={};
-  rows.filter(r=>escIds.has(String(r.id||''))).forEach(r=>{
-    if(r.tags==null)return;
-    for(const nt of iterTags(r.tags))counts[nt]=(counts[nt]||0)+1;
-  });
-  return Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,10)
-    .map(([tag,count])=>({tag,count}));
-}
-function calcNoAlfTags(rows,noAlfAgentIds){
-  const counts={};
-  rows.filter(r=>noAlfAgentIds.has(String(r.id||''))).forEach(r=>{
-    if(r.tags==null)return;
-    for(const nt of iterTags(r.tags))counts[nt]=(counts[nt]||0)+1;
-  });
-  return Object.entries(counts).sort((a,b)=>b[1]-a[1]).slice(0,10)
-    .map(([tag,count])=>({tag,count}));
-}
-function calcProdRanking(rows,prevProdMap){
-  const products={'낼나 타이머':0,'디지털':0,'낼나 키링캠':0,'낼나 펜슬':0,'데일리 케이블':0};
-  rows.forEach(r=>{
-    const t=String(r.tags||'');
-    if(t.includes('타이머'))products['낼나 타이머']++;
-    if(t.includes('디지털'))products['디지털']++;
-    if(t.includes('키링캠'))products['낼나 키링캠']++;
-    if(t.includes('낼나펜슬')||t.includes('펜슬'))products['낼나 펜슬']++;
-    if(t.includes('데일리케이블'))products['데일리 케이블']++;
-  });
-  return Object.entries(products)
-    .map(([name,total])=>({name,total,prev:prevProdMap[name]||0,delta:total-(prevProdMap[name]||0)}))
-    .sort((a,b)=>b.total-a.total).slice(0,5);
-}
-function calcExchangeReturn(rows){
-  function md(d){
-    if(d.includes('타이머')&&d.includes('기능정지'))return'타이머-기능정지';
-    if(d.includes('케이블커버'))return'케이블커버';
-    if(d.includes('낼나펜슬')||(d.includes('펜슬')&&!d.includes('케이블')))return'낼나펜슬';
-    if(d.includes('데일리케이블'))return'데일리케이블';
-    return d;
-  }
-  const exc={},ret={};
-  rows.forEach(r=>{
-    String(r.tags||'').split(',').forEach(rawTag=>{
-      const tag=rawTag.trim();
-      if(!tag.includes('교환반품'))return;
-      const parts=tag.split('/');
-      if(parts.length<2)return;
-      const s=parts[1].trim();
-      const detail=parts.length>=3?md(parts[2].trim()):'';
-      if(!detail)return;
-      if(s.includes('맞교환')||(s.includes('교환')&&!s.includes('반품'))||s.includes('미수거재발송'))exc[detail]=(exc[detail]||0)+1;
-      else if(s.includes('반품'))ret[detail]=(ret[detail]||0)+1;
-    });
-  });
-  return[
-    Object.entries(exc).sort((a,b)=>b[1]-a[1]).map(([product,count])=>({product,count})),
-    Object.entries(ret).sort((a,b)=>b[1]-a[1]).map(([product,count])=>({product,count}))
-  ];
-}
-function incTagsVsPrev(currTags,prevTags){
-  const pm=Object.fromEntries(prevTags.map(t=>[t.tag,t.total]));
-  return currTags.filter(t=>t.total>(pm[t.tag]||0))
-    .map(t=>({tag:t.tag,curr:t.total,prev:pm[t.tag]||0,delta:t.total-(pm[t.tag]||0)}))
-    .sort((a,b)=>b.delta-a.delta);
+function iterTags(s){return(s||'').split(',').map(r=>normTag(r)).filter(Boolean);}
+function mergeDetail(d){
+  if(d.includes('타이머')&&d.includes('기능정지'))return '타이머-기능정지';
+  if(d.includes('케이블커버'))return '케이블커버';
+  if(d.includes('낼나펜슬')||(d.includes('펜슬')&&!d.includes('케이블')))return '낼나펜슬';
+  if(d.includes('데일리케이블'))return '데일리케이블';
+  return d;
 }
 
-// ── 엑셀 행 → 새 D 객체 ─────────────────────────────────────────────────
-function processExcel(rows,prevD){
-  const clean=rows.filter(r=>!String(r.tags||'').includes('테스트'));
-  const total=clean.length;
-  if(!total)throw new Error('테스트 제외 후 데이터가 없습니다');
-  const soloIds=new Set(),escIds=new Set(),agentIds=new Set(),workflowIds=new Set();
-  let alfCnt=0;
-  clean.forEach(r=>{
-    const id=String(r.id||'');
-    const alfTrig=isTrue(r.alfTriggered);
-    if(alfTrig)alfCnt++;
-    const assigned=hasVal(r.assigneeId)&&String(r.assigneeId).trim()!=='';
-    const gs=String(r.goalState||'');
-    if(gs==='waiting'&&alfTrig&&!assigned)soloIds.add(id);
-    else if(gs==='notAchieved'&&alfTrig&&assigned)escIds.add(id);
-    else if(assigned)agentIds.add(id);
-    else workflowIds.add(id);
-  });
-  const alfSolo=soloIds.size,alfEsc=escIds.size,agentOnly=agentIds.size,workflowOnly=workflowIds.size;
-  const agentRows=clean.filter(r=>agentIds.has(String(r.id||''))||escIds.has(String(r.id||'')));
-  const times=agentRows.map(r=>parseFloat(r.firstMemberHandlingTimeInOperation)).filter(v=>!isNaN(v));
-  const avgMin=times.length?+(times.reduce((a,b)=>a+b,0)/times.length/60).toFixed(1):0;
-  const noAlfRows=clean.filter(r=>!isTrue(r.alfTriggered));
-  const noAlfAgt=noAlfRows.filter(r=>hasVal(r.assigneeId)&&String(r.assigneeId).trim()!=='');
-  const noAlfReopen=noAlfAgt.filter(r=>isTrue(r.reopened)).length;
-  const noAlfAgtIds=new Set(noAlfAgt.map(r=>String(r.id||'')));
-  const prevTotal=prevD.total||0,prevAlfSolo=prevD.alf_solo||0;
-  const prevSoloMap=Object.fromEntries((prevD.curr_solo_top5||[]).map(t=>[t.tag,t.curr]));
-  const prevProdMap=Object.fromEntries((prevD.prod_ranking||[]).map(p=>[p.name,p.total]));
-  const t10=calcTop10Tags(clean,soloIds);
-  const[excProds,retProds]=calcExchangeReturn(clean);
-  return{
-    total,agent_assigned:alfEsc+agentOnly,avg_response_min:avgMin,
-    alf_triggered:alfCnt,alf_solo:alfSolo,alf_escalated:alfEsc,
-    agent_only:agentOnly,workflow_only:workflowOnly,
-    curr_solo_rate:+(alfSolo/total*100).toFixed(1),
-    prev_solo_rate:prevTotal?+(prevAlfSolo/prevTotal*100).toFixed(1):0,
-    prev_total:prevTotal,prev_total_real:prevTotal,prev_alf_solo:prevAlfSolo,
-    curr_dow:calcDowCounts(clean),prev_dow:prevD.curr_dow||[0,0,0,0,0,0,0],
-    top10_tags:t10,alf_unresolved_tags:calcUnresolvedTags(clean,escIds),
-    inc_tags:incTagsVsPrev(t10,prevD.top10_tags||[]),
-    curr_solo_top5:calcSoloTop5(clean,soloIds,prevSoloMap),
-    prev_solo_top5:prevD.curr_solo_top5||[],
-    prod_ranking:calcProdRanking(clean,prevProdMap),
-    curr_dates:calcDateRange(clean),prev_dates:prevD.curr_dates||'-',
-    channelio_solo:alfSolo,channelio_triggered:alfCnt,
-    channelio_rate:alfCnt?+(alfSolo/alfCnt*100).toFixed(1):0,
-    no_alf_direct:noAlfAgt.length-noAlfReopen,no_alf_reopen:noAlfReopen,
-    no_alf_total:noAlfRows.length,no_alf_agent:noAlfAgt.length,
-    no_alf_work:noAlfRows.length-noAlfAgt.length,
-    no_alf_tags:calcNoAlfTags(clean,noAlfAgtIds),
-    exchange_products:excProds,return_products:retProds,
-    mon_top6:[],mon_agent:0,mon_alf_esc:0,mon_direct:0,mon_pct:0,
-    mon_date:'',mon_prev:0,mon_curr:0
+// ─── 엑셀 업로드 ──────────────────────────────────────────────────────────────
+async function handleFile(file){
+  if(!file)return;
+  const prog=document.getElementById('uploadProgress');
+  prog.textContent='⏳ 데이터 처리 중...';prog.style.display='block';
+  const reader=new FileReader();
+  reader.onload=async function(e){
+    try{
+      const wb=XLSX.read(e.target.result,{type:'array',cellDates:true});
+      const ws=wb.Sheets[wb.SheetNames[0]];
+      const rows=XLSX.utils.sheet_to_json(ws,{defval:''});
+      const df=rows.filter(r=>!String(r.tags||'').includes('테스트'));
+      const total=df.length;
+      const isTrue=v=>['true','1','yes'].includes(String(v||'').toLowerCase());
+      const alfTrig=r=>isTrue(r.alfTriggered);
+      const soloMask=r=>r.goalState==='waiting'&&alfTrig(r)&&!r.assigneeId;
+      const escMask=r=>r.goalState==='notAchieved'&&alfTrig(r)&&!!r.assigneeId;
+      const alfMask=r=>soloMask(r)||escMask(r);
+      const agentMask=r=>!alfMask(r)&&!!r.assigneeId;
+      const workMask=r=>!alfMask(r)&&!r.assigneeId;
+      const alfSolo=df.filter(soloMask).length;
+      const alfEsc=df.filter(escMask).length;
+      const agentOnly=df.filter(agentMask).length;
+      const workOnly=df.filter(workMask).length;
+      const triggered=df.filter(alfTrig).length;
+      const times=df.filter(r=>agentMask(r)||escMask(r)).map(r=>parseFloat(r.firstMemberHandlingTimeInOperation)).filter(v=>!isNaN(v));
+      const avgMin=times.length?+(times.reduce((a,b)=>a+b,0)/times.length/60).toFixed(1):0;
+      const dates=df.map(r=>new Date(r.createdAt)).filter(d=>!isNaN(d)).sort((a,b)=>a-b);
+      const fmt=d=>(d.getMonth()+1).toString().padStart(2,'0')+'/'+d.getDate().toString().padStart(2,'0');
+      const currDates=dates.length?fmt(dates[0])+' ~ '+fmt(dates[dates.length-1]):'';
+      const currDow=[0,0,0,0,0,0,0];
+      df.forEach(r=>{const d=new Date(r.createdAt);if(!isNaN(d))currDow[d.getDay()===0?6:d.getDay()-1]++;});
+      const soloIds=new Set(df.filter(soloMask).map(r=>String(r.id)));
+      const tagC={};
+      df.forEach(r=>{
+        const isAlf=soloIds.has(String(r.id));const seen=new Set();
+        iterTags(r.tags).forEach(t=>{
+          if(seen.has(t))return;seen.add(t);
+          if(!tagC[t])tagC[t]={tag:t,total:0,alf:0,agent:0};
+          tagC[t].total++;isAlf?tagC[t].alf++:tagC[t].agent++;
+        });
+      });
+      const top10=Object.values(tagC).sort((a,b)=>b.total-a.total).slice(0,10);
+      const escT={};
+      df.filter(escMask).forEach(r=>{const seen=new Set();iterTags(r.tags).forEach(t=>{if(!seen.has(t)){escT[t]=(escT[t]||0)+1;seen.add(t);}});});
+      const alfUnresTags=Object.entries(escT).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([tag,count])=>({tag,count}));
+      const soloC={};
+      df.filter(soloMask).forEach(r=>{const seen=new Set();iterTags(r.tags).forEach(t=>{if(!seen.has(t)){soloC[t]=(soloC[t]||0)+1;seen.add(t);}});});
+      const soloTop5=Object.entries(soloC).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([tag,curr])=>({tag,curr,prev:(D.solo_tag_counts||{})[tag]||0}));
+      const prevAllC=D.all_tag_counts||{};
+      const incTags=top10.filter(t=>t.total>(prevAllC[t.tag]||0)).map(t=>({tag:t.tag,curr:t.total,prev:prevAllC[t.tag]||0,delta:t.total-(prevAllC[t.tag]||0)})).sort((a,b)=>b.delta-a.delta);
+      const prodMap={'낼나 타이머':0,'디지털':0,'낼나 키링캠':0,'낼나 펜슬':0,'데일리 케이블':0};
+      df.forEach(r=>{const t=String(r.tags||'');if(t.includes('타이머'))prodMap['낼나 타이머']++;if(t.includes('디지털'))prodMap['디지털']++;if(t.includes('키링캠'))prodMap['낼나 키링캠']++;if(t.includes('낼나펜슬')||t.includes('펜슬'))prodMap['낼나 펜슬']++;if(t.includes('데일리케이블'))prodMap['데일리 케이블']++;});
+      const prevProd=Object.fromEntries((D.prod_ranking||[]).map(p=>[p.name,p.total]));
+      const prodRanking=Object.entries(prodMap).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([name,total])=>({name,total,prev:prevProd[name]||0,delta:total-(prevProd[name]||0),curr_pct:+(total/df.length*100).toFixed(1),prev_pct:0}));
+      const excMap={},retMap={};
+      df.forEach(r=>{String(r.tags||'').split(',').forEach(raw=>{const tag=raw.trim();if(!tag.includes('교환반품'))return;const p=tag.split('/'),s=(p[1]||'').trim(),d=mergeDetail((p[2]||'').trim());if(!d)return;if(s.includes('미수거재발송'))return;if(s.includes('맞교환')||(s.includes('교환')&&!s.includes('반품')))excMap[d]=(excMap[d]||0)+1;else if(s.includes('반품'))retMap[d]=(retMap[d]||0)+1;});});
+      const exchangeProducts=Object.entries(excMap).sort((a,b)=>b[1]-a[1]).map(([product,count])=>({product,count}));
+      const returnProducts=Object.entries(retMap).sort((a,b)=>b[1]-a[1]).map(([product,count])=>({product,count}));
+      const noAlf=df.filter(r=>!alfTrig(r));
+      const noAlfAgent=noAlf.filter(r=>!!r.assigneeId);
+      const reopen=noAlfAgent.filter(r=>isTrue(r.reopened)).length;
+      const direct=noAlfAgent.length-reopen;
+      const nalfC={};
+      noAlfAgent.filter(r=>!String(r.tags||'').includes('중복')).forEach(r=>{const seen=new Set();iterTags(r.tags).forEach(t=>{if(!seen.has(t)){nalfC[t]=(nalfC[t]||0)+1;seen.add(t);}});});
+      const allTagCounts={};df.forEach(r=>{const seen=new Set();iterTags(r.tags).forEach(t=>{if(!seen.has(t)){allTagCounts[t]=(allTagCounts[t]||0)+1;seen.add(t);}});});
+      const soloTagCounts={};df.filter(soloMask).forEach(r=>{const seen=new Set();iterTags(r.tags).forEach(t=>{if(!seen.has(t)){soloTagCounts[t]=(soloTagCounts[t]||0)+1;seen.add(t);}});});
+      const newD={...D,total,agent_assigned:alfEsc+agentOnly,avg_response_min:avgMin,alf_triggered:triggered,alf_solo:alfSolo,alf_escalated:alfEsc,agent_only:agentOnly,workflow_only:workOnly,curr_solo_rate:+(alfSolo/total*100).toFixed(1),prev_solo_rate:D.curr_solo_rate,prev_total:D.total,prev_total_real:D.total,prev_alf_solo:D.alf_solo,curr_dow:currDow,prev_dow:D.curr_dow,curr_dates:currDates,prev_dates:D.curr_dates,top10_tags:top10,alf_unresolved_tags:alfUnresTags,inc_tags:incTags,curr_solo_top5:soloTop5,prev_solo_top5:soloTop5,prod_ranking:prodRanking,exchange_products:exchangeProducts,return_products:returnProducts,no_alf_direct:direct,no_alf_reopen:reopen,no_alf_total:noAlf.length,no_alf_agent:noAlfAgent.length,no_alf_work:noAlf.filter(r=>!r.assigneeId).length,no_alf_tags:Object.entries(nalfC).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([tag,count])=>({tag,count})),all_tag_counts:allTagCounts,solo_tag_counts:soloTagCounts};
+      Object.assign(D,newD);
+      renderDashboard();
+      if(getToken()&&currDates){
+        prog.textContent='💾 GitHub에 저장 중...';prog.style.display='block';
+        const weekKey=currDates.replace(/\//g,'-').replace(' ~ ','-to-');
+        const saved=await saveToGitHub(weekKey,newD);
+        if(saved){
+          prog.textContent='✅ 저장 완료! ('+weekKey+')';
+          const sel=document.getElementById('weekSelect');
+          if(!sel.querySelector('option[value="'+weekKey+'"]')){const opt=document.createElement('option');opt.value=weekKey;opt.textContent='📅 '+weekKey;sel.insertBefore(opt,sel.querySelectorAll('option')[1]);}
+          let currOpt=sel.querySelector('option[value="current"]');
+          if(!currOpt){currOpt=document.createElement('option');currOpt.value='current';sel.insertBefore(currOpt,sel.querySelectorAll('option')[1]);}
+          currOpt.textContent='📌 '+currDates+' (현재)';
+        }else{prog.textContent='⚠️ GitHub 저장 실패. 토큰을 확인해주세요.';}
+        setTimeout(()=>{prog.style.display='none';},3000);
+      }
+      document.getElementById('uploadOverlay').classList.remove('show');
+    }catch(err){prog.textContent='❌ 오류: '+err.message;console.error(err);}
   };
+  reader.readAsArrayBuffer(file);
 }
 
-// ── 차트/수치 전체 렌더 ──────────────────────────────────────────────────
-function destroyChart(id){const ch=Chart.getChart(document.getElementById(id));if(ch)ch.destroy();}
-
+// ─── 대시보드 렌더링 ──────────────────────────────────────────────────────────
 function renderProdTable(products){
-  if(!products||!products.length)
-    return'<tr><td colspan="2" style="color:#aaa;text-align:center">데이터 없음</td></tr>';
-  return products.map(p=>`<tr><td>${p.product}</td><td style="text-align:right;font-weight:600">${p.count}건</td></tr>`).join('');
+  if(!products||!products.length)return '<tr><td colspan="2" style="color:#aaa;text-align:center">데이터 없음</td></tr>';
+  return products.map(p=>'<tr><td>'+p.product+'</td><td style="text-align:right;font-weight:600">'+p.count+'건</td></tr>').join('');
 }
 
-function renderDashboard(d){
-  document.getElementById('pageSub').textContent='금주: '+d.curr_dates+' · 직전주: '+d.prev_dates+' · 테스트 건 제외';
-  document.getElementById('kTot').textContent=d.total;
+function renderDashboard(){
+  Chart.helpers.each(Chart.instances,c=>c.destroy());
+  document.getElementById('pageSub').textContent='금주: '+D.curr_dates+' · 직전주: '+D.prev_dates+' · 테스트 건 제외';
+  document.getElementById('kTot').textContent=D.total;
   document.getElementById('kTotSub').textContent='테스트 건 제외';
-  document.getElementById('kAgent').textContent=d.agent_assigned;
-  document.getElementById('kAgentSub').textContent='전체의 '+Math.round(d.agent_assigned/d.total*100)+'%';
-  document.getElementById('kAvg').innerHTML=d.avg_response_min+'<span style="font-size:14px;font-weight:400">분</span>';
-  document.getElementById('kSolo').textContent=d.alf_solo;
-  document.getElementById('kSoloSub').textContent='전체의 '+(d.alf_solo/d.total*100).toFixed(1)+'%';
-  document.getElementById('kEsc').textContent=d.alf_escalated;
-  document.getElementById('kEscSub').textContent='전체의 '+(d.alf_escalated/d.total*100).toFixed(1)+'%';
-  document.getElementById('kInvolve').textContent=+(d.alf_triggered/d.total*100).toFixed(1)+'%';
-  document.getElementById('kInvolveSub').textContent=d.alf_triggered+'건 / 전체 '+d.total+'건';
-  const diff=d.total-d.prev_total;
+  document.getElementById('kAgent').textContent=D.agent_assigned;
+  document.getElementById('kAgentSub').textContent='전체의 '+Math.round(D.agent_assigned/D.total*100)+'%';
+  document.getElementById('kAvg').innerHTML=D.avg_response_min+'<span style="font-size:14px;font-weight:400">분</span>';
+  document.getElementById('kSolo').textContent=D.alf_solo;
+  document.getElementById('kSoloSub').textContent='전체의 '+(D.alf_solo/D.total*100).toFixed(1)+'%';
+  document.getElementById('kEsc').textContent=D.alf_escalated;
+  document.getElementById('kEscSub').textContent='전체의 '+(D.alf_escalated/D.total*100).toFixed(1)+'%';
+  const involveRate=+(D.alf_triggered/D.total*100).toFixed(1);
+  document.getElementById('kInvolve').textContent=involveRate+'%';
+  document.getElementById('kInvolveSub').textContent=D.alf_triggered+'건 / 전체 '+D.total+'건';
+  const diff=D.total-D.prev_total;
   const diffEl=document.getElementById('kDiff');
   diffEl.textContent=(diff>0?'+':'')+diff+'건';
   diffEl.style.color=diff>0?'#dc2626':diff<0?'#16a34a':'#1a1a1a';
-  document.getElementById('bTotal').textContent=d.total;
-  document.getElementById('bSolo').textContent=d.alf_solo;
-  document.getElementById('bEsc').textContent=d.alf_escalated;
-  document.getElementById('bAgent').textContent=d.agent_only;
-  document.getElementById('bEtc').textContent=d.workflow_only;
-  document.getElementById('bVerify').textContent='✓ '+d.alf_solo+' + '+d.alf_escalated+' + '+d.agent_only+' + '+d.workflow_only+' = '+(d.alf_solo+d.alf_escalated+d.agent_only+d.workflow_only);
-  document.getElementById('alfBadge').textContent=d.alf_escalated+'건';
-  document.getElementById('dowNote').textContent='직전주: '+d.prev_dates+' / 금주: '+d.curr_dates;
-  const dowMax=Math.max(...d.curr_dow,...d.prev_dow)*1.35|0||10;
-  destroyChart('dowChart');
-  new Chart(document.getElementById('dowChart'),{type:'bar',
-    data:{labels:['월','화','수','목','금','토','일'],datasets:[
-      {label:'직전주',data:d.prev_dow,backgroundColor:'#d1d5db',borderRadius:4,
-        datalabels:{anchor:'end',align:'end',color:'#6b7280',font:{size:11,weight:'600'},formatter:v=>v===0?'':v+'건'}},
-      {label:'금주',data:d.curr_dow,backgroundColor:'#3b82f6',borderRadius:4,
-        datalabels:{anchor:'end',align:'end',color:'#1d4ed8',font:{size:11,weight:'600'},formatter:v=>v===0?'':v+'건'}}
-    ]},
-    options:{responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{position:'bottom'},tooltip:{callbacks:{label:c=>c.dataset.label+': '+c.parsed.y+'건'}}},
-      scales:{y:{beginAtZero:true,grid:{color:'#f0f0ee'},max:dowMax},x:{grid:{display:false}}}}
-  });
-  const t10=d.top10_tags;
-  destroyChart('tagChart');
-  new Chart(document.getElementById('tagChart'),{type:'bar',
-    data:{labels:t10.map(t=>t.tag),datasets:[
-      {label:'알프',data:t10.map(t=>t.alf),backgroundColor:'#818cf8',borderRadius:3,
-        datalabels:{anchor:'center',align:'center',color:'#fff',font:{size:11,weight:'700'},formatter:v=>v===0?'':v}},
-      {label:'상담원',data:t10.map(t=>t.agent),backgroundColor:'#fb923c',borderRadius:3,
-        datalabels:{labels:{
-          inner:{anchor:'center',align:'center',color:'#fff',font:{size:11,weight:'700'},formatter:v=>v===0?'':v},
-          total:{anchor:'end',align:'end',color:'#333',font:{size:12,weight:'700'},formatter:(v,c)=>t10[c.dataIndex].total+'건'}}}}]},
-    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,layout:{padding:{right:40}},
-      plugins:{legend:{position:'bottom'},tooltip:{callbacks:{label:c=>c.dataset.label+': '+c.parsed.x+'건'}}},
-      scales:{x:{beginAtZero:true,stacked:true,grid:{color:'#f0f0ee'}},
-        y:{stacked:true,grid:{display:false},ticks:{font:{size:10},color:'#555'}}}}
-  });
-  document.getElementById('prodRankDow').innerHTML=d.prod_ranking.map((p,i)=>{
-    const delta=p.delta,dStr=(delta>0?'+':'')+delta+'건';
-    const dColor=delta>0?'#dc2626':delta<0?'#16a34a':'#888';
-    return`<tr>
-      <td style="color:#aaa">${i+1}위</td>
-      <td style="font-weight:500">${p.name.replace('낼나 ','')}</td>
-      <td style="text-align:right;color:#aaa">${p.prev}건</td>
-      <td style="text-align:right;font-weight:600">${p.total}건</td>
-      <td style="text-align:right;font-weight:600;color:${dColor}">${dStr}</td>
-    </tr>`;
-  }).join('');
-  document.getElementById('exchangeBody').innerHTML=renderProdTable(d.exchange_products||[]);
-  document.getElementById('returnBody').innerHTML=renderProdTable(d.return_products||[]);
-  const prevTR=d.prev_total_real?+(d.prev_alf_solo/d.prev_total_real*100).toFixed(1):0;
-  const currTR=+(d.alf_solo/d.total*100).toFixed(1);
-  document.getElementById('prevAlfPeriod').textContent='('+d.prev_dates+')';
-  document.getElementById('currAlfPeriod').textContent='('+d.curr_dates+')';
-  document.getElementById('prevRate').textContent=prevTR+'%';
-  document.getElementById('currRate').textContent=currTR+'%';
-  document.getElementById('prevAlfDetail').textContent=d.prev_alf_solo+'건 / 전체 '+d.prev_total_real+'건';
-  document.getElementById('currAlfDetail').textContent=d.alf_solo+'건 / 전체 '+d.total+'건';
-  const rd=+(currTR-prevTR).toFixed(1);
+  document.getElementById('bTotal').textContent=D.total;
+  document.getElementById('bSolo').textContent=D.alf_solo;
+  document.getElementById('bEsc').textContent=D.alf_escalated;
+  document.getElementById('bAgent').textContent=D.agent_only;
+  document.getElementById('bEtc').textContent=D.workflow_only;
+  document.getElementById('bVerify').textContent='✓ '+D.alf_solo+' + '+D.alf_escalated+' + '+D.agent_only+' + '+D.workflow_only+' = '+(D.alf_solo+D.alf_escalated+D.agent_only+D.workflow_only);
+  document.getElementById('alfBadge').textContent=D.alf_escalated+'건';
+  const dow=['월','화','수','목','금','토','일'];
+  document.getElementById('dowNote').textContent='직전주: '+D.prev_dates+' / 금주: '+D.curr_dates;
+  new Chart(document.getElementById('dowChart'),{type:'bar',data:{labels:dow,datasets:[{label:'직전주',data:D.prev_dow,backgroundColor:'#d1d5db',borderRadius:4,datalabels:{anchor:'end',align:'end',color:'#6b7280',font:{size:11,weight:'600'},formatter:v=>v===0?'':v+'건'}},{label:'금주',data:D.curr_dow,backgroundColor:'#3b82f6',borderRadius:4,datalabels:{anchor:'end',align:'end',color:'#1d4ed8',font:{size:11,weight:'600'},formatter:v=>v===0?'':v+'건'}}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'},tooltip:{callbacks:{label:c=>c.dataset.label+': '+c.parsed.y+'건'}}},scales:{y:{beginAtZero:true,grid:{color:'#f0f0ee'},max:Math.max(...D.curr_dow,...D.prev_dow)+10},x:{grid:{display:false}}}}});
+  const t10=D.top10_tags;
+  new Chart(document.getElementById('tagChart'),{type:'bar',data:{labels:t10.map(t=>t.tag),datasets:[{label:'알프',data:t10.map(t=>t.alf),backgroundColor:'#818cf8',borderRadius:3,datalabels:{anchor:'center',align:'center',color:'#fff',font:{size:11,weight:'700'},formatter:v=>v===0?'':v}},{label:'상담원',data:t10.map(t=>t.agent),backgroundColor:'#fb923c',borderRadius:3,datalabels:{labels:{inner:{anchor:'center',align:'center',color:'#fff',font:{size:11,weight:'700'},formatter:v=>v===0?'':v},total:{anchor:'end',align:'end',color:'#333',font:{size:12,weight:'700'},formatter:(v,c)=>t10[c.dataIndex].total+'건'}}}}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,layout:{padding:{right:40}},plugins:{legend:{position:'bottom'},tooltip:{callbacks:{label:c=>c.dataset.label+': '+c.parsed.x+'건'}}},scales:{x:{beginAtZero:true,stacked:true,grid:{color:'#f0f0ee'}},y:{stacked:true,grid:{display:false},ticks:{font:{size:10},color:'#555'}}}}});
+  const pr=D.prod_ranking;
+  document.getElementById('prodRankDow').innerHTML=pr.map((p,i)=>{const delta=p.delta,dStr=(delta>0?'+':'')+delta+'건',dColor=delta>0?'#dc2626':delta<0?'#16a34a':'#888';return '<tr><td style="color:#aaa">'+(i+1)+'위</td><td style="font-weight:500">'+p.name.replace('낼나 ','')+'</td><td style="text-align:right;color:#aaa">'+p.prev+'건</td><td style="text-align:right;font-weight:600">'+p.total+'건</td><td style="text-align:right;font-weight:600;color:'+dColor+'">'+dStr+'</td></tr>';}).join('');
+  const prevTotalRate=+(D.prev_alf_solo/D.prev_total_real*100).toFixed(1);
+  const currTotalRate=+(D.alf_solo/D.total*100).toFixed(1);
+  document.getElementById('prevAlfPeriod').textContent='('+D.prev_dates+')';
+  document.getElementById('currAlfPeriod').textContent='('+D.curr_dates+')';
+  document.getElementById('prevRate').textContent=prevTotalRate+'%';
+  document.getElementById('currRate').textContent=currTotalRate+'%';
+  document.getElementById('prevAlfDetail').textContent=D.prev_alf_solo+'건 / 전체 '+D.prev_total_real+'건';
+  document.getElementById('currAlfDetail').textContent=D.alf_solo+'건 / 전체 '+D.total+'건';
+  const rd=+(currTotalRate-prevTotalRate).toFixed(1);
   const diffEl2=document.getElementById('diffBadge');
   diffEl2.textContent=(rd>0?'+':'')+rd+'%p';
   diffEl2.style.color=rd>0?'#16a34a':rd<0?'#dc2626':'#888';
-  const cs=d.curr_solo_top5,ps=d.prev_solo_top5;
+  const cs=D.curr_solo_top5,ps=D.prev_solo_top5||cs;
+  const soloLabels=cs.map(t=>t.tag);
   const p5=ps[4]?.tag,c5=cs[4]?.tag;
-  document.getElementById('soloNote').textContent=(p5!==c5)?'* 5위: 직전주 '+p5+'('+(ps[4]?.prev||0)+'건) · 금주 '+c5+'('+(cs[4]?.curr||0)+'건)':'';
-  const soloMax=cs.length?Math.max(...cs.map(t=>Math.max(t.curr,t.prev||0)))*1.4|0:10;
-  destroyChart('soloTagChart');
-  new Chart(document.getElementById('soloTagChart'),{type:'bar',
-    data:{labels:cs.map(t=>t.tag),datasets:[
-      {label:'직전주',data:cs.map(t=>t.prev),backgroundColor:'#d1d5db',borderRadius:4,
-        datalabels:{anchor:'end',align:'top',color:'#6b7280',font:{size:11,weight:'600'},formatter:v=>v===0?'':v+'건'}},
-      {label:'금주',data:cs.map(t=>t.curr),backgroundColor:'#16a34a',borderRadius:4,
-        datalabels:{anchor:'end',align:'top',color:'#15803d',font:{size:11,weight:'600'},formatter:v=>v===0?'':v+'건'}}
-    ]},
-    options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:28}},
-      plugins:{legend:{position:'bottom'},tooltip:{callbacks:{label:c=>c.dataset.label+': '+c.parsed.y+'건'}}},
-      scales:{y:{beginAtZero:true,grid:{color:'#f0f0ee'},max:soloMax},x:{grid:{display:false},ticks:{font:{size:11}}}}}
-  });
-  const newItems=cs.filter(t=>t.curr>t.prev).sort((a,b)=>(b.curr-b.prev)-(a.curr-a.prev)).slice(0,3);
+  document.getElementById('soloNote').textContent=(p5!==c5)?'* 5위: 직전주 '+p5+'('+ps[4]?.prev+'건) · 금주 '+c5+'('+cs[4]?.curr+'건)':'';
+  new Chart(document.getElementById('soloTagChart'),{type:'bar',data:{labels:soloLabels,datasets:[{label:'직전주',data:cs.map(t=>t.prev),backgroundColor:'#d1d5db',borderRadius:4,datalabels:{anchor:'end',align:'top',color:'#6b7280',font:{size:11,weight:'600'},formatter:v=>v===0?'':v+'건'}},{label:'금주',data:cs.map(t=>t.curr),backgroundColor:'#16a34a',borderRadius:4,datalabels:{anchor:'end',align:'top',color:'#15803d',font:{size:11,weight:'600'},formatter:v=>v===0?'':v+'건'}}]},options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:28}},plugins:{legend:{position:'bottom'},tooltip:{callbacks:{label:c=>c.dataset.label+': '+c.parsed.y+'건'}}},scales:{y:{beginAtZero:true,grid:{color:'#f0f0ee'},max:Math.max(...cs.map(t=>t.curr))+10},x:{grid:{display:false},ticks:{font:{size:11}}}}}});
+  const newItems=D.curr_solo_top5.filter(t=>t.curr>t.prev).sort((a,b)=>(b.curr-b.prev)-(a.curr-a.prev)).slice(0,3);
   document.getElementById('soloInsight').textContent='단순문의 증가와 함께 알프가 이전보다 다양한 유형을 잘 처리하고 있습니다.';
-  document.getElementById('soloNewItems').innerHTML=newItems.map(t=>{
-    const delta=t.curr-t.prev,isNew=t.prev===0;
-    return`<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#f0fdf4;border-radius:8px;border-left:3px solid #16a34a">
-      <span style="font-size:12px;color:#333">${t.tag}</span>
-      <div style="display:flex;align-items:center;gap:10px">
-        <span style="font-size:12px;color:#aaa">${t.prev}건 →</span>
-        <span style="font-size:15px;font-weight:700;color:#16a34a">${t.curr}건</span>
-        <span style="font-size:11px;background:#dcfce7;color:#16a34a;padding:2px 7px;border-radius:10px;font-weight:600">${isNew?'🆕 신규':'+'+delta+'건'}</span>
-      </div>
-    </div>`;
-  }).join('');
-  const aufT=d.alf_unresolved_tags;
-  const unresMax=aufT.length?Math.max(...aufT.map(t=>t.count))*1.4|0:10;
-  destroyChart('alfUnresChart');
-  new Chart(document.getElementById('alfUnresChart'),{type:'bar',
-    data:{labels:aufT.map(t=>t.tag),datasets:[{data:aufT.map(t=>t.count),backgroundColor:'#f87171',borderRadius:3}]},
-    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false},
-        datalabels:{anchor:'end',align:'end',color:'#b91c1c',font:{size:11,weight:'700'},formatter:v=>v+'건'}},
-      scales:{x:{beginAtZero:true,grid:{color:'#f0f0ee'},max:unresMax},y:{grid:{display:false},ticks:{font:{size:10}}}}}
-  });
+  document.getElementById('soloNewItems').innerHTML=newItems.map(t=>{const delta=t.curr-t.prev,isNew=t.prev===0;return '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#f0fdf4;border-radius:8px;border-left:3px solid #16a34a"><span style="font-size:12px;color:#333">'+t.tag+'</span><div style="display:flex;align-items:center;gap:10px"><span style="font-size:12px;color:#aaa">'+t.prev+'건 →</span><span style="font-size:15px;font-weight:700;color:#16a34a">'+t.curr+'건</span><span style="font-size:11px;background:#dcfce7;color:#16a34a;padding:2px 7px;border-radius:10px;font-weight:600">'+(isNew?'🆕 신규':'+'+delta+'건')+'</span></div></div>';}).join('');
+  const aufT=D.alf_unresolved_tags;
+  new Chart(document.getElementById('alfUnresChart'),{type:'bar',data:{labels:aufT.map(t=>t.tag),datasets:[{data:aufT.map(t=>t.count),backgroundColor:'#f87171',borderRadius:3}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},datalabels:{anchor:'end',align:'end',color:'#b91c1c',font:{size:11,weight:'700'},formatter:v=>v+'건'}},scales:{x:{beginAtZero:true,grid:{color:'#f0f0ee'},max:Math.max(...aufT.map(t=>t.count))+5},y:{grid:{display:false},ticks:{font:{size:10}}}}}});
+  document.getElementById('noAlfTagsBody').innerHTML=(D.no_alf_tags||[]).map(t=>'<tr><td>'+t.tag+'</td><td style="text-align:right;font-weight:600">'+t.count+'건</td></tr>').join('')||'<tr><td colspan="2" style="color:#aaa">데이터 없음</td></tr>';
+  document.getElementById('exchangeBody').innerHTML=renderProdTable(D.exchange_products||[]);
+  document.getElementById('returnBody').innerHTML=renderProdTable(D.return_products||[]);
 }
 
-// ── KPI 목표 차트 (고정 데이터) ──────────────────────────────────────────
+// ─── KPI 차트 (고정) ──────────────────────────────────────────────────────────
 (function(){
   const isDark=matchMedia('(prefers-color-scheme: dark)').matches;
-  const textC=isDark?'#aaa':'#888';
-  const gridC=isDark?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.06)';
-  const labels=['4월4주','4월5주','5월1주','5월2주','연말목표'];
-  // 통합 최신 주차는 D에서 계산
-  const totInvRate=+(D.alf_triggered/D.total*100).toFixed(1);
-  const totSolRate=+(D.alf_solo/D.alf_triggered*100).toFixed(1);
-  function mkOpts(yMin,yMax){
-    return{responsive:true,maintainAspectRatio:false,
-      plugins:{legend:{display:false},datalabels:{display:false},
-        tooltip:{callbacks:{label:c=>c.parsed.y===null?'':c.dataset.label+': '+c.parsed.y+'%'}}},
-      scales:{
-        x:{ticks:{color:textC,font:{size:11}},grid:{color:gridC}},
-        y:{min:yMin,max:yMax,ticks:{color:textC,font:{size:11},callback:v=>v+'%'},grid:{color:gridC}}}};
-  }
-  new Chart(document.getElementById('kpiChart1'),{type:'line',
-    data:{labels,datasets:[
-      {label:'통합',data:[75.8,77,73.7,totInvRate,null],borderColor:'#999',pointBackgroundColor:'#999',pointRadius:4,tension:0.3,borderWidth:2,fill:false},
-      {label:'채널톡',data:[83.1,86.5,79.7,84.3,null],borderColor:'#7F77DD',pointBackgroundColor:'#7F77DD',pointRadius:4,tension:0.3,borderWidth:2,fill:false},
-      {label:'네이버톡톡',data:[63.6,50,48.5,55.2,null],borderColor:'#1D9E75',pointBackgroundColor:'#1D9E75',pointRadius:4,tension:0.3,borderWidth:2,fill:false},
-      {label:'목표',data:[80,80,80,80,80],borderColor:'#E24B4A',borderDash:[6,4],pointRadius:0,tension:0,borderWidth:1.5,fill:false}
-    ]},options:mkOpts(30,100)});
-  new Chart(document.getElementById('kpiChart2'),{type:'line',
-    data:{labels,datasets:[
-      {label:'통합',data:[73.2,61.5,65.6,totSolRate,null],borderColor:'#999',pointBackgroundColor:'#999',pointRadius:4,tension:0.3,borderWidth:2,fill:false},
-      {label:'채널톡',data:[82.7,61.5,66.4,67.3,null],borderColor:'#7F77DD',pointBackgroundColor:'#7F77DD',pointRadius:4,tension:0.3,borderWidth:2,fill:false},
-      {label:'네이버톡톡',data:[57.1,34.8,50,43.8,null],borderColor:'#1D9E75',pointBackgroundColor:'#1D9E75',pointRadius:4,tension:0.3,borderWidth:2,fill:false},
-      {label:'목표',data:[65,65,65,65,65],borderColor:'#E24B4A',borderDash:[6,4],pointRadius:0,tension:0,borderWidth:1.5,fill:false}
-    ]},options:mkOpts(20,95)});
+  const textC=isDark?'#aaa':'#888', gridC=isDark?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.06)';
+  new Chart(document.getElementById('kpiChart1'),{type:'line',data:{labels:['4월 4주','4월 5주','5월 1주','5월 2주','연말 목표'],datasets:[{label:'실제',data:[82.7,61.5,54.5,67.3,null],borderColor:'#378ADD',backgroundColor:'rgba(55,138,221,0.08)',fill:true,pointBackgroundColor:'#378ADD',pointRadius:5,tension:0.3,borderWidth:2},{label:'목표 70%',data:[null,null,null,67.3,70],borderColor:'#E24B4A',borderDash:[6,4],pointBackgroundColor:'#E24B4A',pointRadius:[0,0,0,0,6],tension:0.3,borderWidth:2,fill:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},datalabels:{display:false},tooltip:{callbacks:{label:c=>c.dataset.label+': '+c.parsed.y+'%'}}},scales:{x:{ticks:{color:textC,font:{size:11}},grid:{color:gridC}},y:{min:0,max:90,ticks:{color:textC,font:{size:11},callback:v=>v+'%'},grid:{color:gridC}}}}});
+  new Chart(document.getElementById('kpiChart2'),{type:'line',data:{labels:['4월 4주','4월 5주','5월 1주','5월 2주','연말 목표'],datasets:[{label:'관여율 실제',data:[63.6,50,56,55.2,null],borderColor:'#1D9E75',backgroundColor:'rgba(29,158,117,0.06)',fill:true,pointBackgroundColor:'#1D9E75',pointRadius:5,tension:0.3,borderWidth:2},{label:'관여율 목표 65%',data:[null,null,null,55.2,65],borderColor:'#E24B4A',borderDash:[6,4],pointBackgroundColor:'#E24B4A',pointRadius:[0,0,0,0,6],tension:0.3,borderWidth:2,fill:false},{label:'관여대비해결율 실제',data:[57.1,34.8,35.7,43.8,null],borderColor:'#7F77DD',backgroundColor:'rgba(127,119,221,0.06)',fill:false,pointBackgroundColor:'#7F77DD',pointRadius:5,tension:0.3,borderWidth:2,borderDash:[3,2]},{label:'관여대비해결율 목표 55%',data:[null,null,null,43.8,55],borderColor:'#E24B4A',borderDash:[6,4],pointBackgroundColor:'#E24B4A',pointRadius:[0,0,0,0,6],tension:0.3,borderWidth:2,fill:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},datalabels:{display:false},tooltip:{callbacks:{label:c=>c.dataset.label+': '+c.parsed.y+'%'}}},scales:{x:{ticks:{color:textC,font:{size:11}},grid:{color:gridC}},y:{min:0,max:85,ticks:{color:textC,font:{size:11},callback:v=>v+'%'},grid:{color:gridC}}}}});
 })();
 
-// ── 파일 업로드 ─────────────────────────────────────────────────────────
-document.getElementById('xlsxInput').addEventListener('change',function(e){
-  const file=e.target.files[0];
-  if(!file)return;
-  const status=document.getElementById('uploadStatus');
-  const btn=document.getElementById('uploadBtn');
-  status.textContent='처리 중...';
-  status.style.color='#888';
-  btn.disabled=true;
-  const reader=new FileReader();
-  reader.onload=function(ev){
-    try{
-      const wb=XLSX.read(ev.target.result,{type:'array',cellDates:true});
-      const ws=wb.Sheets[wb.SheetNames[0]];
-      const rows=XLSX.utils.sheet_to_json(ws,{defval:''});
-      if(!rows.length)throw new Error('데이터가 없습니다');
-      const newD=processExcel(rows,D);
-      renderDashboard(newD);
-      status.textContent='✓ '+file.name;
-      status.style.color='#16a34a';
-    }catch(err){
-      status.textContent='오류: '+err.message;
-      status.style.color='#dc2626';
-    }finally{
-      btn.disabled=false;
-      e.target.value='';
-    }
-  };
-  reader.onerror=function(){
-    status.textContent='파일 읽기 실패';
-    status.style.color='#dc2626';
-    btn.disabled=false;
-    e.target.value='';
-  };
-  reader.readAsArrayBuffer(file);
-});
-
-// 초기 렌더
-renderDashboard(D);
-
 // 메모
-document.getElementById('memoArea').addEventListener('input',function(){
-  document.getElementById('memoCount').textContent=this.value.length+'자';
-});
+document.getElementById('memoArea').addEventListener('input',function(){document.getElementById('memoCount').textContent=this.value.length+'자';});
 
+// 초기 렌더링
+renderDashboard();
+loadWeekList();
 </script>
 </body>
 </html>
