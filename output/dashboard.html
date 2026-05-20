@@ -622,7 +622,8 @@ function renderProdTable(products){
 }
 
 function renderDashboard(){
-  Chart.helpers.each(Chart.instances,c=>c.destroy());
+  const kpiIds=new Set(['kpiChart1','kpiChart2']);
+  Chart.helpers.each(Chart.instances,c=>{if(!kpiIds.has(c.canvas.id))c.destroy();});
   document.getElementById('pageSub').textContent='금주: '+D.curr_dates+' · 직전주: '+D.prev_dates+' · 테스트 건 제외';
   document.getElementById('kTot').textContent=D.total;
   document.getElementById('kTotSub').textContent='테스트 건 제외';
@@ -681,20 +682,17 @@ function renderDashboard(){
   document.getElementById('returnBody').innerHTML=renderProdTable(D.return_products||[]);
 }
 
-// ─── KPI 차트 (고정) ──────────────────────────────────────────────────────────
+// 초기 렌더링
+renderDashboard();
+loadWeekList();
+
+// ─── KPI 차트 (고정 — renderDashboard 이후 실행) ─────────────────────────────
 (function(){
   const isDark=matchMedia('(prefers-color-scheme: dark)').matches;
   const textC=isDark?'#aaa':'#888', gridC=isDark?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.06)';
   new Chart(document.getElementById('kpiChart1'),{type:'line',data:{labels:['4월 4주','4월 5주','5월 1주','5월 2주','연말 목표'],datasets:[{label:'실제',data:[82.7,61.5,54.5,67.3,null],borderColor:'#378ADD',backgroundColor:'rgba(55,138,221,0.08)',fill:true,pointBackgroundColor:'#378ADD',pointRadius:5,tension:0.3,borderWidth:2},{label:'목표 70%',data:[null,null,null,67.3,70],borderColor:'#E24B4A',borderDash:[6,4],pointBackgroundColor:'#E24B4A',pointRadius:[0,0,0,0,6],tension:0.3,borderWidth:2,fill:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},datalabels:{display:false},tooltip:{callbacks:{label:c=>c.dataset.label+': '+c.parsed.y+'%'}}},scales:{x:{ticks:{color:textC,font:{size:11}},grid:{color:gridC}},y:{min:0,max:90,ticks:{color:textC,font:{size:11},callback:v=>v+'%'},grid:{color:gridC}}}}});
   new Chart(document.getElementById('kpiChart2'),{type:'line',data:{labels:['4월 4주','4월 5주','5월 1주','5월 2주','연말 목표'],datasets:[{label:'관여율 실제',data:[63.6,50,56,55.2,null],borderColor:'#1D9E75',backgroundColor:'rgba(29,158,117,0.06)',fill:true,pointBackgroundColor:'#1D9E75',pointRadius:5,tension:0.3,borderWidth:2},{label:'관여율 목표 65%',data:[null,null,null,55.2,65],borderColor:'#E24B4A',borderDash:[6,4],pointBackgroundColor:'#E24B4A',pointRadius:[0,0,0,0,6],tension:0.3,borderWidth:2,fill:false},{label:'관여대비해결율 실제',data:[57.1,34.8,35.7,43.8,null],borderColor:'#7F77DD',backgroundColor:'rgba(127,119,221,0.06)',fill:false,pointBackgroundColor:'#7F77DD',pointRadius:5,tension:0.3,borderWidth:2,borderDash:[3,2]},{label:'관여대비해결율 목표 55%',data:[null,null,null,43.8,55],borderColor:'#E24B4A',borderDash:[6,4],pointBackgroundColor:'#E24B4A',pointRadius:[0,0,0,0,6],tension:0.3,borderWidth:2,fill:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},datalabels:{display:false},tooltip:{callbacks:{label:c=>c.dataset.label+': '+c.parsed.y+'%'}}},scales:{x:{ticks:{color:textC,font:{size:11}},grid:{color:gridC}},y:{min:0,max:85,ticks:{color:textC,font:{size:11},callback:v=>v+'%'},grid:{color:gridC}}}}});
 })();
-
-// 메모
-document.getElementById('memoArea').addEventListener('input',function(){document.getElementById('memoCount').textContent=this.value.length+'자';});
-
-// 초기 렌더링
-renderDashboard();
-loadWeekList();
 </script>
 </body>
 </html>
