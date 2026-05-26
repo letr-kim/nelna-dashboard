@@ -279,126 +279,91 @@ body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#f5
   <div class="card"><div class="card-title">이관 사유 태그 TOP 10</div><div class="chart-wrap-md"><canvas id="alfUnresChart"></canvas></div></div>
 </div>
 
+<!-- ⑧ 2026 KPI 목표 비교 -->
+<div class="section">
+  <div class="section-title">2026 KPI 목표 비교 <span class="badge">채널별 · 3주 합산 기준</span></div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px">
+    <div style="background:#f5f5f2;border-radius:8px;padding:14px;text-align:center">
+      <div style="font-size:11px;color:#888;margin-bottom:4px">금주 전체 상담건</div>
+      <div style="font-size:22px;font-weight:600;color:#1a1a1a" id="kpiTotalVal">156건</div>
+      <div style="font-size:11px;color:#aaa;margin-top:2px" id="kpiTotalSub">05/09 ~ 05/15</div>
+    </div>
+    <div style="background:#f5f5f2;border-radius:8px;padding:14px;text-align:center">
+      <div style="font-size:11px;color:#888;margin-bottom:4px">금주 알프 관여율</div>
+      <div style="font-size:22px;font-weight:600;color:#7c3aed" id="kpiTotalInvolveVal">78.8%</div>
+      <div style="font-size:11px;color:#aaa;margin-top:2px" id="kpiTotalInvolveSub">123 / 156건</div>
+    </div>
+    <div style="background:#f5f5f2;border-radius:8px;padding:14px;text-align:center">
+      <div style="font-size:11px;color:#888;margin-bottom:4px">금주 알프 단독해결율</div>
+      <div style="font-size:22px;font-weight:600;color:#16a34a" id="kpiTotalResolveVal">47.4%</div>
+      <div style="font-size:11px;color:#aaa;margin-top:2px" id="kpiTotalResolveSub">82 / 173건</div>
+    </div>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
+    <div class="card">
+      <div class="card-title">관여율 추이 & 목표 (80%)</div>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;font-size:11px;color:#888;flex-wrap:wrap">
+        <span style="display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:10px;height:3px;background:#888;border-radius:2px"></span>통합</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:10px;height:3px;background:#7F77DD;border-radius:2px"></span>채널톡</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:10px;height:3px;background:#1D9E75;border-radius:2px"></span>네이버톡톡</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:14px;border-top:2px dashed #E24B4A"></span>목표 80%</span>
+      </div>
+      <div style="position:relative;width:100%;height:220px"><canvas id="kpiChart1"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">관여대비해결율 추이 & 목표 (60%)</div>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;font-size:11px;color:#888;flex-wrap:wrap">
+        <span style="display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:10px;height:3px;background:#888;border-radius:2px"></span>통합</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:10px;height:3px;background:#7F77DD;border-radius:2px"></span>채널톡</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:10px;height:3px;background:#1D9E75;border-radius:2px"></span>네이버톡톡</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:14px;border-top:2px dashed #E24B4A"></span>목표 60%</span>
+      </div>
+      <div style="position:relative;width:100%;height:220px"><canvas id="kpiChart2"></canvas></div>
+    </div>
+  </div>
+</div>
+
+
 <!-- ⑦ 3주 합산 채널별 알프 지표 -->
 <div class="section">
-  <div class="section-title">채널별 알프 지표 <span class="badge">3주 합산 · 04/18~05/08</span></div>
-  <div class="grid-2">
+  <div class="section-title">채널별 알프 지표 <span class="badge" id="chTableBadge">3주 합산 · 04/25~05/15</span></div>
+  <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px">
+    <div class="card">
+      <div class="card-title">통합</div>
+      <table class="tbl">
+        <thead><tr><th>주차</th><th style="text-align:right">총인입</th><th style="text-align:right">관여율</th><th style="text-align:right">단독해결율</th></tr></thead>
+        <tbody id="totalTableBody">
+          <tr><td>04/25~05/01</td><td style="text-align:right;color:#aaa">171건</td><td style="text-align:right">77.0%</td><td style="text-align:right">46.8%</td></tr>
+          <tr><td>05/02~05/08</td><td style="text-align:right;color:#aaa">114건</td><td style="text-align:right">73.7%</td><td style="text-align:right">40.4%</td></tr>
+          <tr><td>05/09~05/15</td><td style="text-align:right;color:#aaa">156건</td><td style="text-align:right">78.8%</td><td style="text-align:right">50.6%</td></tr>
+          <tr style="border-top:1.5px solid #e5e5e0;font-weight:600"><td>3주 합산</td><td style="text-align:right;color:#aaa">441건</td><td style="text-align:right;color:#3b82f6">76.9%</td><td style="text-align:right;color:#3b82f6">46.5%</td></tr>
+        </tbody>
+      </table>
+    </div>
     <div class="card">
       <div class="card-title">채널톡</div>
       <table class="tbl">
-        <thead><tr><th>주차</th><th style="text-align:right">총인입</th><th style="text-align:right">관여율</th><th style="text-align:right">단독해결율</th><th style="text-align:right">관여대비해결율</th></tr></thead>
-        <tbody>
-          <tr><td>04/25~05/01</td><td style="text-align:right;color:#aaa">138건</td><td style="text-align:right">79.7%</td><td style="text-align:right">52.9%</td><td style="text-align:right">66.4%</td></tr>
-          <tr><td>05/02~05/08</td><td style="text-align:right;color:#aaa">89건</td><td style="text-align:right">86.5%</td><td style="text-align:right">47.2%</td><td style="text-align:right">54.5%</td></tr>
-          <tr><td>05/09~05/15</td><td style="text-align:right;color:#aaa">127건</td><td style="text-align:right">84.3%</td><td style="text-align:right">56.7%</td><td style="text-align:right">67.3%</td></tr>
-          <tr style="border-top:1.5px solid #e5e5e0;font-weight:600"><td>3주 합산</td><td style="text-align:right;color:#aaa">354건</td><td style="text-align:right;color:#3b82f6">83.1%</td><td style="text-align:right;color:#3b82f6">52.5%</td><td style="text-align:right;color:#3b82f6">63.2%</td></tr>
+        <thead><tr><th>주차</th><th style="text-align:right">총인입</th><th style="text-align:right">관여율</th><th style="text-align:right">단독해결율</th></tr></thead>
+        <tbody id="chTableBody">
+          <tr><td>04/25~05/01</td><td style="text-align:right;color:#aaa">138건</td><td style="text-align:right">79.7%</td><td style="text-align:right">52.9%</td></tr>
+          <tr><td>05/02~05/08</td><td style="text-align:right;color:#aaa">89건</td><td style="text-align:right">86.5%</td><td style="text-align:right">47.2%</td></tr>
+          <tr><td>05/09~05/15</td><td style="text-align:right;color:#aaa">127건</td><td style="text-align:right">84.3%</td><td style="text-align:right">56.7%</td></tr>
+          <tr style="border-top:1.5px solid #e5e5e0;font-weight:600"><td>3주 합산</td><td style="text-align:right;color:#aaa">354건</td><td style="text-align:right;color:#3b82f6">83.1%</td><td style="text-align:right;color:#3b82f6">52.5%</td></tr>
         </tbody>
       </table>
     </div>
     <div class="card">
       <div class="card-title">네이버 톡톡</div>
       <table class="tbl">
-        <thead><tr><th>주차</th><th style="text-align:right">총인입</th><th style="text-align:right">관여율</th><th style="text-align:right">단독해결율</th><th style="text-align:right">관여대비해결율</th></tr></thead>
-        <tbody>
-          <tr><td>04/25~05/01</td><td style="text-align:right;color:#aaa">33건</td><td style="text-align:right">48.5%</td><td style="text-align:right">24.2%</td><td style="text-align:right">50.0%</td></tr>
-          <tr><td>05/02~05/08</td><td style="text-align:right;color:#aaa">25건</td><td style="text-align:right">56.0%</td><td style="text-align:right">20.0%</td><td style="text-align:right">35.7%</td></tr>
-          <tr><td>05/09~05/15</td><td style="text-align:right;color:#aaa">29건</td><td style="text-align:right">55.2%</td><td style="text-align:right">24.1%</td><td style="text-align:right">43.8%</td></tr>
-          <tr style="border-top:1.5px solid #e5e5e0;font-weight:600"><td>3주 합산</td><td style="text-align:right;color:#aaa">87건</td><td style="text-align:right;color:#3b82f6">52.9%</td><td style="text-align:right;color:#3b82f6">22.9%</td><td style="text-align:right;color:#3b82f6">43.5%</td></tr>
+        <thead><tr><th>주차</th><th style="text-align:right">총인입</th><th style="text-align:right">관여율</th><th style="text-align:right">단독해결율</th></tr></thead>
+        <tbody id="nvTableBody">
+          <tr><td>04/25~05/01</td><td style="text-align:right;color:#aaa">33건</td><td style="text-align:right">48.5%</td><td style="text-align:right">24.2%</td></tr>
+          <tr><td>05/02~05/08</td><td style="text-align:right;color:#aaa">25건</td><td style="text-align:right">56.0%</td><td style="text-align:right">20.0%</td></tr>
+          <tr><td>05/09~05/15</td><td style="text-align:right;color:#aaa">29건</td><td style="text-align:right">55.2%</td><td style="text-align:right">24.1%</td></tr>
+          <tr style="border-top:1.5px solid #e5e5e0;font-weight:600"><td>3주 합산</td><td style="text-align:right;color:#aaa">87건</td><td style="text-align:right;color:#3b82f6">52.9%</td><td style="text-align:right;color:#3b82f6">22.9%</td></tr>
         </tbody>
       </table>
-    </div>
-  </div>
-</div>
-
-<!-- ⑧ 2026 KPI 목표 비교 -->
-<div class="section">
-  <div class="section-title">2026 KPI 목표 비교 <span class="badge">채널별 · 3주 합산 기준</span></div>
-  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:16px">
-    <div style="background:#f5f5f2;border-radius:8px;padding:14px;text-align:center">
-      <div style="font-size:11px;color:#888;margin-bottom:4px">전체 상담건</div>
-      <div style="font-size:22px;font-weight:600;color:#1a1a1a">540건</div>
-      <div style="font-size:11px;color:#aaa;margin-top:2px">04/25 ~ 05/15 (3주)</div>
-    </div>
-    <div style="background:#f5f5f2;border-radius:8px;padding:14px;text-align:center">
-      <div style="font-size:11px;color:#888;margin-bottom:4px">채널톡 관여율</div>
-      <div style="font-size:22px;font-weight:600;color:#1a1a1a">83.1%</div>
-      <div style="font-size:11px;color:#aaa;margin-top:2px">294 / 354건</div>
-    </div>
-    <div style="background:#f5f5f2;border-radius:8px;padding:14px;text-align:center">
-      <div style="font-size:11px;color:#888;margin-bottom:4px">채널톡 관여대비해결율</div>
-      <div style="font-size:22px;font-weight:600;color:#1a1a1a">63.2%</div>
-      <div style="font-size:11px;color:#aaa;margin-top:2px">224 / 354건 (관여건 대비)</div>
-    </div>
-    <div style="background:#f5f5f2;border-radius:8px;padding:14px;text-align:center">
-      <div style="font-size:11px;color:#888;margin-bottom:4px">네이버톡톡 관여율</div>
-      <div style="font-size:22px;font-weight:600;color:#1a1a1a">52.9%</div>
-      <div style="font-size:11px;color:#aaa;margin-top:2px">46 / 87건</div>
-    </div>
-  </div>
-
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px">
-    <div class="card">
-      <div class="card-title">채널톡 — 관여대비해결율 추이 & 목표</div>
-      <div style="font-size:11px;color:#aaa;margin-bottom:8px">관여건 대비 알프 해결율</div>
-      <div style="display:flex;align-items:center;gap:16px;margin-bottom:10px;font-size:11px;color:#888">
-        <span style="display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:10px;height:3px;background:#378ADD;border-radius:2px"></span>실제</span>
-        <span style="display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:14px;border-top:2px dashed #E24B4A"></span>목표 70%</span>
-      </div>
-      <div style="display:flex;justify-content:space-between;margin-bottom:6px;padding:0 4px">
-        <div style="text-align:center">
-          <div style="font-size:18px;font-weight:500;color:#378ADD">82.7%</div>
-          <div style="font-size:10px;color:#aaa">4월 4주</div>
-        </div>
-        <div style="text-align:center">
-          <div style="font-size:18px;font-weight:500;color:#378ADD">61.5%</div>
-          <div style="font-size:10px;color:#aaa">4월 5주</div>
-        </div>
-        <div style="text-align:center">
-          <div style="font-size:18px;font-weight:500;color:#378ADD">54.5%</div>
-          <div style="font-size:10px;color:#aaa">5월 1주</div>
-        </div>
-        <div style="text-align:center">
-          <div style="font-size:18px;font-weight:500;color:#378ADD">67.3%</div>
-          <div style="font-size:10px;color:#aaa">5월 2주</div>
-        </div>
-        <div style="text-align:center">
-          <div style="font-size:18px;font-weight:500;color:#E24B4A">70%</div>
-          <div style="font-size:10px;color:#aaa">연말 목표</div>
-        </div>
-      </div>
-      <div style="position:relative;width:100%;height:200px"><canvas id="kpiChart1" role="img" aria-label="채널톡 관여대비해결율: 4월5주 61.5%, 5월1주 54.5%, 목표 70%">채널톡 관여대비해결율 추이</canvas></div>
-    </div>
-    <div class="card">
-      <div class="card-title">네이버톡톡 — 관여율 & 관여대비해결율 추이 & 목표</div>
-      <div style="font-size:11px;color:#aaa;margin-bottom:8px">관여율 목표 65% / 관여대비해결율 목표 55%</div>
-      <div style="display:flex;align-items:center;gap:16px;margin-bottom:10px;font-size:11px;color:#888">
-        <span style="display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:10px;height:3px;background:#1D9E75;border-radius:2px"></span>관여율</span>
-        <span style="display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:10px;height:3px;background:#7F77DD;border-radius:2px"></span>관여대비해결율</span>
-        <span style="display:flex;align-items:center;gap:4px"><span style="display:inline-block;width:14px;border-top:2px dashed #E24B4A"></span>목표</span>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;gap:4px;margin-bottom:6px;padding:0 4px">
-        <div style="text-align:center">
-          <div style="font-size:11px;font-weight:500;color:#1D9E75">관여 63.6% / 해결 57.1%</div>
-          <div style="font-size:10px;color:#aaa">4월 4주</div>
-        </div>
-        <div style="text-align:center">
-          <div style="font-size:11px;font-weight:500;color:#1D9E75">관여 50% / 해결 34.8%</div>
-          <div style="font-size:10px;color:#aaa">4월 5주</div>
-        </div>
-        <div style="text-align:center">
-          <div style="font-size:11px;font-weight:500;color:#1D9E75">관여 56% / 해결 35.7%</div>
-          <div style="font-size:10px;color:#aaa">5월 1주</div>
-        </div>
-        <div style="text-align:center">
-          <div style="font-size:11px;font-weight:500;color:#1D9E75">관여 55.2% / 해결 43.8%</div>
-          <div style="font-size:10px;color:#aaa">5월 2주</div>
-        </div>
-        <div style="text-align:center">
-          <div style="font-size:11px;font-weight:500;color:#E24B4A">관여 65% / 해결 55%</div>
-          <div style="font-size:10px;color:#aaa">연말 목표</div>
-        </div>
-      </div>
-      <div style="position:relative;width:100%;height:200px"><canvas id="kpiChart2" role="img" aria-label="네이버톡톡 관여율/관여대비해결율 추이와 목표">네이버톡톡 추이</canvas></div>
     </div>
   </div>
 </div>
@@ -423,7 +388,7 @@ body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#f5
 Chart.register(ChartDataLabels);
 Chart.defaults.font.family="'Apple SD Gothic Neo','Malgun Gothic',sans-serif";
 Chart.defaults.font.size=12;Chart.defaults.color='#666';
-const D={"total": 156, "agent_assigned": 66, "avg_response_min": 25.8, "alf_triggered": 123, "alf_solo": 79, "alf_escalated": 43, "agent_only": 23, "workflow_only": 11, "curr_solo_rate": 50.6, "prev_solo_rate": 40.4, "prev_total": 114, "prev_total_real": 114, "prev_alf_solo": 46, "curr_dow": [25, 33, 24, 25, 28, 11, 10], "prev_dow": [20, 10, 25, 20, 24, 4, 11], "top10_tags": [{"tag": "디지털/사용문의/가계부", "total": 21, "alf": 15, "agent": 6}, {"tag": "실물/제품문의/필름", "total": 10, "alf": 10, "agent": 0}, {"tag": "교환", "total": 8, "alf": 0, "agent": 8}, {"tag": "실물/제품문의/입고품절", "total": 7, "alf": 3, "agent": 4}, {"tag": "실물/이상주장/타이머", "total": 7, "alf": 4, "agent": 3}, {"tag": "디지털/오류문의/가계부", "total": 6, "alf": 2, "agent": 4}, {"tag": "결제/결제문의/기타", "total": 6, "alf": 6, "agent": 0}, {"tag": "와디즈", "total": 5, "alf": 0, "agent": 5}, {"tag": "미수거재발송", "total": 5, "alf": 0, "agent": 5}, {"tag": "실물/이상주장/키링캠", "total": 4, "alf": 0, "agent": 4}], "alf_unresolved_tags": [{"tag": "디지털/사용문의/가계부", "count": 5}, {"tag": "교환", "count": 5}, {"tag": "실물/이상주장/키링캠", "count": 4}, {"tag": "반품", "count": 4}, {"tag": "미수거재발송", "count": 4}, {"tag": "디지털/오류문의/가계부", "count": 3}, {"tag": "와디즈", "count": 3}, {"tag": "실물/이상주장/타이머", "count": 3}, {"tag": "실물/이상주장/낼나펜슬", "count": 2}, {"tag": "실물/제품문의/입고품절", "count": 2}], "inc_tags": [{"tag": "디지털/사용문의/가계부", "curr": 21, "prev": 11, "delta": 10}, {"tag": "실물/제품문의/필름", "curr": 10, "prev": 2, "delta": 8}, {"tag": "디지털/오류문의/가계부", "curr": 6, "prev": 3, "delta": 3}, {"tag": "결제/결제문의/기타", "curr": 6, "prev": 1, "delta": 5}, {"tag": "와디즈", "curr": 5, "prev": 0, "delta": 5}, {"tag": "미수거재발송", "curr": 5, "prev": 3, "delta": 2}, {"tag": "실물/이상주장/키링캠", "curr": 4, "prev": 1, "delta": 3}, {"tag": "실물/제품문의/입고품절", "curr": 7, "prev": 6, "delta": 1}], "curr_solo_top5": [{"tag": "디지털/사용문의/가계부", "curr": 15, "prev": 7}, {"tag": "실물/제품문의/필름", "curr": 10, "prev": 1}, {"tag": "결제/결제문의/기타", "curr": 6, "prev": 1}, {"tag": "실물/이상주장/타이머", "curr": 4, "prev": 5}, {"tag": "배송/배송문의/일정문의", "curr": 3, "prev": 0}], "prev_solo_top5": [{"tag": "디지털/사용문의/가계부", "curr": 15, "prev": 7}, {"tag": "실물/제품문의/필름", "curr": 10, "prev": 0}, {"tag": "결제/결제문의/기타", "curr": 6, "prev": 0}, {"tag": "실물/이상주장/타이머", "curr": 4, "prev": 5}, {"tag": "배송/배송문의/일정문의", "curr": 3, "prev": 0}], "prod_ranking": [{"name": "디지털", "total": 31, "prev": 19, "curr_pct": 19.9, "prev_pct": 16.7, "delta": 12}, {"name": "낼나 타이머", "total": 16, "prev": 20, "curr_pct": 10.3, "prev_pct": 17.5, "delta": -4}, {"name": "낼나 키링캠", "total": 9, "prev": 9, "curr_pct": 5.8, "prev_pct": 7.9, "delta": 0}, {"name": "낼나 펜슬", "total": 7, "prev": 5, "curr_pct": 4.5, "prev_pct": 4.4, "delta": 2}, {"name": "데일리 케이블", "total": 2, "prev": 2, "curr_pct": 1.3, "prev_pct": 1.8, "delta": 0}], "curr_dates": "05/09 ~ 05/15", "prev_dates": "05/02 ~ 05/08", "channelio_solo": 72, "channelio_triggered": 107, "channelio_rate": 67.3, "mon_top6": [], "mon_agent": 0, "mon_alf_esc": 0, "mon_direct": 0, "mon_pct": 0, "mon_date": "", "mon_prev": 0, "mon_curr": 0, "no_alf_direct": 16, "no_alf_reopen": 3, "no_alf_total": 33, "no_alf_agent": 22, "no_alf_work": 11, "no_alf_tags": [{"tag": "교환", "count": 5}, {"tag": "와디즈", "count": 2}, {"tag": "실물/제품문의/입고품절", "count": 2}, {"tag": "취소문의", "count": 2}, {"tag": "배송/배송문의/누락오배송", "count": 1}, {"tag": "배송/배송문의/합배송", "count": 1}, {"tag": "배송/배송문의/일정문의", "count": 1}, {"tag": "미수거재발송", "count": 1}, {"tag": "실물/이상주장/기타", "count": 1}, {"tag": "철회", "count": 1}, {"tag": "디지털/오류문의/가계부", "count": 1}], "exchange_products": [{"product": "타이머-기능정지", "count": 4}, {"product": "타이머버터-외관부품", "count": 1}, {"product": "낼나펜슬", "count": 1}, {"product": "타이머클래식-기능사운드", "count": 1}, {"product": "필름(와디즈)", "count": 1}], "return_products": [{"product": "케이블스트랩세트", "count": 1}, {"product": "키링캠", "count": 1}]};
+const D={"total": 173, "agent_assigned": 77, "avg_response_min": 30.2, "alf_triggered": 132, "alf_solo": 82, "alf_escalated": 49, "agent_only": 28, "workflow_only": 14, "curr_solo_rate": 47.4, "prev_solo_rate": 50.6, "prev_total": 156, "prev_total_real": 156, "prev_alf_solo": 79, "curr_dow": [31, 30, 38, 36, 20, 13, 5], "prev_dow": [25, 33, 24, 25, 28, 11, 10], "top10_tags": [{"tag": "디지털/사용문의/가계부", "total": 19, "alf": 11, "agent": 8}, {"tag": "교환", "total": 17, "alf": 0, "agent": 17}, {"tag": "실물/제품문의/필름", "total": 9, "alf": 8, "agent": 1}, {"tag": "결제/결제문의/기타", "total": 9, "alf": 9, "agent": 0}, {"tag": "취소문의", "total": 7, "alf": 2, "agent": 5}, {"tag": "디지털/오류문의/가계부", "total": 6, "alf": 1, "agent": 5}, {"tag": "실물/이상주장/타이머", "total": 6, "alf": 4, "agent": 2}, {"tag": "실물/제품문의/펜촉", "total": 6, "alf": 4, "agent": 2}, {"tag": "실물/제품문의/케이블스트랩", "total": 5, "alf": 3, "agent": 2}, {"tag": "미수거재발송", "total": 5, "alf": 0, "agent": 5}], "alf_unresolved_tags": [{"tag": "교환", "count": 10}, {"tag": "미수거재발송", "count": 5}, {"tag": "디지털/오류문의/가계부", "count": 4}, {"tag": "배송/배송문의/오배송(매칭오류)", "count": 3}, {"tag": "취소문의", "count": 3}, {"tag": "디지털/사용문의/가계부", "count": 3}, {"tag": "낼나펜슬", "count": 3}, {"tag": "배송/배송문의/일정문의", "count": 2}, {"tag": "태그홀더", "count": 2}, {"tag": "실물/제품문의/케이블스트랩", "count": 2}], "inc_tags": [{"tag": "디지털/사용문의/가계부", "curr": 19, "prev": 0, "delta": 19}, {"tag": "교환", "curr": 17, "prev": 0, "delta": 17}, {"tag": "실물/제품문의/필름", "curr": 9, "prev": 0, "delta": 9}, {"tag": "결제/결제문의/기타", "curr": 9, "prev": 0, "delta": 9}, {"tag": "취소문의", "curr": 7, "prev": 0, "delta": 7}, {"tag": "디지털/오류문의/가계부", "curr": 6, "prev": 0, "delta": 6}, {"tag": "실물/이상주장/타이머", "curr": 6, "prev": 0, "delta": 6}, {"tag": "실물/제품문의/펜촉", "curr": 6, "prev": 0, "delta": 6}, {"tag": "실물/제품문의/케이블스트랩", "curr": 5, "prev": 0, "delta": 5}, {"tag": "미수거재발송", "curr": 5, "prev": 0, "delta": 5}], "curr_solo_top5": [{"tag": "디지털/사용문의/가계부", "curr": 11, "prev": 15}, {"tag": "결제/결제문의/기타", "curr": 9, "prev": 6}, {"tag": "실물/제품문의/필름", "curr": 8, "prev": 10}, {"tag": "실물/제품문의/펜촉", "curr": 4, "prev": 1}, {"tag": "실물/이상주장/타이머", "curr": 4, "prev": 4}], "prev_solo_top5": [{"tag": "디지털/사용문의/가계부", "curr": 11, "prev": 0}, {"tag": "결제/결제문의/기타", "curr": 9, "prev": 0}, {"tag": "실물/제품문의/필름", "curr": 8, "prev": 0}, {"tag": "실물/제품문의/펜촉", "curr": 4, "prev": 0}, {"tag": "실물/이상주장/타이머", "curr": 4, "prev": 0}], "prod_ranking": [{"name": "디지털", "total": 29, "prev": 31, "delta": -2, "curr_pct": 16.8, "prev_pct": 0}, {"name": "낼나 타이머", "total": 16, "prev": 16, "delta": 0, "curr_pct": 9.2, "prev_pct": 0}, {"name": "낼나 키링캠", "total": 12, "prev": 9, "delta": 3, "curr_pct": 6.9, "prev_pct": 0}, {"name": "낼나 펜슬", "total": 9, "prev": 7, "delta": 2, "curr_pct": 5.2, "prev_pct": 0}, {"name": "데일리 케이블", "total": 0, "prev": 2, "delta": -2, "curr_pct": 0.0, "prev_pct": 0}], "curr_dates": "05/16 ~ 05/22", "prev_dates": "05/09 ~ 05/15", "channelio_solo": 72, "channelio_triggered": 107, "channelio_rate": 67.3, "mon_top6": [], "mon_agent": 0, "mon_alf_esc": 0, "mon_direct": 0, "mon_pct": 0, "mon_date": "", "mon_prev": 0, "mon_curr": 0, "no_alf_direct": 25, "no_alf_reopen": 2, "no_alf_total": 41, "no_alf_agent": 27, "no_alf_work": 14, "no_alf_tags": [{"tag": "교환", "count": 7}, {"tag": "디지털/사용문의/가계부", "count": 5}, {"tag": "배송/배송문의/일정문의", "count": 2}, {"tag": "실물/제품문의/입고품절", "count": 2}, {"tag": "실물/이상주장/타이머", "count": 1}, {"tag": "반품", "count": 1}, {"tag": "타이머", "count": 1}, {"tag": "실물/제품문의/펜촉", "count": 1}, {"tag": "실물/제품문의/타이머", "count": 1}, {"tag": "디지털/오류문의/가계부", "count": 1}], "exchange_products": [{"product": "낼나펜슬", "count": 4}, {"product": "타이머-기능정지", "count": 3}, {"product": "타이머클래식-기능사운드", "count": 2}, {"product": "타이머버터-외관부품", "count": 1}, {"product": "필름(다이아)", "count": 1}, {"product": "키링캠", "count": 1}], "return_products": [{"product": "기타", "count": 2}], "ch_history": [{"dates": "04/25 ~ 05/01", "total": 138, "triggered": 110, "solo": 73, "involveRate": 79.7, "soloRate": 52.9, "resolveRate": 66.4}, {"dates": "05/02 ~ 05/08", "total": 89, "triggered": 77, "solo": 42, "involveRate": 86.5, "soloRate": 47.2, "resolveRate": 54.5}, {"dates": "05/09 ~ 05/15", "total": 127, "triggered": 107, "solo": 72, "involveRate": 84.3, "soloRate": 56.7, "resolveRate": 67.3}, {"dates": "05/16 ~ 05/22", "total": 132, "triggered": 112, "solo": 77, "involveRate": 84.8, "soloRate": 58.3, "resolveRate": 68.8}], "nv_history": [{"dates": "04/25 ~ 05/01", "total": 33, "triggered": 16, "solo": 8, "involveRate": 48.5, "soloRate": 24.2, "resolveRate": 50.0}, {"dates": "05/02 ~ 05/08", "total": 25, "triggered": 14, "solo": 5, "involveRate": 56.0, "soloRate": 20.0, "resolveRate": 35.7}, {"dates": "05/09 ~ 05/15", "total": 29, "triggered": 16, "solo": 7, "involveRate": 55.2, "soloRate": 24.1, "resolveRate": 43.8}, {"dates": "05/16 ~ 05/22", "total": 41, "triggered": 20, "solo": 5, "involveRate": 48.8, "soloRate": 12.2, "resolveRate": 25.0}], "kpi_history": [{"dates": "04/18~04/24", "involveRate": 82.7, "resolveRate": 61.5, "chInvolve": 83.1, "chResolve": 66.4, "nvInvolve": 50.0, "nvResolve": 34.8, "totalCount": 255, "triggeredCount": 211, "soloCount": 106, "soloRate": 41.6}, {"dates": "04/25~05/01", "involveRate": 77.0, "resolveRate": 66.4, "chInvolve": 79.7, "chResolve": 66.4, "nvInvolve": 48.5, "nvResolve": 50.0, "totalCount": 171, "triggeredCount": 132, "soloCount": 80, "soloRate": 46.8}, {"dates": "05/02~05/08", "involveRate": 73.7, "resolveRate": 54.5, "chInvolve": 86.5, "chResolve": 54.5, "nvInvolve": 56.0, "nvResolve": 35.7, "totalCount": 114, "triggeredCount": 84, "soloCount": 46, "soloRate": 40.4}, {"dates": "05/09~05/15", "involveRate": 78.8, "resolveRate": 64.2, "chInvolve": 84.3, "chResolve": 67.3, "nvInvolve": 55.2, "nvResolve": 43.8, "totalCount": 156, "triggeredCount": 123, "soloCount": 79, "soloRate": 50.6}, {"dates": "05/16 ~ 05/22", "involveRate": 76.3, "resolveRate": 62.1, "chInvolve": 84.8, "chResolve": 68.8, "nvInvolve": 48.8, "nvResolve": 25.0, "totalCount": 173, "triggeredCount": 132, "soloCount": 82, "soloRate": 47.4}], "all_tag_counts": {"비밀링크/비밀링크/비밀링크": 1, "실물/제품문의/필름": 9, "교환": 17, "와디즈": 2, "디지털/사용문의/가계부": 19, "결제/결제문의/기타": 9, "디지털/오류문의/가계부": 6, "배송/배송문의/오배송(매칭오류)": 3, "실물/제품문의/케이블스트랩": 5, "취소문의": 7, "디지털": 1, "실물/이상주장/타이머": 6, "반품": 2, "타이머": 1, "실물/제품문의/펜촉": 6, "실물/제품문의/타이머": 2, "2차": 1, "배송/배송문의/일정문의": 4, "필름": 1, "미수거재발송": 5, "태그홀더": 3, "결제/구매문의/비회원": 3, "실물/제품문의/키링캠": 3, "실물/제품문의/케이블스트랩구성품": 3, "실물/제품문의/폰트": 1, "실물/이상주장/키링캠": 2, "실물/이상주장/기타": 1, "공동구매": 1, "기타/기타/기타": 2, "낼나펜슬": 3, "키링캠": 2, "케이블스트랩": 1, "실물/이상주장/낼나펜슬": 2, "쿠폰/사용문의/사용문의": 1, "실물/제품문의/키링캠구성품": 3, "쿠팡": 2, "케이블세트": 1, "디지털/사용문의/노션기타": 3, "실물/제품문의/O링": 2, "광고스팸메시지": 1, "실물/제품문의/입고품절": 4, "키링캠-은행노랑": 1, "타이머핑크": 1, "스탬프커터": 1, "실물/제품문의/폰케이스": 2, "결제/결제문의/오류": 1, "배송/배송문의/기타": 1}, "solo_tag_counts": {"디지털/사용문의/가계부": 11, "결제/결제문의/기타": 9, "실물/제품문의/필름": 8, "실물/제품문의/케이블스트랩": 3, "실물/제품문의/펜촉": 4, "결제/구매문의/비회원": 2, "실물/제품문의/키링캠": 2, "실물/제품문의/케이블스트랩구성품": 2, "실물/제품문의/폰트": 1, "실물/이상주장/타이머": 4, "공동구매": 1, "기타/기타/기타": 1, "취소문의": 2, "쿠폰/사용문의/사용문의": 1, "실물/제품문의/키링캠구성품": 3, "쿠팡": 2, "디지털/사용문의/노션기타": 2, "실물/제품문의/O링": 2, "실물/제품문의/입고품절": 1, "키링캠-은행노랑": 1, "실물/제품문의/타이머": 1, "실물/이상주장/낼나펜슬": 1, "실물/제품문의/폰케이스": 1, "결제/결제문의/오류": 1, "태그홀더": 1, "디지털/오류문의/가계부": 1}, "ch_stat": {"total": 132, "triggered": 112, "solo": 77, "involveRate": 84.8, "soloRate": 58.3, "resolveRate": 68.8}, "nv_stat": {"total": 41, "triggered": 20, "solo": 5, "involveRate": 48.8, "soloRate": 12.2, "resolveRate": 25.0}};
 
 // ─── GitHub 설정 ─────────────────────────────────────────────────────────────
 const GH_OWNER='letr-kim', GH_REPO='nelna-dashboard', GH_BRANCH='main';
@@ -593,6 +558,56 @@ async function handleFile(file){
       const allTagCounts={};df.forEach(r=>{const seen=new Set();iterTags(r.tags).forEach(t=>{if(!seen.has(t)){allTagCounts[t]=(allTagCounts[t]||0)+1;seen.add(t);}});});
       const soloTagCounts={};df.filter(soloMask).forEach(r=>{const seen=new Set();iterTags(r.tags).forEach(t=>{if(!seen.has(t)){soloTagCounts[t]=(soloTagCounts[t]||0)+1;seen.add(t);}});});
       const newD={...D,total,agent_assigned:alfEsc+agentOnly,avg_response_min:avgMin,alf_triggered:triggered,alf_solo:alfSolo,alf_escalated:alfEsc,agent_only:agentOnly,workflow_only:workOnly,curr_solo_rate:+(alfSolo/total*100).toFixed(1),prev_solo_rate:D.curr_solo_rate,prev_total:D.total,prev_total_real:D.total,prev_alf_solo:D.alf_solo,curr_dow:currDow,prev_dow:D.curr_dow,curr_dates:currDates,prev_dates:D.curr_dates,top10_tags:top10,alf_unresolved_tags:alfUnresTags,inc_tags:incTags,curr_solo_top5:soloTop5,prev_solo_top5:soloTop5,prod_ranking:prodRanking,exchange_products:exchangeProducts,return_products:returnProducts,no_alf_direct:direct,no_alf_reopen:reopen,no_alf_total:noAlf.length,no_alf_agent:noAlfAgent.length,no_alf_work:noAlf.filter(r=>!r.assigneeId).length,no_alf_tags:Object.entries(nalfC).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([tag,count])=>({tag,count})),all_tag_counts:allTagCounts,solo_tag_counts:soloTagCounts};
+
+      // 채널별 계산 (채널톡: mediumType=native, 네이버톡톡: mediumName=appNaverTalk)
+      const pct = (a,b) => b>0?+(a/b*100).toFixed(1):0;
+      function chStats(rows) {
+        const t=rows.length;
+        const trig=rows.filter(alfTrig).length;
+        const solo=rows.filter(soloMask).length;
+        return {total:t, triggered:trig, solo,
+          involveRate:pct(trig,t), soloRate:pct(solo,t),
+          resolveRate:pct(solo,trig)};
+      }
+      const chRows = df.filter(r=>r.mediumType==='native');
+      const nvRows = df.filter(r=>r.mediumName==='appNaverTalk');
+      const chStat = chStats(chRows);
+      const nvStat = chStats(nvRows);
+      newD.ch_stat = chStat;
+      newD.nv_stat = nvStat;
+
+      // 채널별 히스토리 업데이트 (최근 3주 유지)
+      const chHistory = D.ch_history || [];
+      const nvHistory = D.nv_history || [];
+      const newChRow = {dates: currDates, ...chStat};
+      const newNvRow = {dates: currDates, ...nvStat};
+      // 같은 주차면 교체, 없으면 추가
+      const chIdx = chHistory.findIndex(r=>r.dates===currDates);
+      if(chIdx>=0) chHistory[chIdx]=newChRow; else chHistory.push(newChRow);
+      const nvIdx = nvHistory.findIndex(r=>r.dates===currDates);
+      if(nvIdx>=0) nvHistory[nvIdx]=newNvRow; else nvHistory.push(newNvRow);
+      // 최근 3주만 유지
+      newD.ch_history = chHistory.slice(-3);
+      newD.nv_history = nvHistory.slice(-3);
+
+      // KPI 히스토리 누적 (엑셀 업로드마다 추가)
+      const kpiHistory = D.kpi_history ? [...D.kpi_history] : [];
+      const newKpiRow = {
+        dates: currDates,
+        totalCount: total,
+        triggeredCount: triggered,
+        soloCount: alfSolo,
+        involveRate: +(triggered/total*100).toFixed(1),
+        soloRate: +(alfSolo/total*100).toFixed(1),
+        resolveRate: +(alfSolo/triggered*100).toFixed(1),
+        chInvolve: chStat.involveRate,
+        chResolve: chStat.resolveRate,
+        nvInvolve: nvStat.involveRate,
+        nvResolve: nvStat.resolveRate,
+      };
+      const kpiIdx = kpiHistory.findIndex(r=>r.dates===currDates);
+      if(kpiIdx>=0) kpiHistory[kpiIdx]=newKpiRow; else kpiHistory.push(newKpiRow);
+      newD.kpi_history = kpiHistory;
       Object.assign(D,newD);
       renderDashboard();
       if(getToken()&&currDates){
@@ -678,21 +693,134 @@ function renderDashboard(){
   const aufT=D.alf_unresolved_tags;
   new Chart(document.getElementById('alfUnresChart'),{type:'bar',data:{labels:aufT.map(t=>t.tag),datasets:[{data:aufT.map(t=>t.count),backgroundColor:'#f87171',borderRadius:3}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},datalabels:{anchor:'end',align:'end',color:'#b91c1c',font:{size:11,weight:'700'},formatter:v=>v+'건'}},scales:{x:{beginAtZero:true,grid:{color:'#f0f0ee'},max:Math.max(...aufT.map(t=>t.count))+5},y:{grid:{display:false},ticks:{font:{size:10}}}}}});
   document.getElementById('noAlfTagsBody').innerHTML=(D.no_alf_tags||[]).map(t=>'<tr><td>'+t.tag+'</td><td style="text-align:right;font-weight:600">'+t.count+'건</td></tr>').join('')||'<tr><td colspan="2" style="color:#aaa">데이터 없음</td></tr>';
+  // KPI 카드 업데이트 (금주 전체 수치)
+  document.getElementById('kpiTotalVal').textContent = D.total+'건';
+  document.getElementById('kpiTotalSub').textContent = D.curr_dates;
+  const involveRate2 = +(D.alf_triggered/D.total*100).toFixed(1);
+  const soloRate2 = +(D.alf_solo/D.total*100).toFixed(1);
+  document.getElementById('kpiTotalInvolveVal').textContent = involveRate2+'%';
+  document.getElementById('kpiTotalInvolveSub').textContent = D.alf_triggered+' / '+D.total+'건';
+  document.getElementById('kpiTotalResolveVal').textContent = soloRate2+'%';
+  document.getElementById('kpiTotalResolveSub').textContent = D.alf_solo+' / '+D.total+'건';
+
+  // KPI 차트 재빌드
+  if(typeof buildKpiCharts === 'function') buildKpiCharts();
+
   document.getElementById('exchangeBody').innerHTML=renderProdTable(D.exchange_products||[]);
   document.getElementById('returnBody').innerHTML=renderProdTable(D.return_products||[]);
+
+  // 통합 지표 표 업데이트 (kpi_history 기반)
+  if(D.kpi_history && D.kpi_history.length) {
+    const kh = D.kpi_history;
+    const totalSum = kh.reduce((a,r)=>({
+      total:(a.total||0)+(r.totalCount||0),
+      triggered:(a.triggered||0)+(r.triggeredCount||0),
+      solo:(a.solo||0)+(r.soloCount||0)
+    }), {total:0,triggered:0,solo:0});
+    document.getElementById('totalTableBody').innerHTML =
+      kh.map(r=>`<tr><td>${r.dates}</td>
+        <td style="text-align:right;color:#aaa">${r.totalCount||'-'}건</td>
+        <td style="text-align:right">${r.involveRate}%</td>
+        <td style="text-align:right">${r.soloRate||'-'}%</td></tr>`).join('') +
+      `<tr style="border-top:1.5px solid #e5e5e0;font-weight:600"><td>합산</td>
+        <td style="text-align:right;color:#aaa">${totalSum.total||'-'}건</td>
+        <td style="text-align:right;color:#3b82f6">${totalSum.triggered&&totalSum.total?+(totalSum.triggered/totalSum.total*100).toFixed(1):'-'}%</td>
+        <td style="text-align:right;color:#3b82f6">${totalSum.solo&&totalSum.total?+(totalSum.solo/totalSum.total*100).toFixed(1):'-'}%</td></tr>`;
+  }
+
+  // 채널별 알프 지표 표 업데이트
+  function chRow(r, isSummary) {
+    const style = isSummary ? 'style="border-top:1.5px solid #e5e5e0;font-weight:600"' : '';
+    const label = isSummary ? '최신 주차' : r.dates;
+    return `<tr ${style}><td>${label}</td>
+      <td style="text-align:right;color:#aaa">${r.total}건</td>
+      <td style="text-align:right${isSummary?';color:#3b82f6':''}">${r.involveRate}%</td>
+      <td style="text-align:right${isSummary?';color:#3b82f6':''}">${r.soloRate}%</td></tr>`;
+  }
+
+  if(D.ch_history && D.ch_history.length) {
+    const chH = D.ch_history;
+    const chSum = chH.reduce((a,r)=>({
+      total:a.total+r.total, triggered:a.triggered+r.triggered, solo:a.solo+r.solo
+    }), {total:0,triggered:0,solo:0});
+    const chSumRow = {dates:'3주 합산', total:chSum.total,
+      involveRate:+(chSum.triggered/chSum.total*100).toFixed(1),
+      soloRate:+(chSum.solo/chSum.total*100).toFixed(1),
+      resolveRate:+(chSum.solo/chSum.triggered*100).toFixed(1)};
+    document.getElementById('chTableBody').innerHTML =
+      chH.map(r=>chRow(r,false)).join('') + chRow(chSumRow,true);
+
+    // KPI 카드 업데이트 (채널별 합산 — ch_history/nv_history 기반)
+    const firstDate = chH[0].dates.split(' ~ ')[0];
+    const lastDate = chH[chH.length-1].dates.split(' ~ ')[1] || chH[chH.length-1].dates;
+    document.getElementById('chTableBadge').textContent = '3주 합산 · '+firstDate+'~'+lastDate;
+  }
+
+  if(D.nv_history && D.nv_history.length) {
+    const nvH = D.nv_history;
+    const nvSum = nvH.reduce((a,r)=>({
+      total:a.total+r.total, triggered:a.triggered+r.triggered, solo:a.solo+r.solo
+    }), {total:0,triggered:0,solo:0});
+    const nvSumRow = {dates:'3주 합산', total:nvSum.total,
+      involveRate:+(nvSum.triggered/nvSum.total*100).toFixed(1),
+      soloRate:+(nvSum.solo/nvSum.total*100).toFixed(1),
+      resolveRate:+(nvSum.solo/nvSum.triggered*100).toFixed(1)};
+    document.getElementById('nvTableBody').innerHTML =
+      nvH.map(r=>chRow(r,false)).join('') + chRow(nvSumRow,true);
+
+    // 전체 합산 상담건
+    const allTotal = (D.ch_history||[]).reduce((a,r)=>a+r.total,0) + nvSum.total;
+    document.getElementById('kpiTotalVal').textContent = allTotal+'건';
+  }
 }
+
+// KPI 목표값
+const KPI_GOAL_INVOLVE = 80, KPI_GOAL_RESOLVE = 60;
 
 // 초기 렌더링
 renderDashboard();
 loadWeekList();
 
-// ─── KPI 차트 (고정 — renderDashboard 이후 실행) ─────────────────────────────
-(function(){
+// ─── KPI 차트 (동적 — 엑셀 업로드 시 자동 업데이트) ────────────────────────
+// D.kpi_history: [{dates, involveRate, resolveRate, chInvolve, chResolve, nvInvolve, nvResolve}]
+function buildKpiCharts() {
   const isDark=matchMedia('(prefers-color-scheme: dark)').matches;
   const textC=isDark?'#aaa':'#888', gridC=isDark?'rgba(255,255,255,0.06)':'rgba(0,0,0,0.06)';
-  new Chart(document.getElementById('kpiChart1'),{type:'line',data:{labels:['4월 4주','4월 5주','5월 1주','5월 2주','연말 목표'],datasets:[{label:'실제',data:[82.7,61.5,54.5,67.3,null],borderColor:'#378ADD',backgroundColor:'rgba(55,138,221,0.08)',fill:true,pointBackgroundColor:'#378ADD',pointRadius:5,tension:0.3,borderWidth:2},{label:'목표 70%',data:[null,null,null,67.3,70],borderColor:'#E24B4A',borderDash:[6,4],pointBackgroundColor:'#E24B4A',pointRadius:[0,0,0,0,6],tension:0.3,borderWidth:2,fill:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},datalabels:{display:false},tooltip:{callbacks:{label:c=>c.dataset.label+': '+c.parsed.y+'%'}}},scales:{x:{ticks:{color:textC,font:{size:11}},grid:{color:gridC}},y:{min:0,max:90,ticks:{color:textC,font:{size:11},callback:v=>v+'%'},grid:{color:gridC}}}}});
-  new Chart(document.getElementById('kpiChart2'),{type:'line',data:{labels:['4월 4주','4월 5주','5월 1주','5월 2주','연말 목표'],datasets:[{label:'관여율 실제',data:[63.6,50,56,55.2,null],borderColor:'#1D9E75',backgroundColor:'rgba(29,158,117,0.06)',fill:true,pointBackgroundColor:'#1D9E75',pointRadius:5,tension:0.3,borderWidth:2},{label:'관여율 목표 65%',data:[null,null,null,55.2,65],borderColor:'#E24B4A',borderDash:[6,4],pointBackgroundColor:'#E24B4A',pointRadius:[0,0,0,0,6],tension:0.3,borderWidth:2,fill:false},{label:'관여대비해결율 실제',data:[57.1,34.8,35.7,43.8,null],borderColor:'#7F77DD',backgroundColor:'rgba(127,119,221,0.06)',fill:false,pointBackgroundColor:'#7F77DD',pointRadius:5,tension:0.3,borderWidth:2,borderDash:[3,2]},{label:'관여대비해결율 목표 55%',data:[null,null,null,43.8,55],borderColor:'#E24B4A',borderDash:[6,4],pointBackgroundColor:'#E24B4A',pointRadius:[0,0,0,0,6],tension:0.3,borderWidth:2,fill:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},datalabels:{display:false},tooltip:{callbacks:{label:c=>c.dataset.label+': '+c.parsed.y+'%'}}},scales:{x:{ticks:{color:textC,font:{size:11}},grid:{color:gridC}},y:{min:0,max:85,ticks:{color:textC,font:{size:11},callback:v=>v+'%'},grid:{color:gridC}}}}});
-})();
+  const hist = D.kpi_history || [];
+  const labels = hist.map(h=>h.dates);
+
+  // 기존 차트 제거
+  ['kpiChart1','kpiChart2'].forEach(id=>{
+    const existing = Chart.getChart(id);
+    if(existing) existing.destroy();
+  });
+
+  new Chart(document.getElementById('kpiChart1'),{type:'line',
+    data:{labels,datasets:[
+      {label:'통합',data:hist.map(h=>h.involveRate),borderColor:'#888',fill:false,pointBackgroundColor:'#888',pointRadius:5,tension:0.3,borderWidth:2,borderDash:[4,2]},
+      {label:'채널톡',data:hist.map(h=>h.chInvolve),borderColor:'#7F77DD',fill:false,pointBackgroundColor:'#7F77DD',pointRadius:5,tension:0.3,borderWidth:2},
+      {label:'네이버톡톡',data:hist.map(h=>h.nvInvolve),borderColor:'#1D9E75',fill:false,pointBackgroundColor:'#1D9E75',pointRadius:5,tension:0.3,borderWidth:2},
+      {label:'목표 '+KPI_GOAL_INVOLVE+'%',data:hist.map(()=>KPI_GOAL_INVOLVE),borderColor:'#E24B4A',borderDash:[6,4],pointRadius:0,tension:0,borderWidth:2,fill:false}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:true,position:'bottom',labels:{boxWidth:12,font:{size:11}}},datalabels:{display:false},tooltip:{callbacks:{label:c=>c.dataset.label+': '+c.parsed.y+'%'}}},
+      scales:{x:{ticks:{color:textC,font:{size:11}},grid:{color:gridC}},y:{min:0,max:100,ticks:{color:textC,font:{size:11},callback:v=>v+'%'},grid:{color:gridC}}}}
+  });
+
+  new Chart(document.getElementById('kpiChart2'),{type:'line',
+    data:{labels,datasets:[
+      {label:'통합',data:hist.map(h=>h.resolveRate),borderColor:'#888',fill:false,pointBackgroundColor:'#888',pointRadius:5,tension:0.3,borderWidth:2,borderDash:[4,2]},
+      {label:'채널톡',data:hist.map(h=>h.chResolve),borderColor:'#7F77DD',fill:false,pointBackgroundColor:'#7F77DD',pointRadius:5,tension:0.3,borderWidth:2},
+      {label:'네이버톡톡',data:hist.map(h=>h.nvResolve),borderColor:'#1D9E75',fill:false,pointBackgroundColor:'#1D9E75',pointRadius:5,tension:0.3,borderWidth:2},
+      {label:'목표 '+KPI_GOAL_RESOLVE+'%',data:hist.map(()=>KPI_GOAL_RESOLVE),borderColor:'#E24B4A',borderDash:[6,4],pointRadius:0,tension:0,borderWidth:2,fill:false}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{display:true,position:'bottom',labels:{boxWidth:12,font:{size:11}}},datalabels:{display:false},tooltip:{callbacks:{label:c=>c.dataset.label+': '+c.parsed.y+'%'}}},
+      scales:{x:{ticks:{color:textC,font:{size:11}},grid:{color:gridC}},y:{min:0,max:100,ticks:{color:textC,font:{size:11},callback:v=>v+'%'},grid:{color:gridC}}}}
+  });
+}
+
+buildKpiCharts();
 </script>
 </body>
 </html>
