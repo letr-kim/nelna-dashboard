@@ -47,8 +47,21 @@ body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#f5
 .upload-btn{position:fixed;top:20px;right:24px;z-index:100;display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #e5e5e0;border-radius:10px;padding:8px 14px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.08);font-size:13px;color:#555;transition:all 0.2s}
 .upload-btn:hover{background:#f5f5f2;border-color:#ccc}
 .upload-btn svg{width:18px;height:18px;color:#7c3aed}
-.week-select-wrap{position:fixed;top:20px;right:200px;z-index:100}
+.week-select-wrap{position:fixed;top:20px;right:200px;z-index:100;display:flex;align-items:center;gap:8px}
 .week-select{background:#fff;border:1px solid #e5e5e0;border-radius:10px;padding:8px 14px;font-size:13px;color:#555;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.08);outline:none;appearance:none;padding-right:28px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
+.date-range-btn{background:#fff;border:1px solid #e5e5e0;border-radius:10px;padding:8px 12px;font-size:13px;color:#555;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.08);white-space:nowrap}
+.date-range-btn:hover{background:#f5f5f2}
+.date-picker-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.3);z-index:300;align-items:center;justify-content:center}
+.date-picker-overlay.show{display:flex}
+.date-picker-modal{background:#fff;border-radius:16px;padding:28px;width:380px;max-width:90vw}
+.date-picker-modal h3{font-size:16px;font-weight:600;margin-bottom:16px}
+.date-picker-row{display:flex;gap:12px;margin-bottom:16px}
+.date-picker-row label{font-size:12px;color:#888;margin-bottom:4px;display:block}
+.date-picker-row input{border:1px solid #e5e5e0;border-radius:8px;padding:8px 10px;font-size:13px;width:100%;outline:none}
+.date-picker-row input:focus{border-color:#7c3aed}
+.date-picker-apply{width:100%;background:#7c3aed;color:#fff;border:none;border-radius:8px;padding:11px;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:8px}
+.date-picker-apply:hover{background:#6d28d9}
+.date-picker-cancel{width:100%;background:none;border:0.5px solid #e0e0db;border-radius:8px;padding:8px;font-size:13px;color:#888;cursor:pointer}
 .upload-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:200;align-items:center;justify-content:center}
 .upload-overlay.show{display:flex}
 .upload-modal{background:#fff;border-radius:16px;padding:32px;width:480px;max-width:90vw;text-align:center}
@@ -72,11 +85,26 @@ body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#f5
 </style>
 </head>
 <body>
-<!-- 주차 선택 드롭다운 -->
+<!-- 주차/월별/날짜 선택 -->
 <div class="week-select-wrap">
-  <select class="week-select" id="weekSelect" onchange="loadWeekData(this.value)">
-    <option value="">📅 주차 선택</option>
+  <select class="week-select" id="weekSelect" onchange="handleSelectChange(this.value)">
+    <option value="">📅 기간 선택</option>
   </select>
+  <button class="date-range-btn" onclick="document.getElementById('datePickerOverlay').classList.add('show')">📆 날짜 범위</button>
+</div>
+
+<!-- 날짜 범위 선택 모달 -->
+<div class="date-picker-overlay" id="datePickerOverlay">
+  <div class="date-picker-modal">
+    <h3>📆 날짜 범위 선택</h3>
+    <div class="date-picker-row">
+      <div style="flex:1"><label>시작일</label><input type="date" id="dateFrom"></div>
+      <div style="flex:1"><label>종료일</label><input type="date" id="dateTo"></div>
+    </div>
+    <div style="font-size:12px;color:#aaa;margin-bottom:16px">해당 기간에 걸치는 주차 데이터를 합산해서 보여줍니다.</div>
+    <button class="date-picker-apply" onclick="applyDateRange()">적용</button>
+    <button class="date-picker-cancel" onclick="document.getElementById('datePickerOverlay').classList.remove('show')">취소</button>
+  </div>
 </div>
 
 <!-- 업로드 버튼 -->
@@ -388,7 +416,7 @@ body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#f5
 Chart.register(ChartDataLabels);
 Chart.defaults.font.family="'Apple SD Gothic Neo','Malgun Gothic',sans-serif";
 Chart.defaults.font.size=12;Chart.defaults.color='#666';
-const D={"total": 173, "agent_assigned": 77, "avg_response_min": 30.2, "alf_triggered": 132, "alf_solo": 82, "alf_escalated": 49, "agent_only": 28, "workflow_only": 14, "curr_solo_rate": 47.4, "prev_solo_rate": 50.6, "prev_total": 156, "prev_total_real": 156, "prev_alf_solo": 79, "curr_dow": [31, 30, 38, 36, 20, 13, 5], "prev_dow": [25, 33, 24, 25, 28, 11, 10], "top10_tags": [{"tag": "디지털/사용문의/가계부", "total": 19, "alf": 11, "agent": 8}, {"tag": "교환", "total": 17, "alf": 0, "agent": 17}, {"tag": "실물/제품문의/필름", "total": 9, "alf": 8, "agent": 1}, {"tag": "결제/결제문의/기타", "total": 9, "alf": 9, "agent": 0}, {"tag": "취소문의", "total": 7, "alf": 2, "agent": 5}, {"tag": "디지털/오류문의/가계부", "total": 6, "alf": 1, "agent": 5}, {"tag": "실물/이상주장/타이머", "total": 6, "alf": 4, "agent": 2}, {"tag": "실물/제품문의/펜촉", "total": 6, "alf": 4, "agent": 2}, {"tag": "실물/제품문의/케이블스트랩", "total": 5, "alf": 3, "agent": 2}, {"tag": "미수거재발송", "total": 5, "alf": 0, "agent": 5}], "alf_unresolved_tags": [{"tag": "교환", "count": 10}, {"tag": "미수거재발송", "count": 5}, {"tag": "디지털/오류문의/가계부", "count": 4}, {"tag": "배송/배송문의/오배송(매칭오류)", "count": 3}, {"tag": "취소문의", "count": 3}, {"tag": "디지털/사용문의/가계부", "count": 3}, {"tag": "낼나펜슬", "count": 3}, {"tag": "배송/배송문의/일정문의", "count": 2}, {"tag": "태그홀더", "count": 2}, {"tag": "실물/제품문의/케이블스트랩", "count": 2}], "inc_tags": [{"tag": "디지털/사용문의/가계부", "curr": 19, "prev": 0, "delta": 19}, {"tag": "교환", "curr": 17, "prev": 0, "delta": 17}, {"tag": "실물/제품문의/필름", "curr": 9, "prev": 0, "delta": 9}, {"tag": "결제/결제문의/기타", "curr": 9, "prev": 0, "delta": 9}, {"tag": "취소문의", "curr": 7, "prev": 0, "delta": 7}, {"tag": "디지털/오류문의/가계부", "curr": 6, "prev": 0, "delta": 6}, {"tag": "실물/이상주장/타이머", "curr": 6, "prev": 0, "delta": 6}, {"tag": "실물/제품문의/펜촉", "curr": 6, "prev": 0, "delta": 6}, {"tag": "실물/제품문의/케이블스트랩", "curr": 5, "prev": 0, "delta": 5}, {"tag": "미수거재발송", "curr": 5, "prev": 0, "delta": 5}], "curr_solo_top5": [{"tag": "디지털/사용문의/가계부", "curr": 11, "prev": 15}, {"tag": "결제/결제문의/기타", "curr": 9, "prev": 6}, {"tag": "실물/제품문의/필름", "curr": 8, "prev": 10}, {"tag": "실물/제품문의/펜촉", "curr": 4, "prev": 1}, {"tag": "실물/이상주장/타이머", "curr": 4, "prev": 4}], "prev_solo_top5": [{"tag": "디지털/사용문의/가계부", "curr": 11, "prev": 0}, {"tag": "결제/결제문의/기타", "curr": 9, "prev": 0}, {"tag": "실물/제품문의/필름", "curr": 8, "prev": 0}, {"tag": "실물/제품문의/펜촉", "curr": 4, "prev": 0}, {"tag": "실물/이상주장/타이머", "curr": 4, "prev": 0}], "prod_ranking": [{"name": "디지털", "total": 29, "prev": 31, "delta": -2, "curr_pct": 16.8, "prev_pct": 0}, {"name": "낼나 타이머", "total": 16, "prev": 16, "delta": 0, "curr_pct": 9.2, "prev_pct": 0}, {"name": "낼나 키링캠", "total": 12, "prev": 9, "delta": 3, "curr_pct": 6.9, "prev_pct": 0}, {"name": "낼나 펜슬", "total": 9, "prev": 7, "delta": 2, "curr_pct": 5.2, "prev_pct": 0}, {"name": "데일리 케이블", "total": 0, "prev": 2, "delta": -2, "curr_pct": 0.0, "prev_pct": 0}], "curr_dates": "05/16 ~ 05/22", "prev_dates": "05/09 ~ 05/15", "channelio_solo": 72, "channelio_triggered": 107, "channelio_rate": 67.3, "mon_top6": [], "mon_agent": 0, "mon_alf_esc": 0, "mon_direct": 0, "mon_pct": 0, "mon_date": "", "mon_prev": 0, "mon_curr": 0, "no_alf_direct": 25, "no_alf_reopen": 2, "no_alf_total": 41, "no_alf_agent": 27, "no_alf_work": 14, "no_alf_tags": [{"tag": "교환", "count": 7}, {"tag": "디지털/사용문의/가계부", "count": 5}, {"tag": "배송/배송문의/일정문의", "count": 2}, {"tag": "실물/제품문의/입고품절", "count": 2}, {"tag": "실물/이상주장/타이머", "count": 1}, {"tag": "반품", "count": 1}, {"tag": "타이머", "count": 1}, {"tag": "실물/제품문의/펜촉", "count": 1}, {"tag": "실물/제품문의/타이머", "count": 1}, {"tag": "디지털/오류문의/가계부", "count": 1}], "exchange_products": [{"product": "낼나펜슬", "count": 4}, {"product": "타이머-기능정지", "count": 3}, {"product": "타이머클래식-기능사운드", "count": 2}, {"product": "타이머버터-외관부품", "count": 1}, {"product": "필름(다이아)", "count": 1}, {"product": "키링캠", "count": 1}], "return_products": [{"product": "기타", "count": 2}], "ch_history": [{"dates": "04/25 ~ 05/01", "total": 138, "triggered": 110, "solo": 73, "involveRate": 79.7, "soloRate": 52.9, "resolveRate": 66.4}, {"dates": "05/02 ~ 05/08", "total": 89, "triggered": 77, "solo": 42, "involveRate": 86.5, "soloRate": 47.2, "resolveRate": 54.5}, {"dates": "05/09 ~ 05/15", "total": 127, "triggered": 107, "solo": 72, "involveRate": 84.3, "soloRate": 56.7, "resolveRate": 67.3}, {"dates": "05/16 ~ 05/22", "total": 132, "triggered": 112, "solo": 77, "involveRate": 84.8, "soloRate": 58.3, "resolveRate": 68.8}], "nv_history": [{"dates": "04/25 ~ 05/01", "total": 33, "triggered": 16, "solo": 8, "involveRate": 48.5, "soloRate": 24.2, "resolveRate": 50.0}, {"dates": "05/02 ~ 05/08", "total": 25, "triggered": 14, "solo": 5, "involveRate": 56.0, "soloRate": 20.0, "resolveRate": 35.7}, {"dates": "05/09 ~ 05/15", "total": 29, "triggered": 16, "solo": 7, "involveRate": 55.2, "soloRate": 24.1, "resolveRate": 43.8}, {"dates": "05/16 ~ 05/22", "total": 41, "triggered": 20, "solo": 5, "involveRate": 48.8, "soloRate": 12.2, "resolveRate": 25.0}], "kpi_history": [{"dates": "04/18~04/24", "involveRate": 82.7, "resolveRate": 61.5, "chInvolve": 83.1, "chResolve": 66.4, "nvInvolve": 50.0, "nvResolve": 34.8, "totalCount": 255, "triggeredCount": 211, "soloCount": 106, "soloRate": 41.6}, {"dates": "04/25~05/01", "involveRate": 77.0, "resolveRate": 66.4, "chInvolve": 79.7, "chResolve": 66.4, "nvInvolve": 48.5, "nvResolve": 50.0, "totalCount": 171, "triggeredCount": 132, "soloCount": 80, "soloRate": 46.8}, {"dates": "05/02~05/08", "involveRate": 73.7, "resolveRate": 54.5, "chInvolve": 86.5, "chResolve": 54.5, "nvInvolve": 56.0, "nvResolve": 35.7, "totalCount": 114, "triggeredCount": 84, "soloCount": 46, "soloRate": 40.4}, {"dates": "05/09~05/15", "involveRate": 78.8, "resolveRate": 64.2, "chInvolve": 84.3, "chResolve": 67.3, "nvInvolve": 55.2, "nvResolve": 43.8, "totalCount": 156, "triggeredCount": 123, "soloCount": 79, "soloRate": 50.6}, {"dates": "05/16 ~ 05/22", "involveRate": 76.3, "resolveRate": 62.1, "chInvolve": 84.8, "chResolve": 68.8, "nvInvolve": 48.8, "nvResolve": 25.0, "totalCount": 173, "triggeredCount": 132, "soloCount": 82, "soloRate": 47.4}], "all_tag_counts": {"비밀링크/비밀링크/비밀링크": 1, "실물/제품문의/필름": 9, "교환": 17, "와디즈": 2, "디지털/사용문의/가계부": 19, "결제/결제문의/기타": 9, "디지털/오류문의/가계부": 6, "배송/배송문의/오배송(매칭오류)": 3, "실물/제품문의/케이블스트랩": 5, "취소문의": 7, "디지털": 1, "실물/이상주장/타이머": 6, "반품": 2, "타이머": 1, "실물/제품문의/펜촉": 6, "실물/제품문의/타이머": 2, "2차": 1, "배송/배송문의/일정문의": 4, "필름": 1, "미수거재발송": 5, "태그홀더": 3, "결제/구매문의/비회원": 3, "실물/제품문의/키링캠": 3, "실물/제품문의/케이블스트랩구성품": 3, "실물/제품문의/폰트": 1, "실물/이상주장/키링캠": 2, "실물/이상주장/기타": 1, "공동구매": 1, "기타/기타/기타": 2, "낼나펜슬": 3, "키링캠": 2, "케이블스트랩": 1, "실물/이상주장/낼나펜슬": 2, "쿠폰/사용문의/사용문의": 1, "실물/제품문의/키링캠구성품": 3, "쿠팡": 2, "케이블세트": 1, "디지털/사용문의/노션기타": 3, "실물/제품문의/O링": 2, "광고스팸메시지": 1, "실물/제품문의/입고품절": 4, "키링캠-은행노랑": 1, "타이머핑크": 1, "스탬프커터": 1, "실물/제품문의/폰케이스": 2, "결제/결제문의/오류": 1, "배송/배송문의/기타": 1}, "solo_tag_counts": {"디지털/사용문의/가계부": 11, "결제/결제문의/기타": 9, "실물/제품문의/필름": 8, "실물/제품문의/케이블스트랩": 3, "실물/제품문의/펜촉": 4, "결제/구매문의/비회원": 2, "실물/제품문의/키링캠": 2, "실물/제품문의/케이블스트랩구성품": 2, "실물/제품문의/폰트": 1, "실물/이상주장/타이머": 4, "공동구매": 1, "기타/기타/기타": 1, "취소문의": 2, "쿠폰/사용문의/사용문의": 1, "실물/제품문의/키링캠구성품": 3, "쿠팡": 2, "디지털/사용문의/노션기타": 2, "실물/제품문의/O링": 2, "실물/제품문의/입고품절": 1, "키링캠-은행노랑": 1, "실물/제품문의/타이머": 1, "실물/이상주장/낼나펜슬": 1, "실물/제품문의/폰케이스": 1, "결제/결제문의/오류": 1, "태그홀더": 1, "디지털/오류문의/가계부": 1}, "ch_stat": {"total": 132, "triggered": 112, "solo": 77, "involveRate": 84.8, "soloRate": 58.3, "resolveRate": 68.8}, "nv_stat": {"total": 41, "triggered": 20, "solo": 5, "involveRate": 48.8, "soloRate": 12.2, "resolveRate": 25.0}};
+const D={"total": 173, "agent_assigned": 77, "avg_response_min": 30.2, "alf_triggered": 132, "alf_solo": 82, "alf_escalated": 49, "agent_only": 28, "workflow_only": 14, "curr_solo_rate": 47.4, "prev_solo_rate": 50.6, "prev_total": 156, "prev_total_real": 156, "prev_alf_solo": 79, "curr_dow": [31, 30, 38, 36, 20, 13, 5], "prev_dow": [25, 33, 24, 25, 28, 11, 10], "top10_tags": [{"tag": "디지털/사용문의/가계부", "total": 19, "alf": 11, "agent": 8}, {"tag": "교환", "total": 17, "alf": 0, "agent": 17}, {"tag": "실물/제품문의/필름", "total": 9, "alf": 8, "agent": 1}, {"tag": "결제/결제문의/기타", "total": 9, "alf": 9, "agent": 0}, {"tag": "취소문의", "total": 7, "alf": 2, "agent": 5}, {"tag": "디지털/오류문의/가계부", "total": 6, "alf": 1, "agent": 5}, {"tag": "실물/이상주장/타이머", "total": 6, "alf": 4, "agent": 2}, {"tag": "실물/제품문의/펜촉", "total": 6, "alf": 4, "agent": 2}, {"tag": "실물/제품문의/케이블스트랩", "total": 5, "alf": 3, "agent": 2}, {"tag": "미수거재발송", "total": 5, "alf": 0, "agent": 5}], "alf_unresolved_tags": [{"tag": "교환", "count": 10}, {"tag": "미수거재발송", "count": 5}, {"tag": "디지털/오류문의/가계부", "count": 4}, {"tag": "배송/배송문의/오배송(매칭오류)", "count": 3}, {"tag": "취소문의", "count": 3}, {"tag": "디지털/사용문의/가계부", "count": 3}, {"tag": "낼나펜슬", "count": 3}, {"tag": "배송/배송문의/일정문의", "count": 2}, {"tag": "태그홀더", "count": 2}, {"tag": "실물/제품문의/케이블스트랩", "count": 2}], "inc_tags": [{"tag": "디지털/사용문의/가계부", "curr": 19, "prev": 0, "delta": 19}, {"tag": "교환", "curr": 17, "prev": 0, "delta": 17}, {"tag": "실물/제품문의/필름", "curr": 9, "prev": 0, "delta": 9}, {"tag": "결제/결제문의/기타", "curr": 9, "prev": 0, "delta": 9}, {"tag": "취소문의", "curr": 7, "prev": 0, "delta": 7}, {"tag": "디지털/오류문의/가계부", "curr": 6, "prev": 0, "delta": 6}, {"tag": "실물/이상주장/타이머", "curr": 6, "prev": 0, "delta": 6}, {"tag": "실물/제품문의/펜촉", "curr": 6, "prev": 0, "delta": 6}, {"tag": "실물/제품문의/케이블스트랩", "curr": 5, "prev": 0, "delta": 5}, {"tag": "미수거재발송", "curr": 5, "prev": 0, "delta": 5}], "curr_solo_top5": [{"tag": "디지털/사용문의/가계부", "curr": 11, "prev": 15}, {"tag": "결제/결제문의/기타", "curr": 9, "prev": 6}, {"tag": "실물/제품문의/필름", "curr": 8, "prev": 10}, {"tag": "실물/제품문의/펜촉", "curr": 4, "prev": 1}, {"tag": "실물/이상주장/타이머", "curr": 4, "prev": 4}], "prev_solo_top5": [{"tag": "디지털/사용문의/가계부", "curr": 11, "prev": 0}, {"tag": "결제/결제문의/기타", "curr": 9, "prev": 0}, {"tag": "실물/제품문의/필름", "curr": 8, "prev": 0}, {"tag": "실물/제품문의/펜촉", "curr": 4, "prev": 0}, {"tag": "실물/이상주장/타이머", "curr": 4, "prev": 0}], "prod_ranking": [{"name": "디지털", "total": 29, "prev": 31, "delta": -2, "curr_pct": 16.8, "prev_pct": 0}, {"name": "낼나 타이머", "total": 16, "prev": 16, "delta": 0, "curr_pct": 9.2, "prev_pct": 0}, {"name": "낼나 키링캠", "total": 12, "prev": 9, "delta": 3, "curr_pct": 6.9, "prev_pct": 0}, {"name": "낼나 펜슬", "total": 9, "prev": 7, "delta": 2, "curr_pct": 5.2, "prev_pct": 0}, {"name": "데일리 케이블", "total": 0, "prev": 2, "delta": -2, "curr_pct": 0.0, "prev_pct": 0}], "curr_dates": "05/16 ~ 05/22", "prev_dates": "05/09 ~ 05/15", "channelio_solo": 72, "channelio_triggered": 107, "channelio_rate": 67.3, "mon_top6": [], "mon_agent": 0, "mon_alf_esc": 0, "mon_direct": 0, "mon_pct": 0, "mon_date": "", "mon_prev": 0, "mon_curr": 0, "no_alf_direct": 25, "no_alf_reopen": 2, "no_alf_total": 41, "no_alf_agent": 27, "no_alf_work": 14, "no_alf_tags": [{"tag": "교환", "count": 7}, {"tag": "디지털/사용문의/가계부", "count": 5}, {"tag": "배송/배송문의/일정문의", "count": 2}, {"tag": "실물/제품문의/입고품절", "count": 2}, {"tag": "실물/이상주장/타이머", "count": 1}, {"tag": "반품", "count": 1}, {"tag": "타이머", "count": 1}, {"tag": "실물/제품문의/펜촉", "count": 1}, {"tag": "실물/제품문의/타이머", "count": 1}, {"tag": "디지털/오류문의/가계부", "count": 1}], "exchange_products": [{"product": "낼나펜슬", "count": 4}, {"product": "타이머-기능정지", "count": 3}, {"product": "타이머클래식-기능사운드", "count": 2}, {"product": "타이머버터-외관부품", "count": 1}, {"product": "필름(다이아)", "count": 1}, {"product": "키링캠", "count": 1}], "return_products": [{"product": "타이머", "count": 1}, {"product": "케이블스트랩", "count": 1}], "ch_history": [{"dates": "04/25 ~ 05/01", "total": 138, "triggered": 110, "solo": 73, "involveRate": 79.7, "soloRate": 52.9, "resolveRate": 66.4}, {"dates": "05/02 ~ 05/08", "total": 89, "triggered": 77, "solo": 42, "involveRate": 86.5, "soloRate": 47.2, "resolveRate": 54.5}, {"dates": "05/09 ~ 05/15", "total": 127, "triggered": 107, "solo": 72, "involveRate": 84.3, "soloRate": 56.7, "resolveRate": 67.3}, {"dates": "05/16 ~ 05/22", "total": 132, "triggered": 112, "solo": 77, "involveRate": 84.8, "soloRate": 58.3, "resolveRate": 68.8}], "nv_history": [{"dates": "04/25 ~ 05/01", "total": 33, "triggered": 16, "solo": 8, "involveRate": 48.5, "soloRate": 24.2, "resolveRate": 50.0}, {"dates": "05/02 ~ 05/08", "total": 25, "triggered": 14, "solo": 5, "involveRate": 56.0, "soloRate": 20.0, "resolveRate": 35.7}, {"dates": "05/09 ~ 05/15", "total": 29, "triggered": 16, "solo": 7, "involveRate": 55.2, "soloRate": 24.1, "resolveRate": 43.8}, {"dates": "05/16 ~ 05/22", "total": 41, "triggered": 20, "solo": 5, "involveRate": 48.8, "soloRate": 12.2, "resolveRate": 25.0}], "kpi_history": [{"dates": "04/18~04/24", "involveRate": 82.7, "resolveRate": 61.5, "chInvolve": 83.1, "chResolve": 66.4, "nvInvolve": 50.0, "nvResolve": 34.8, "totalCount": 255, "triggeredCount": 211, "soloCount": 106, "soloRate": 41.6}, {"dates": "04/25~05/01", "involveRate": 77.0, "resolveRate": 66.4, "chInvolve": 79.7, "chResolve": 66.4, "nvInvolve": 48.5, "nvResolve": 50.0, "totalCount": 171, "triggeredCount": 132, "soloCount": 80, "soloRate": 46.8}, {"dates": "05/02~05/08", "involveRate": 73.7, "resolveRate": 54.5, "chInvolve": 86.5, "chResolve": 54.5, "nvInvolve": 56.0, "nvResolve": 35.7, "totalCount": 114, "triggeredCount": 84, "soloCount": 46, "soloRate": 40.4}, {"dates": "05/09~05/15", "involveRate": 78.8, "resolveRate": 64.2, "chInvolve": 84.3, "chResolve": 67.3, "nvInvolve": 55.2, "nvResolve": 43.8, "totalCount": 156, "triggeredCount": 123, "soloCount": 79, "soloRate": 50.6}, {"dates": "05/16 ~ 05/22", "involveRate": 76.3, "resolveRate": 62.1, "chInvolve": 84.8, "chResolve": 68.8, "nvInvolve": 48.8, "nvResolve": 25.0, "totalCount": 173, "triggeredCount": 132, "soloCount": 82, "soloRate": 47.4}], "all_tag_counts": {"비밀링크/비밀링크/비밀링크": 1, "실물/제품문의/필름": 9, "교환": 17, "와디즈": 2, "디지털/사용문의/가계부": 19, "결제/결제문의/기타": 9, "디지털/오류문의/가계부": 6, "배송/배송문의/오배송(매칭오류)": 3, "실물/제품문의/케이블스트랩": 5, "취소문의": 7, "디지털": 1, "실물/이상주장/타이머": 6, "반품": 2, "타이머": 1, "실물/제품문의/펜촉": 6, "실물/제품문의/타이머": 2, "2차": 1, "배송/배송문의/일정문의": 4, "필름": 1, "미수거재발송": 5, "태그홀더": 3, "결제/구매문의/비회원": 3, "실물/제품문의/키링캠": 3, "실물/제품문의/케이블스트랩구성품": 3, "실물/제품문의/폰트": 1, "실물/이상주장/키링캠": 2, "실물/이상주장/기타": 1, "공동구매": 1, "기타/기타/기타": 2, "낼나펜슬": 3, "키링캠": 2, "케이블스트랩": 1, "실물/이상주장/낼나펜슬": 2, "쿠폰/사용문의/사용문의": 1, "실물/제품문의/키링캠구성품": 3, "쿠팡": 2, "케이블세트": 1, "디지털/사용문의/노션기타": 3, "실물/제품문의/O링": 2, "광고스팸메시지": 1, "실물/제품문의/입고품절": 4, "키링캠-은행노랑": 1, "타이머핑크": 1, "스탬프커터": 1, "실물/제품문의/폰케이스": 2, "결제/결제문의/오류": 1, "배송/배송문의/기타": 1}, "solo_tag_counts": {"디지털/사용문의/가계부": 11, "결제/결제문의/기타": 9, "실물/제품문의/필름": 8, "실물/제품문의/케이블스트랩": 3, "실물/제품문의/펜촉": 4, "결제/구매문의/비회원": 2, "실물/제품문의/키링캠": 2, "실물/제품문의/케이블스트랩구성품": 2, "실물/제품문의/폰트": 1, "실물/이상주장/타이머": 4, "공동구매": 1, "기타/기타/기타": 1, "취소문의": 2, "쿠폰/사용문의/사용문의": 1, "실물/제품문의/키링캠구성품": 3, "쿠팡": 2, "디지털/사용문의/노션기타": 2, "실물/제품문의/O링": 2, "실물/제품문의/입고품절": 1, "키링캠-은행노랑": 1, "실물/제품문의/타이머": 1, "실물/이상주장/낼나펜슬": 1, "실물/제품문의/폰케이스": 1, "결제/결제문의/오류": 1, "태그홀더": 1, "디지털/오류문의/가계부": 1}, "ch_stat": {"total": 132, "triggered": 112, "solo": 77, "involveRate": 84.8, "soloRate": 58.3, "resolveRate": 68.8}, "nv_stat": {"total": 41, "triggered": 20, "solo": 5, "involveRate": 48.8, "soloRate": 12.2, "resolveRate": 25.0}};
 
 // ─── GitHub 설정 ─────────────────────────────────────────────────────────────
 const GH_OWNER='letr-kim', GH_REPO='nelna-dashboard', GH_BRANCH='main';
@@ -417,30 +445,77 @@ async function saveToGitHub(weekKey,data){
   if(sha)body.sha=sha;
   const res=await fetch('https://api.github.com/repos/'+GH_OWNER+'/'+GH_REPO+'/contents/'+path,{
     method:'PUT',headers:{Authorization:'token '+token,'Content-Type':'application/json'},body:JSON.stringify(body)});
+  if(res.ok) await updateIndexJson(weekKey, token);
   return res.ok;
+}
+
+async function updateIndexJson(newKey, token){
+  try{
+    const idxPath='data/index.json';
+    let sha=null, weeks=[];
+    const ex=await fetch('https://api.github.com/repos/'+GH_OWNER+'/'+GH_REPO+'/contents/'+idxPath,
+      {headers:{Authorization:'token '+token}});
+    if(ex.ok){
+      const j=await ex.json();
+      sha=j.sha;
+      weeks=JSON.parse(atob(j.content.replace(/\n/g,''))).weeks||[];
+    }
+    if(!weeks.includes(newKey))weeks.push(newKey);
+    weeks.sort();
+    const content=btoa(unescape(encodeURIComponent(JSON.stringify({weeks},null,2))));
+    const body={message:'update index '+newKey,content,branch:GH_BRANCH};
+    if(sha)body.sha=sha;
+    await fetch('https://api.github.com/repos/'+GH_OWNER+'/'+GH_REPO+'/contents/'+idxPath,{
+      method:'PUT',headers:{Authorization:'token '+token,'Content-Type':'application/json'},
+      body:JSON.stringify(body)});
+  }catch(e){console.error('index.json 업데이트 실패:',e);}
 }
 async function loadWeekList(){
   try{
-    const r=await fetch('https://api.github.com/repos/'+GH_OWNER+'/'+GH_REPO+'/contents/data?ref='+GH_BRANCH,
-      {headers:getToken()?{Authorization:'token '+getToken()}:{}});
+    // GitHub API 대신 index.json으로 파일 목록 로드 (토큰 불필요)
+    const r=await fetch('https://raw.githubusercontent.com/'+GH_OWNER+'/'+GH_REPO+'/'+GH_BRANCH+'/data/index.json');
     if(!r.ok)return;
-    const files=await r.json();
+    const index=await r.json();
+    const weeks=(index.weeks||[]).slice().sort((a,b)=>b.localeCompare(a));
     const sel=document.getElementById('weekSelect');
-    if(!sel.querySelector('option[value="current"]')){
-      const opt=document.createElement('option');
-      opt.value='current';opt.textContent='📌 '+D.curr_dates+' (현재)';
-      sel.appendChild(opt);
-    }
-    files.filter(f=>f.name.endsWith('.json')).sort((a,b)=>b.name.localeCompare(a.name)).forEach(f=>{
-      const key=f.name.replace('.json','');
-      if(!sel.querySelector('option[value="'+key+'"]')){
-        const opt=document.createElement('option');
-        opt.value=key;opt.textContent='📅 '+key;
-        sel.appendChild(opt);
-      }
+    while(sel.options.length>1)sel.remove(1);
+    const currOpt=document.createElement('option');
+    currOpt.value='current';currOpt.textContent='📌 '+D.curr_dates+' (현재)';
+    sel.appendChild(currOpt);
+    const monthGroups={};
+    weeks.forEach(key=>{
+      const mm=key.split('-')[0];
+      const mk='2026-'+mm;
+      if(!monthGroups[mk])monthGroups[mk]=[];
+      monthGroups[mk].push(key);
     });
-  }catch(e){}
+    const mNames={'01':'1월','02':'2월','03':'3월','04':'4월','05':'5월','06':'6월','07':'7월','08':'8월','09':'9월','10':'10월','11':'11월','12':'12월'};
+    Object.keys(monthGroups).sort((a,b)=>b.localeCompare(a)).forEach(mk=>{
+      const mm=mk.split('-')[1];
+      const opt=document.createElement('option');
+      opt.value='month:'+mk;
+      opt.textContent='📅 2026년 '+(mNames[mm]||mm);
+      sel.appendChild(opt);
+    });
+    const sep=document.createElement('option');
+    sep.disabled=true;sep.textContent='──────────';
+    sel.appendChild(sep);
+    weeks.forEach(key=>{
+      const opt=document.createElement('option');
+      opt.value=key;
+      opt.textContent='📅 '+key.replace(/-to-/,' ~ ').replace(/-/g,'/');
+      sel.appendChild(opt);
+    });
+  }catch(e){console.error(e);}
 }
+
+function handleSelectChange(val){
+  if(!val||val==='')return;
+  if(val==='current'){renderDashboard();return;}
+  if(val.startsWith('month:')){loadMonthData(val.replace('month:',''));}
+  else{loadWeekData(val);}
+}
+
 async function loadWeekData(weekKey){
   if(!weekKey||weekKey==='current'){renderDashboard();return;}
   const prog=document.getElementById('uploadProgress');
@@ -453,6 +528,104 @@ async function loadWeekData(weekKey){
     renderDashboard();
   }catch(e){alert('데이터를 불러올 수 없어요: '+e.message);}
   finally{prog.style.display='none';}
+}
+
+async function loadMonthData(monthKey){
+  const prog=document.getElementById('uploadProgress');
+  prog.textContent='⏳ 월별 데이터 합산 중...';prog.style.display='block';
+  try{
+    const r=await fetch('https://raw.githubusercontent.com/'+GH_OWNER+'/'+GH_REPO+'/'+GH_BRANCH+'/data/index.json');
+    const index=await r.json();
+    const mm=monthKey.split('-')[1];
+    const weekKeys=(index.weeks||[]).filter(k=>k.startsWith(mm+'-'));
+    if(!weekKeys.length){alert('해당 월 데이터가 없어요.');return;}
+    const mNames={'01':'1월','02':'2월','03':'3월','04':'4월','05':'5월','06':'6월','07':'7월','08':'8월','09':'9월','10':'10월','11':'11월','12':'12월'};
+    await mergeAndRender(weekKeys,'2026년 '+(mNames[mm]||mm));
+  }catch(e){alert('오류: '+e.message);}
+  finally{prog.style.display='none';}
+}
+
+async function applyDateRange(){
+  const from=document.getElementById('dateFrom').value;
+  const to=document.getElementById('dateTo').value;
+  if(!from||!to){alert('시작일과 종료일을 모두 선택해주세요.');return;}
+  if(from>to){alert('시작일이 종료일보다 늦을 수 없어요.');return;}
+  document.getElementById('datePickerOverlay').classList.remove('show');
+  const prog=document.getElementById('uploadProgress');
+  prog.textContent='⏳ 해당 기간 데이터 합산 중...';prog.style.display='block';
+  try{
+    const r=await fetch('https://raw.githubusercontent.com/'+GH_OWNER+'/'+GH_REPO+'/'+GH_BRANCH+'/data/index.json');
+    const index=await r.json();
+    const fromD=new Date(from),toD=new Date(to);
+    const weekKeys=(index.weeks||[]).filter(key=>{
+      const pts=key.split('-to-');
+      if(pts.length<2)return false;
+      const sp=pts[0].split('-'),ep=pts[1].split('-');
+      if(sp.length<2||ep.length<2)return false;
+      const wS=new Date('2026-'+sp[0]+'-'+sp[1]);
+      const wE=new Date('2026-'+ep[0]+'-'+ep[1]);
+      return wS<=toD&&wE>=fromD;
+    });
+    if(!weekKeys.length){alert('해당 기간 데이터가 없어요.');return;}
+    const label=from.slice(5)+' ~ '+to.slice(5);
+    await mergeAndRender(weekKeys,label);
+  }catch(e){alert('오류: '+e.message);}
+  finally{prog.style.display='none';}
+}
+
+async function mergeAndRender(weekKeys,label){
+  const dataArr=await Promise.all(weekKeys.map(async key=>{
+    const r=await fetch('https://raw.githubusercontent.com/'+GH_OWNER+'/'+GH_REPO+'/'+GH_BRANCH+'/data/'+key+'.json');
+    return r.ok?await r.json():null;
+  }));
+  const valid=dataArr.filter(Boolean).sort((a,b)=>(a.curr_dates||'').localeCompare(b.curr_dates||''));
+  if(!valid.length)return;
+  const merged={...valid[valid.length-1]};
+  merged.curr_dates=label;
+  merged.total=valid.reduce((s,d)=>s+d.total,0);
+  merged.alf_solo=valid.reduce((s,d)=>s+d.alf_solo,0);
+  merged.alf_escalated=valid.reduce((s,d)=>s+d.alf_escalated,0);
+  merged.agent_only=valid.reduce((s,d)=>s+d.agent_only,0);
+  merged.workflow_only=valid.reduce((s,d)=>s+d.workflow_only,0);
+  merged.alf_triggered=valid.reduce((s,d)=>s+d.alf_triggered,0);
+  merged.agent_assigned=valid.reduce((s,d)=>s+d.agent_assigned,0);
+  const tot=merged.total;
+  merged.curr_solo_rate=tot?+(merged.alf_solo/tot*100).toFixed(1):0;
+  merged.curr_dow=valid.reduce((acc,d)=>acc.map((v,i)=>v+(d.curr_dow?.[i]||0)),[0,0,0,0,0,0,0]);
+  merged.prev_dow=[0,0,0,0,0,0,0];
+  merged.prev_total=0;merged.prev_alf_solo=0;merged.prev_solo_rate=0;merged.inc_tags=[];
+  const tagMap={};
+  valid.forEach(d=>(d.top10_tags||[]).forEach(t=>{
+    if(!tagMap[t.tag])tagMap[t.tag]={tag:t.tag,total:0,alf:0,agent:0};
+    tagMap[t.tag].total+=t.total;tagMap[t.tag].alf+=t.alf;tagMap[t.tag].agent+=t.agent;
+  }));
+  merged.top10_tags=Object.values(tagMap).sort((a,b)=>b.total-a.total).slice(0,10);
+  const escMap={};
+  valid.forEach(d=>(d.alf_unresolved_tags||[]).forEach(t=>{escMap[t.tag]=(escMap[t.tag]||0)+t.count;}));
+  merged.alf_unresolved_tags=Object.entries(escMap).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([tag,count])=>({tag,count}));
+  const excMap={},retMap={};
+  valid.forEach(d=>{
+    (d.exchange_products||[]).forEach(p=>{excMap[p.product]=(excMap[p.product]||0)+p.count;});
+    (d.return_products||[]).forEach(p=>{retMap[p.product]=(retMap[p.product]||0)+p.count;});
+  });
+  merged.exchange_products=Object.entries(excMap).sort((a,b)=>b[1]-a[1]).map(([product,count])=>({product,count}));
+  merged.return_products=Object.entries(retMap).sort((a,b)=>b[1]-a[1]).map(([product,count])=>({product,count}));
+  merged.no_alf_total=valid.reduce((s,d)=>s+(d.no_alf_total||0),0);
+  merged.no_alf_agent=valid.reduce((s,d)=>s+(d.no_alf_agent||0),0);
+  merged.no_alf_work=valid.reduce((s,d)=>s+(d.no_alf_work||0),0);
+  merged.no_alf_direct=valid.reduce((s,d)=>s+(d.no_alf_direct||0),0);
+  merged.no_alf_reopen=valid.reduce((s,d)=>s+(d.no_alf_reopen||0),0);
+  const nalfMap={};
+  valid.forEach(d=>(d.no_alf_tags||[]).forEach(t=>{nalfMap[t.tag]=(nalfMap[t.tag]||0)+t.count;}));
+  merged.no_alf_tags=Object.entries(nalfMap).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([tag,count])=>({tag,count}));
+  const soloMap={};
+  valid.forEach(d=>(d.curr_solo_top5||[]).forEach(t=>{soloMap[t.tag]=(soloMap[t.tag]||0)+t.curr;}));
+  merged.curr_solo_top5=Object.entries(soloMap).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([tag,curr])=>({tag,curr,prev:0}));
+  merged.prev_solo_top5=merged.curr_solo_top5;
+  const totalAgent=valid.reduce((s,d)=>s+(d.agent_assigned||0),0);
+  merged.avg_response_min=totalAgent?+(valid.reduce((s,d)=>s+(d.avg_response_min||0)*(d.agent_assigned||0),0)/totalAgent).toFixed(1):0;
+  Object.assign(D,merged);
+  renderDashboard();
 }
 
 // ─── 태그 정규화 ──────────────────────────────────────────────────────────────
