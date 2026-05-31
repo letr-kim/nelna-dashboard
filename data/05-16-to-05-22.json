@@ -1,17 +1,17 @@
 {
   "total": 173,
-  "agent_assigned": 77,
-  "avg_response_min": 30.2,
+  "agent_assigned": 81,
+  "avg_response_min": 31.9,
   "alf_triggered": 132,
-  "alf_solo": 82,
-  "alf_escalated": 49,
-  "agent_only": 28,
-  "workflow_only": 14,
-  "curr_solo_rate": 47.4,
-  "prev_solo_rate": 50.6,
-  "prev_total": 156,
-  "prev_total_real": 156,
-  "prev_alf_solo": 79,
+  "alf_solo": 80,
+  "alf_escalated": 51,
+  "agent_only": 30,
+  "workflow_only": 12,
+  "curr_solo_rate": 46.2,
+  "prev_solo_rate": 37.5,
+  "prev_total": 120,
+  "prev_total_real": 120,
+  "prev_alf_solo": 45,
   "curr_dow": [
     31,
     30,
@@ -22,16 +22,14 @@
     5
   ],
   "prev_dow": [
-    25,
-    33,
-    24,
-    25,
-    28,
     11,
-    10
+    19,
+    23,
+    29,
+    27,
+    4,
+    7
   ],
-  "curr_dates": "05/16 ~ 05/22",
-  "prev_dates": "05/07 ~ 05/15",
   "top10_tags": [
     {
       "tag": "디지털/사용문의/가계부",
@@ -59,9 +57,9 @@
     },
     {
       "tag": "취소문의",
-      "total": 7,
+      "total": 8,
       "alf": 2,
-      "agent": 5
+      "agent": 6
     },
     {
       "tag": "디지털/오류문의/가계부",
@@ -124,144 +122,234 @@
       "count": 3
     },
     {
+      "tag": "반품",
+      "count": 2
+    },
+    {
       "tag": "배송/배송문의/일정문의",
       "count": 2
     },
     {
       "tag": "태그홀더",
       "count": 2
-    },
-    {
-      "tag": "실물/제품문의/케이블스트랩",
-      "count": 2
     }
   ],
   "inc_tags": [
     {
-      "tag": "교환",
-      "curr": 17,
-      "prev": 11,
-      "delta": 6
+      "tag": "디지털/사용문의/가계부",
+      "curr": 19,
+      "prev": 7,
+      "delta": 12
+    },
+    {
+      "tag": "실물/제품문의/필름",
+      "curr": 9,
+      "prev": 2,
+      "delta": 7
     },
     {
       "tag": "실물/제품문의/펜촉",
+      "curr": 6,
+      "prev": 0,
+      "delta": 6
+    },
+    {
+      "tag": "결제/결제문의/기타",
+      "curr": 9,
+      "prev": 4,
+      "delta": 5
+    },
+    {
+      "tag": "취소문의",
+      "curr": 8,
+      "prev": 3,
+      "delta": 5
+    },
+    {
+      "tag": "디지털/오류문의/가계부",
       "curr": 6,
       "prev": 1,
       "delta": 5
     },
     {
+      "tag": "교환",
+      "curr": 17,
+      "prev": 14,
+      "delta": 3
+    },
+    {
+      "tag": "미수거재발송",
+      "curr": 5,
+      "prev": 3,
+      "delta": 2
+    },
+    {
+      "tag": "실물/이상주장/타이머",
+      "curr": 6,
+      "prev": 5,
+      "delta": 1
+    },
+    {
       "tag": "실물/제품문의/케이블스트랩",
       "curr": 5,
-      "prev": 0,
-      "delta": 5
-    },
-    {
-      "tag": "결제/결제문의/기타",
-      "curr": 9,
-      "prev": 6,
-      "delta": 3
-    },
-    {
-      "tag": "취소문의",
-      "curr": 7,
       "prev": 4,
-      "delta": 3
+      "delta": 1
     }
   ],
   "curr_solo_top5": [
     {
       "tag": "디지털/사용문의/가계부",
       "curr": 11,
-      "prev": 15
+      "prev": 4
     },
     {
       "tag": "결제/결제문의/기타",
       "curr": 9,
-      "prev": 6
+      "prev": 3
     },
     {
       "tag": "실물/제품문의/필름",
       "curr": 8,
-      "prev": 10
+      "prev": 1
     },
     {
       "tag": "실물/제품문의/펜촉",
       "curr": 4,
-      "prev": 1
+      "prev": 0
     },
     {
       "tag": "실물/이상주장/타이머",
       "curr": 4,
-      "prev": 4
+      "prev": 2
     }
   ],
   "prev_solo_top5": [
     {
       "tag": "디지털/사용문의/가계부",
       "curr": 11,
-      "prev": 15
+      "prev": 4
     },
     {
       "tag": "결제/결제문의/기타",
       "curr": 9,
-      "prev": 6
+      "prev": 3
     },
     {
       "tag": "실물/제품문의/필름",
       "curr": 8,
-      "prev": 10
+      "prev": 1
     },
     {
       "tag": "실물/제품문의/펜촉",
       "curr": 4,
-      "prev": 1
+      "prev": 0
     },
     {
       "tag": "실물/이상주장/타이머",
       "curr": 4,
-      "prev": 4
+      "prev": 2
     }
   ],
   "prod_ranking": [
     {
       "name": "디지털",
       "total": 29,
-      "prev": 31,
-      "delta": -2,
+      "prev": 9,
+      "delta": 20,
       "curr_pct": 16.8,
       "prev_pct": 0
     },
     {
       "name": "낼나 타이머",
       "total": 16,
-      "prev": 16,
-      "delta": 0,
+      "prev": 18,
+      "delta": -2,
       "curr_pct": 9.2,
       "prev_pct": 0
     },
     {
       "name": "낼나 키링캠",
-      "total": 12,
-      "prev": 9,
-      "delta": 3,
-      "curr_pct": 6.9,
+      "total": 13,
+      "prev": 13,
+      "delta": 0,
+      "curr_pct": 7.5,
       "prev_pct": 0
     },
     {
       "name": "낼나 펜슬",
-      "total": 9,
-      "prev": 7,
+      "total": 11,
+      "prev": 9,
       "delta": 2,
-      "curr_pct": 5.2,
+      "curr_pct": 6.4,
       "prev_pct": 0
     },
     {
       "name": "데일리 케이블",
       "total": 0,
-      "prev": 2,
-      "delta": -2,
-      "curr_pct": 0.0,
+      "prev": 0,
+      "delta": 0,
+      "curr_pct": 0,
       "prev_pct": 0
+    }
+  ],
+  "curr_dates": "05/16 ~ 05/22",
+  "prev_dates": "05/23 ~ 05/29",
+  "channelio_solo": 79,
+  "channelio_triggered": 123,
+  "channelio_rate": 64.2,
+  "mon_top6": [],
+  "mon_agent": 0,
+  "mon_alf_esc": 0,
+  "mon_direct": 0,
+  "mon_pct": 0,
+  "mon_date": "",
+  "mon_prev": 0,
+  "mon_curr": 0,
+  "no_alf_direct": 27,
+  "no_alf_reopen": 2,
+  "no_alf_total": 41,
+  "no_alf_agent": 29,
+  "no_alf_work": 12,
+  "no_alf_tags": [
+    {
+      "tag": "교환",
+      "count": 7
+    },
+    {
+      "tag": "디지털/사용문의/가계부",
+      "count": 5
+    },
+    {
+      "tag": "취소문의",
+      "count": 2
+    },
+    {
+      "tag": "반품",
+      "count": 2
+    },
+    {
+      "tag": "배송/배송문의/일정문의",
+      "count": 2
+    },
+    {
+      "tag": "실물/제품문의/입고품절",
+      "count": 2
+    },
+    {
+      "tag": "실물/이상주장/타이머",
+      "count": 1
+    },
+    {
+      "tag": "타이머",
+      "count": 1
+    },
+    {
+      "tag": "실물/제품문의/펜촉",
+      "count": 1
+    },
+    {
+      "tag": "실물/제품문의/타이머",
+      "count": 1
     }
   ],
   "exchange_products": [
@@ -278,73 +366,171 @@
       "count": 2
     },
     {
-      "product": "타이머버터-외관부품",
+      "product": "다이아필름-변심",
       "count": 1
     },
     {
-      "product": "필름(다이아)",
+      "product": "타이머버터-외관오염",
       "count": 1
     },
     {
-      "product": "키링캠",
+      "product": "키링캠기능",
       "count": 1
     }
   ],
   "return_products": [
     {
-      "product": "기타",
-      "count": 2
+      "product": "고객사유",
+      "count": 3
+    },
+    {
+      "product": "낼나펜슬",
+      "count": 1
     }
   ],
-  "no_alf_direct": 25,
-  "no_alf_reopen": 2,
-  "no_alf_total": 41,
-  "no_alf_agent": 27,
-  "no_alf_work": 14,
-  "no_alf_tags": [
+  "ch_history": [
     {
-      "tag": "교환",
-      "count": 7
+      "dates": "05/09 ~ 05/15",
+      "total": 127,
+      "triggered": 107,
+      "solo": 72,
+      "involveRate": 84.3,
+      "soloRate": 56.7,
+      "resolveRate": 67.3
     },
     {
-      "tag": "디지털/사용문의/가계부",
-      "count": 5
+      "dates": "05/16 ~ 05/22",
+      "total": 132,
+      "triggered": 112,
+      "solo": 76,
+      "involveRate": 84.8,
+      "soloRate": 57.6,
+      "resolveRate": 67.9
     },
     {
-      "tag": "배송/배송문의/일정문의",
-      "count": 2
+      "dates": "05/23 ~ 05/29",
+      "total": 96,
+      "triggered": 79,
+      "solo": 42,
+      "involveRate": 82.3,
+      "soloRate": 43.8,
+      "resolveRate": 53.2
+    }
+  ],
+  "nv_history": [
+    {
+      "dates": "05/09 ~ 05/15",
+      "total": 29,
+      "triggered": 16,
+      "solo": 7,
+      "involveRate": 55.2,
+      "soloRate": 24.1,
+      "resolveRate": 43.8
     },
     {
-      "tag": "실물/제품문의/입고품절",
-      "count": 2
+      "dates": "05/16 ~ 05/22",
+      "total": 41,
+      "triggered": 20,
+      "solo": 4,
+      "involveRate": 48.8,
+      "soloRate": 9.8,
+      "resolveRate": 20
     },
     {
-      "tag": "실물/이상주장/타이머",
-      "count": 1
+      "dates": "05/23 ~ 05/29",
+      "total": 24,
+      "triggered": 10,
+      "solo": 3,
+      "involveRate": 41.7,
+      "soloRate": 12.5,
+      "resolveRate": 30
+    }
+  ],
+  "kpi_history": [
+    {
+      "dates": "04/18~04/24",
+      "involveRate": 82.7,
+      "resolveRate": 61.5,
+      "chInvolve": 83.1,
+      "chResolve": 66.4,
+      "nvInvolve": 50,
+      "nvResolve": 34.8,
+      "totalCount": 255,
+      "triggeredCount": 211,
+      "soloCount": 106,
+      "soloRate": 41.6
     },
     {
-      "tag": "반품",
-      "count": 1
+      "dates": "04/25~05/01",
+      "involveRate": 77,
+      "resolveRate": 66.4,
+      "chInvolve": 79.7,
+      "chResolve": 66.4,
+      "nvInvolve": 48.5,
+      "nvResolve": 50,
+      "totalCount": 171,
+      "triggeredCount": 132,
+      "soloCount": 80,
+      "soloRate": 46.8
     },
     {
-      "tag": "타이머",
-      "count": 1
+      "dates": "05/02~05/08",
+      "involveRate": 73.7,
+      "resolveRate": 54.5,
+      "chInvolve": 86.5,
+      "chResolve": 54.5,
+      "nvInvolve": 56,
+      "nvResolve": 35.7,
+      "totalCount": 114,
+      "triggeredCount": 84,
+      "soloCount": 46,
+      "soloRate": 40.4
     },
     {
-      "tag": "실물/제품문의/펜촉",
-      "count": 1
+      "dates": "05/09~05/15",
+      "involveRate": 78.8,
+      "resolveRate": 64.2,
+      "chInvolve": 84.3,
+      "chResolve": 67.3,
+      "nvInvolve": 55.2,
+      "nvResolve": 43.8,
+      "totalCount": 156,
+      "triggeredCount": 123,
+      "soloCount": 79,
+      "soloRate": 50.6
     },
     {
-      "tag": "실물/제품문의/타이머",
-      "count": 1
+      "dates": "05/16 ~ 05/22",
+      "totalCount": 173,
+      "triggeredCount": 132,
+      "soloCount": 80,
+      "involveRate": 76.3,
+      "soloRate": 46.2,
+      "resolveRate": 60.6,
+      "chInvolve": 84.8,
+      "chResolve": 67.9,
+      "nvInvolve": 48.8,
+      "nvResolve": 20
     },
     {
-      "tag": "디지털/오류문의/가계부",
-      "count": 1
+      "dates": "05/23 ~ 05/29",
+      "totalCount": 120,
+      "triggeredCount": 89,
+      "soloCount": 45,
+      "involveRate": 74.2,
+      "soloRate": 37.5,
+      "resolveRate": 50.6,
+      "chInvolve": 82.3,
+      "chResolve": 53.2,
+      "nvInvolve": 41.7,
+      "nvResolve": 30
     }
   ],
   "all_tag_counts": {
-    "비밀링크/비밀링크/비밀링크": 1,
+    "취소문의": 8,
+    "실물/제품문의/키링캠": 4,
+    "반품": 4,
+    "실물/제품문의/낼나펜슬": 1,
     "실물/제품문의/필름": 9,
     "교환": 17,
     "와디즈": 2,
@@ -353,10 +539,8 @@
     "디지털/오류문의/가계부": 6,
     "배송/배송문의/오배송(매칭오류)": 3,
     "실물/제품문의/케이블스트랩": 5,
-    "취소문의": 7,
     "디지털": 1,
     "실물/이상주장/타이머": 6,
-    "반품": 2,
     "타이머": 1,
     "실물/제품문의/펜촉": 6,
     "실물/제품문의/타이머": 2,
@@ -366,7 +550,6 @@
     "미수거재발송": 5,
     "태그홀더": 3,
     "결제/구매문의/비회원": 3,
-    "실물/제품문의/키링캠": 3,
     "실물/제품문의/케이블스트랩구성품": 3,
     "실물/제품문의/폰트": 1,
     "실물/이상주장/키링캠": 2,
@@ -393,13 +576,13 @@
     "배송/배송문의/기타": 1
   },
   "solo_tag_counts": {
+    "실물/제품문의/키링캠": 3,
     "디지털/사용문의/가계부": 11,
     "결제/결제문의/기타": 9,
     "실물/제품문의/필름": 8,
     "실물/제품문의/케이블스트랩": 3,
     "실물/제품문의/펜촉": 4,
     "결제/구매문의/비회원": 2,
-    "실물/제품문의/키링캠": 2,
     "실물/제품문의/케이블스트랩구성품": 2,
     "실물/제품문의/폰트": 1,
     "실물/이상주장/타이머": 4,
@@ -420,15 +603,20 @@
     "태그홀더": 1,
     "디지털/오류문의/가계부": 1
   },
-  "channelio_solo": 82,
-  "channelio_triggered": 132,
-  "channelio_rate": 62.1,
-  "mon_top6": [],
-  "mon_agent": 0,
-  "mon_alf_esc": 0,
-  "mon_direct": 0,
-  "mon_pct": 0,
-  "mon_date": "",
-  "mon_prev": 0,
-  "mon_curr": 0
+  "ch_stat": {
+    "total": 132,
+    "triggered": 112,
+    "solo": 76,
+    "involveRate": 84.8,
+    "soloRate": 57.6,
+    "resolveRate": 67.9
+  },
+  "nv_stat": {
+    "total": 41,
+    "triggered": 20,
+    "solo": 4,
+    "involveRate": 48.8,
+    "soloRate": 9.8,
+    "resolveRate": 20
+  }
 }
