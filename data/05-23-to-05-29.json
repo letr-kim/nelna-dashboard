@@ -33,9 +33,9 @@
   "top10_tags": [
     {
       "tag": "교환",
-      "total": 15,
+      "total": 14,
       "alf": 0,
-      "agent": 15
+      "agent": 14
     },
     {
       "tag": "실물/제품문의/입고품절",
@@ -226,7 +226,7 @@
       "total": 18,
       "prev": 16,
       "delta": 2,
-      "curr_pct": 15.0,
+      "curr_pct": 15,
       "prev_pct": 0
     },
     {
@@ -258,7 +258,7 @@
       "total": 0,
       "prev": 0,
       "delta": 0,
-      "curr_pct": 0.0,
+      "curr_pct": 0,
       "prev_pct": 0
     }
   ],
@@ -328,43 +328,29 @@
       "count": 1
     },
     {
-      "product": "키링캠",
+      "product": "키링캠외관",
       "count": 1
     }
   ],
   "return_products": [
     {
+      "product": "고객사유",
+      "count": 1
+    },
+    {
       "product": "케이블스트랩",
       "count": 1
     },
     {
-      "product": "키링캠",
+      "product": "타이머버터기능",
       "count": 1
     },
     {
-      "product": "타이머버터",
-      "count": 2
+      "product": "타이머버터외관",
+      "count": 1
     }
   ],
   "ch_history": [
-    {
-      "dates": "04/25 ~ 05/01",
-      "total": 138,
-      "triggered": 110,
-      "solo": 73,
-      "involveRate": 79.7,
-      "soloRate": 52.9,
-      "resolveRate": 66.4
-    },
-    {
-      "dates": "05/02 ~ 05/08",
-      "total": 89,
-      "triggered": 77,
-      "solo": 42,
-      "involveRate": 86.5,
-      "soloRate": 47.2,
-      "resolveRate": 54.5
-    },
     {
       "dates": "05/09 ~ 05/15",
       "total": 127,
@@ -395,24 +381,6 @@
   ],
   "nv_history": [
     {
-      "dates": "04/25 ~ 05/01",
-      "total": 33,
-      "triggered": 16,
-      "solo": 8,
-      "involveRate": 48.5,
-      "soloRate": 24.2,
-      "resolveRate": 50.0
-    },
-    {
-      "dates": "05/02 ~ 05/08",
-      "total": 25,
-      "triggered": 14,
-      "solo": 5,
-      "involveRate": 56.0,
-      "soloRate": 20.0,
-      "resolveRate": 35.7
-    },
-    {
       "dates": "05/09 ~ 05/15",
       "total": 29,
       "triggered": 16,
@@ -428,7 +396,7 @@
       "solo": 5,
       "involveRate": 48.8,
       "soloRate": 12.2,
-      "resolveRate": 25.0
+      "resolveRate": 25
     },
     {
       "dates": "05/23 ~ 05/29",
@@ -437,7 +405,7 @@
       "solo": 3,
       "involveRate": 41.7,
       "soloRate": 12.5,
-      "resolveRate": 30.0
+      "resolveRate": 30
     }
   ],
   "kpi_history": [
@@ -447,7 +415,7 @@
       "resolveRate": 61.5,
       "chInvolve": 83.1,
       "chResolve": 66.4,
-      "nvInvolve": 50.0,
+      "nvInvolve": 50,
       "nvResolve": 34.8,
       "totalCount": 255,
       "triggeredCount": 211,
@@ -456,12 +424,12 @@
     },
     {
       "dates": "04/25~05/01",
-      "involveRate": 77.0,
+      "involveRate": 77,
       "resolveRate": 66.4,
       "chInvolve": 79.7,
       "chResolve": 66.4,
       "nvInvolve": 48.5,
-      "nvResolve": 50.0,
+      "nvResolve": 50,
       "totalCount": 171,
       "triggeredCount": 132,
       "soloCount": 80,
@@ -473,7 +441,7 @@
       "resolveRate": 54.5,
       "chInvolve": 86.5,
       "chResolve": 54.5,
-      "nvInvolve": 56.0,
+      "nvInvolve": 56,
       "nvResolve": 35.7,
       "totalCount": 114,
       "triggeredCount": 84,
@@ -500,7 +468,7 @@
       "chInvolve": 84.8,
       "chResolve": 68.8,
       "nvInvolve": 48.8,
-      "nvResolve": 25.0,
+      "nvResolve": 25,
       "totalCount": 173,
       "triggeredCount": 132,
       "soloCount": 82,
@@ -517,7 +485,7 @@
       "chInvolve": 82.3,
       "chResolve": 53.2,
       "nvInvolve": 41.7,
-      "nvResolve": 30.0
+      "nvResolve": 30
     }
   ],
   "all_tag_counts": {
@@ -594,6 +562,6 @@
     "solo": 3,
     "involveRate": 41.7,
     "soloRate": 12.5,
-    "resolveRate": 30.0
+    "resolveRate": 30
   }
 }
