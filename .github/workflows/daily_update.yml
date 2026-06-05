@@ -1,0 +1,62 @@
+name: Weekly Dashboard Update
+
+on:
+  schedule:
+    - cron: '1 8 * * 5'     # 매주 금요일 오후 5시 1분 KST (UTC 8시 1분)
+  workflow_dispatch:          # 수동 실행 버튼
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests holidays
+
+      - name: Check if Korean holiday
+        id: holiday_check
+        run: |
+          python3 - <<'EOF'
+          import holidays
+          from datetime import datetime, timezone, timedelta
+          import os
+
+          KST = timezone(timedelta(hours=9))
+          today = datetime.now(KST).date()
+          kr_holidays = holidays.KR(years=today.year)
+
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+              if today in kr_holidays:
+                  print(f"오늘은 공휴일: {kr_holidays[today]} — 스킵")
+                  f.write("skip=true\n")
+              else:
+                  print(f"오늘은 공휴일 아님 ({today}) — 실행")
+                  f.write("skip=false\n")
+          EOF
+
+      - name: Fetch and process data
+        if: steps.holiday_check.outputs.skip != 'true'
+        env:
+          CHANNELTALK_ACCESS_KEY: ${{ secrets.CHANNELTALK_ACCESS_KEY }}
+          CHANNELTALK_ACCESS_SECRET: ${{ secrets.CHANNELTALK_ACCESS_SECRET }}
+        run: python fetch_data.py
+
+      - name: Commit and push
+        if: steps.holiday_check.outputs.skip != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/
+          git diff --staged --quiet && echo "변경 없음 — 커밋 스킵" || \
+          (git commit -m "auto update $(TZ='Asia/Seoul' date +'%Y-%m-%d %H:%M KST')" && \
+           git push https://x-access-token:${{ secrets.GH_TOKEN }}@github.com/letr-kim/nelna-dashboard.git)
