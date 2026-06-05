@@ -129,6 +129,9 @@ def norm_tag(raw: str):
     return tag
 
 def iter_tags(s):
+    # API 응답에서 tags는 리스트일 수도, 쉼표 구분 문자열일 수도 있음
+    if isinstance(s, list):
+        return [t for t in (norm_tag(r) for r in s) if t]
     return [t for t in (norm_tag(r) for r in str(s or '').split(',')) if t]
 
 def merge_detail(d):
@@ -370,6 +373,11 @@ if __name__ == '__main__':
     chats = fetch_all_chats(start_ms, end_ms)
     print(f"✅ {len(chats)}건 수집 완료")
 
+    # 첫 번째 상담 구조 확인 (디버깅용)
+    if chats:
+        print(f"🔍 첫 번째 상담 키 목록: {list(chats[0].keys())}")
+        print(f"🔍 tags 필드: {chats[0].get('tags', '없음')}")
+
     # 직전 주차 JSON 로드 (prev 비교용)
     existing_files = sorted(DATA_DIR.glob('*.json'))
     existing_files = [f for f in existing_files if f.name != 'index.json'
@@ -381,13 +389,24 @@ if __name__ == '__main__':
         print(f"직전 주차 로드: {existing_files[-1].name}")
 
     # 데이터 처리
-    result = process(chats, prev)
+    try:
+        result = process(chats, prev)
+    except Exception as e:
+        import traceback
+        print(f"❌ process() 오류: {e}")
+        traceback.print_exc()
+        sys.exit(1)
+
     if not result:
         print("처리할 데이터 없음 — 종료")
         sys.exit(0)
 
     # ⚠️ 3차 보호: 저장 전 개인정보 최종 검증
-    verify_no_personal_data(result)
+    try:
+        verify_no_personal_data(result)
+    except ValueError as e:
+        print(f"❌ 개인정보 검증 실패: {e}")
+        sys.exit(1)
 
     # JSON 저장
     out_path = DATA_DIR / f"{week_key}.json"
