@@ -402,13 +402,34 @@ body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#f5
 <!-- ⑧ 톡톡 알프인입 분석 -->
 <div class="section" id="nvInipSection" style="display:none">
   <div class="section-title">톡톡 알프인입 분석</div>
-  <div class="card" style="max-width:480px">
-    <div class="card-title" style="margin-bottom:12px">요일별 알프인입 건수 · 비율</div>
-    <table class="tbl">
-      <thead><tr><th>날짜</th><th style="text-align:right">톡톡인입</th><th style="text-align:right">알프인입</th><th style="text-align:right">인입%</th><th style="text-align:right">알프인입X</th><th style="text-align:right">X%</th></tr></thead>
-      <tbody id="nvInipDowBody"></tbody>
-    </table>
-    <div id="nvInipNote" style="font-size:11px;color:#aaa;margin-top:8px;display:none">※ 톡톡인입·비율은 엑셀 재업로드 후 표시됩니다.</div>
+  <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px">
+    <div class="card" style="flex:1;min-width:140px;max-width:180px;text-align:center">
+      <div style="font-size:11px;color:#aaa;margin-bottom:4px">알프 관여율</div>
+      <div style="font-size:22px;font-weight:700;color:#7c3aed" id="nvInipInvolveVal">-</div>
+      <div style="font-size:11px;color:#aaa;margin-top:2px" id="nvInipInvolveSub">-</div>
+    </div>
+    <div class="card" style="flex:1;min-width:140px;max-width:180px;text-align:center">
+      <div style="font-size:11px;color:#aaa;margin-bottom:4px">알프 단독해결율</div>
+      <div style="font-size:22px;font-weight:700;color:#16a34a" id="nvInipSoloVal">-</div>
+      <div style="font-size:11px;color:#aaa;margin-top:2px" id="nvInipSoloSub">-</div>
+    </div>
+  </div>
+  <div style="display:flex;gap:12px;flex-wrap:wrap">
+    <div class="card" style="flex:2;min-width:300px;max-width:480px">
+      <div class="card-title" style="margin-bottom:12px">요일별 알프인입 건수 · 비율</div>
+      <table class="tbl">
+        <thead><tr><th>날짜</th><th style="text-align:right">톡톡인입</th><th style="text-align:right">알프인입</th><th style="text-align:right">인입%</th><th style="text-align:right">알프인입X</th><th style="text-align:right">X%</th></tr></thead>
+        <tbody id="nvInipDowBody"></tbody>
+      </table>
+      <div id="nvInipNote" style="font-size:11px;color:#aaa;margin-top:8px;display:none">※ 톡톡인입·비율은 엑셀 재업로드 후 표시됩니다.</div>
+    </div>
+    <div class="card" id="nvInipTagCard" style="flex:1;min-width:220px;max-width:320px;display:none">
+      <div class="card-title" style="margin-bottom:12px">상담 태그</div>
+      <table class="tbl">
+        <thead><tr><th>태그</th><th style="text-align:right">건수</th></tr></thead>
+        <tbody id="nvInipTagBody"></tbody>
+      </table>
+    </div>
   </div>
 </div>
 
@@ -605,6 +626,11 @@ function handleFile(file){
       const nvInipTotal=nvRowsInip.length;
       const nvInipSolo=nvRowsInip.filter(r=>hasDuplicate(r)).length;
       const nvInipToChannel=chRows.filter(r=>hasTokTokInip(r)).length;
+      const nvInipTriggered=nvRowsInip.filter(alfTrig).length;
+      const nvInipAlfSolo=nvRowsInip.filter(r=>r.goalState==='waiting'&&!r.assigneeId).length;
+      const nvInipTagC={};
+      nvRowsInip.forEach(r=>{const seen=new Set();iterTags(r.tags).forEach(t=>{if(!seen.has(t)&&!t.startsWith('톡톡/')){nvInipTagC[t]=(nvInipTagC[t]||0)+1;seen.add(t);}});});
+      const nvInipTopTags=Object.entries(nvInipTagC).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([tag,count])=>({tag,count}));
       const nvInipDow=[0,0,0,0,0,0,0];
       nvRowsInip.forEach(r=>{const d=new Date(r.createdAt);if(!isNaN(d))nvInipDow[d.getDay()===0?6:d.getDay()-1]++;});
       const nvInipXRows=nvRows.filter(r=>hasTokTokInipX(r));
@@ -612,7 +638,7 @@ function handleFile(file){
       nvInipXRows.forEach(r=>{const d=new Date(r.createdAt);if(!isNaN(d))nvInipXDow[d.getDay()===0?6:d.getDay()-1]++;});
       const nvTotalDow=[0,0,0,0,0,0,0];
       nvRows.forEach(r=>{const d=new Date(r.createdAt);if(!isNaN(d))nvTotalDow[d.getDay()===0?6:d.getDay()-1]++;});
-      const nvInipStat={total:nvInipTotal,solo:nvInipSolo,toChannel:nvInipToChannel,other:Math.max(0,nvInipTotal-nvInipSolo-nvInipToChannel),involveRate:pct(nvInipTotal,nvRows.length),soloRate:pct(nvInipSolo,nvInipTotal),toChannelRate:pct(nvInipToChannel,nvInipTotal),dow:nvInipDow,dowX:nvInipXDow,nvTotalDow:nvTotalDow};
+      const nvInipStat={total:nvInipTotal,solo:nvInipSolo,toChannel:nvInipToChannel,other:Math.max(0,nvInipTotal-nvInipSolo-nvInipToChannel),involveRate:pct(nvInipTotal,nvRows.length),soloRate:pct(nvInipSolo,nvInipTotal),toChannelRate:pct(nvInipToChannel,nvInipTotal),triggered:nvInipTriggered,alfSolo:nvInipAlfSolo,alfInvolveRate:pct(nvInipTriggered,nvInipTotal),alfSoloRate:pct(nvInipAlfSolo,nvInipTriggered),topTags:nvInipTopTags,dow:nvInipDow,dowX:nvInipXDow,nvTotalDow:nvTotalDow};
       const chHistory=D.ch_history?[...D.ch_history]:[];
       const nvHistory=D.nv_history?[...D.nv_history]:[];
       const newChRow={dates:currDates,...chStat};
@@ -849,9 +875,22 @@ async function mergeAndRender(weekKeys,label){
   merged.avg_response_min=totalAgent?+(valid.reduce((s,d)=>s+(d.avg_response_min||0)*(d.agent_assigned||0),0)/totalAgent).toFixed(1):0;
   // nv_inip_stat 합산
   const nvInipDowM=[0,0,0,0,0,0,0],nvInipXDowM=[0,0,0,0,0,0,0],nvTotDowM=[0,0,0,0,0,0,0];
-  let nvInipTotM=0,nvTotM=0;
-  valid.forEach(d=>{if(d.nv_inip_stat){(d.nv_inip_stat.dow||[]).forEach((v,i)=>nvInipDowM[i]+=v);(d.nv_inip_stat.dowX||[]).forEach((v,i)=>nvInipXDowM[i]+=v);(d.nv_inip_stat.nvTotalDow||[]).forEach((v,i)=>nvTotDowM[i]+=v);nvInipTotM+=d.nv_inip_stat.total||0;}if(d.nv_stat)nvTotM+=d.nv_stat.total||0;});
-  merged.nv_inip_stat=nvInipTotM>0?{...(valid[valid.length-1].nv_inip_stat||{}),total:nvInipTotM,dow:nvInipDowM,dowX:nvInipXDowM,nvTotalDow:nvTotDowM,involveRate:nvTotM>0?+(nvInipTotM/nvTotM*100).toFixed(1):0}:null;
+  let nvInipTotM=0,nvTotM=0,nvInipTrigM=0,nvInipAlfSoloM=0;
+  const nvInipTagMapM={};
+  valid.forEach(d=>{
+    if(d.nv_inip_stat){
+      (d.nv_inip_stat.dow||[]).forEach((v,i)=>nvInipDowM[i]+=v);
+      (d.nv_inip_stat.dowX||[]).forEach((v,i)=>nvInipXDowM[i]+=v);
+      (d.nv_inip_stat.nvTotalDow||[]).forEach((v,i)=>nvTotDowM[i]+=v);
+      nvInipTotM+=d.nv_inip_stat.total||0;
+      nvInipTrigM+=d.nv_inip_stat.triggered||0;
+      nvInipAlfSoloM+=d.nv_inip_stat.alfSolo||0;
+      (d.nv_inip_stat.topTags||[]).forEach(({tag,count})=>{nvInipTagMapM[tag]=(nvInipTagMapM[tag]||0)+count;});
+    }
+    if(d.nv_stat)nvTotM+=d.nv_stat.total||0;
+  });
+  const nvInipTopTagsM=Object.entries(nvInipTagMapM).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([tag,count])=>({tag,count}));
+  merged.nv_inip_stat=nvInipTotM>0?{...(valid[valid.length-1].nv_inip_stat||{}),total:nvInipTotM,triggered:nvInipTrigM,alfSolo:nvInipAlfSoloM,alfInvolveRate:nvInipTotM>0?+(nvInipTrigM/nvInipTotM*100).toFixed(1):0,alfSoloRate:nvInipTrigM>0?+(nvInipAlfSoloM/nvInipTrigM*100).toFixed(1):0,topTags:nvInipTopTagsM,dow:nvInipDowM,dowX:nvInipXDowM,nvTotalDow:nvTotDowM,involveRate:nvTotM>0?+(nvInipTotM/nvTotM*100).toFixed(1):0}:null;
   Object.assign(D,merged);
   renderDashboard();
 }
@@ -1053,6 +1092,21 @@ function renderDashboard(){
   if(D.nv_inip_stat) {
     const ni=D.nv_inip_stat;
     document.getElementById('nvInipSection').style.display='';
+    // 관여율 카드
+    const niTrig=ni.triggered||0,niSolo=ni.alfSolo||0,niTot=ni.total||0;
+    document.getElementById('nvInipInvolveVal').textContent=(niTot>0?+(niTrig/niTot*100).toFixed(1):0)+'%';
+    document.getElementById('nvInipInvolveSub').textContent=niTrig+' / '+niTot+'건';
+    document.getElementById('nvInipSoloVal').textContent=(niTrig>0?+(niSolo/niTrig*100).toFixed(1):0)+'%';
+    document.getElementById('nvInipSoloSub').textContent=niSolo+' / '+niTrig+'건 (관여)';
+    // 상담태그 테이블
+    const topTags=ni.topTags||[];
+    if(topTags.length){
+      document.getElementById('nvInipTagCard').style.display='';
+      document.getElementById('nvInipTagBody').innerHTML=topTags.map(({tag,count})=>
+        `<tr><td>${tag}</td><td style="text-align:right;font-weight:600">${count}건</td></tr>`).join('');
+    } else {
+      document.getElementById('nvInipTagCard').style.display='none';
+    }
     const dow=ni.dow||[0,0,0,0,0,0,0];
     const dowX=ni.dowX||[0,0,0,0,0,0,0];
     const nvTotalDow=ni.nvTotalDow||[0,0,0,0,0,0,0];
