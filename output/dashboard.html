@@ -474,40 +474,45 @@ async function saveToGitHub(newD,currDates,prog){
   if(!token){prog.textContent='⚠️ GitHub 토큰 없음';return;}
   const weekKey=currDates.replace(/\//g,'-').replace(' ~ ','-to-');
   const apiBase='https://api.github.com/repos/'+GH_OWNER+'/'+GH_REPO+'/contents/data/';
-  const headers={'Authorization':'token '+token,'Content-Type':'application/json'};
+  const headers={'Authorization':'Bearer '+token,'Content-Type':'application/json'};
   prog.textContent='☁️ GitHub 저장 중...';
+  async function ghFetch(url,opts){
+    const res=await fetch(url,{...opts,headers:{...headers,...(opts&&opts.headers||{})}});
+    if(!res.ok){
+      let msg=res.status+'';
+      try{const j=await res.clone().json();msg=res.status+' '+( j.message||'');}catch(e){}
+      throw new Error(msg);
+    }
+    return res;
+  }
   try{
     // weekKey.json 저장
     const weekPath=apiBase+weekKey+'.json';
     let weekSha='';
-    const weekCheck=await fetch(weekPath,{headers});
-    if(weekCheck.ok){const wj=await weekCheck.json();weekSha=wj.sha||'';}
+    try{const wj=await (await ghFetch(weekPath)).json();weekSha=wj.sha||'';}catch(e){if(!String(e.message).startsWith('404'))throw e;}
     const weekContent=btoa(unescape(encodeURIComponent(JSON.stringify(newD,null,2))));
     const weekBody={message:'data: update '+weekKey,content:weekContent,branch:GH_BRANCH};
     if(weekSha)weekBody.sha=weekSha;
-    const weekRes=await fetch(weekPath,{method:'PUT',headers,body:JSON.stringify(weekBody)});
-    if(!weekRes.ok)throw new Error('data 저장 실패 ('+weekRes.status+')');
+    await ghFetch(weekPath,{method:'PUT',body:JSON.stringify(weekBody)});
     // index.json 업데이트
     const indexPath=apiBase+'index.json';
     let indexSha='',indexData={weeks:[]};
-    const indexCheck=await fetch(indexPath,{headers});
-    if(indexCheck.ok){
-      const ij=await indexCheck.json();
+    try{
+      const ij=await (await ghFetch(indexPath)).json();
       indexSha=ij.sha||'';
-      try{indexData=JSON.parse(decodeURIComponent(escape(atob(ij.content.replace(/\n/g,'')))));}catch(e){}
-    }
+      indexData=JSON.parse(decodeURIComponent(escape(atob(ij.content.replace(/\n/g,'')))));
+    }catch(e){if(!String(e.message).startsWith('404'))throw e;}
     if(!indexData.weeks.includes(weekKey))indexData.weeks.push(weekKey);
     indexData.weeks.sort((a,b)=>a.localeCompare(b));
     const idxContent=btoa(unescape(encodeURIComponent(JSON.stringify(indexData,null,2))));
     const idxBody={message:'index: add '+weekKey,content:idxContent,branch:GH_BRANCH};
     if(indexSha)idxBody.sha=indexSha;
-    const idxRes=await fetch(indexPath,{method:'PUT',headers,body:JSON.stringify(idxBody)});
-    if(!idxRes.ok)throw new Error('index 저장 실패 ('+idxRes.status+')');
+    await ghFetch(indexPath,{method:'PUT',body:JSON.stringify(idxBody)});
     prog.textContent='✅ GitHub 저장 완료!';
     setTimeout(()=>{prog.style.display='none';document.getElementById('uploadOverlay').classList.remove('show');},2000);
   }catch(err){
     console.error('[saveToGitHub]',err);
-    prog.textContent='⚠️ GitHub 저장 실패. 토큰을 확인해주세요.';
+    prog.textContent='⚠️ 저장 실패: '+err.message+' (F12 콘솔 확인)';
   }
 }
 
