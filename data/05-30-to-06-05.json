@@ -508,7 +508,16 @@
       "chInvolve": 82.3,
       "chResolve": 53.2,
       "nvInvolve": 41.7,
-      "nvResolve": 30
+      "nvResolve": 30,
+      "dow": [
+        11,
+        19,
+        23,
+        29,
+        27,
+        4,
+        7
+      ]
     },
     {
       "dates": "05/30 ~ 06/05",
@@ -521,7 +530,16 @@
       "chInvolve": 86.7,
       "chResolve": 70.2,
       "nvInvolve": 48.1,
-      "nvResolve": 76.9
+      "nvResolve": 76.9,
+      "dow": [
+        32,
+        34,
+        7,
+        28,
+        28,
+        10,
+        8
+      ]
     }
   ],
   "all_tag_counts": {
