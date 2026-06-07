@@ -536,7 +536,14 @@ function handleFile(file){
       const rows=XLSX.utils.sheet_to_json(ws,{defval:''});
       // [보호 1단계] rows 변환 직후 sanitizeRow()로 모든 행에서 개인정보 키 즉시 삭제 (값 읽기 전)
       rows.forEach(sanitizeRow);
-      const df=rows.filter(r=>!String(r.tags||'').includes('테스트')&&!String(r.tags||'').includes('중복'));
+      const hasTokTokInip=r=>String(r.tags||'').includes('톡톡/알프인입')&&!String(r.tags||'').includes('톡톡/알프인입X');
+      const hasTokTokInipX=r=>String(r.tags||'').includes('톡톡/알프인입X');
+      // 알프인입 분석용 raw 톡톡 rows (테스트 제외만 적용, 알프인입·중복 제외 전)
+      const nvRowsRaw=rows.filter(r=>!String(r.tags||'').includes('테스트')&&r.mediumName==='appNaverTalk');
+      const nvRowsInip=nvRowsRaw.filter(hasTokTokInip);
+      const nvInipXRows=nvRowsRaw.filter(hasTokTokInipX);
+      // 메인 df: 테스트·중복·톡톡알프인입 제외
+      const df=rows.filter(r=>!String(r.tags||'').includes('테스트')&&!String(r.tags||'').includes('중복')&&!(r.mediumName==='appNaverTalk'&&String(r.tags||'').includes('톡톡/알프인입')));
       // [보호 2단계] 처리 전 각 행의 개인정보 키 잔존 검증 및 강제 삭제
       df.forEach(r=>FORBIDDEN_FIELDS.forEach(f=>{if(f in r){console.warn('[보안] 개인정보 키 재발견, 강제 삭제:',f);delete r[f];}}));
       console.log('[handleFile] 전체 rows:', rows.length, '/ 테스트 제외 df:', df.length, '/ 첫 행 키:', df.length?Object.keys(df[0]):[]);
@@ -600,8 +607,6 @@ function handleFile(file){
       const allTagCounts={};df.forEach(r=>{const seen=new Set();iterTags(r.tags).forEach(t=>{if(!seen.has(t)){allTagCounts[t]=(allTagCounts[t]||0)+1;seen.add(t);}});});
       const soloTagCounts={};df.filter(soloMask).forEach(r=>{const seen=new Set();iterTags(r.tags).forEach(t=>{if(!seen.has(t)){soloTagCounts[t]=(soloTagCounts[t]||0)+1;seen.add(t);}});});
       const pct=(a,b)=>b>0?+(a/b*100).toFixed(1):0;
-      const hasTokTokInip=r=>String(r.tags||'').includes('톡톡/알프인입')&&!String(r.tags||'').includes('톡톡/알프인입X');
-      const hasTokTokInipX=r=>String(r.tags||'').includes('톡톡/알프인입X');
       const hasDuplicate=r=>String(r.tags||'').includes('중복');
       function chStats(rows){
         const t=rows.length,trig=rows.filter(alfTrig).length,solo=rows.filter(soloMask).length;
@@ -609,7 +614,6 @@ function handleFile(file){
       }
       const chRows=df.filter(r=>r.mediumType==='native');
       const nvRows=df.filter(r=>r.mediumName==='appNaverTalk');
-      const nvRowsInip=nvRows.filter(r=>hasTokTokInip(r));
       function nvChStats(rows){
         const t=rows.length;
         const nvTrig=r=>hasTokTokInip(r)||alfTrig(r);
@@ -629,12 +633,11 @@ function handleFile(file){
       const nvInipTopTags=Object.entries(nvInipTagC).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([tag,count])=>({tag,count}));
       const nvInipDow=[0,0,0,0,0,0,0];
       nvRowsInip.forEach(r=>{const d=new Date(r.createdAt);if(!isNaN(d))nvInipDow[d.getDay()===0?6:d.getDay()-1]++;});
-      const nvInipXRows=nvRows.filter(r=>hasTokTokInipX(r));
       const nvInipXDow=[0,0,0,0,0,0,0];
       nvInipXRows.forEach(r=>{const d=new Date(r.createdAt);if(!isNaN(d))nvInipXDow[d.getDay()===0?6:d.getDay()-1]++;});
       const nvTotalDow=[0,0,0,0,0,0,0];
-      nvRows.forEach(r=>{const d=new Date(r.createdAt);if(!isNaN(d))nvTotalDow[d.getDay()===0?6:d.getDay()-1]++;});
-      const nvInipStat={total:nvInipTotal,solo:nvInipSolo,toChannel:nvInipToChannel,other:Math.max(0,nvInipTotal-nvInipSolo-nvInipToChannel),involveRate:pct(nvInipTotal,nvRows.length),soloRate:pct(nvInipSolo,nvInipTotal),toChannelRate:pct(nvInipToChannel,nvInipTotal),triggered:nvInipTriggered,alfSolo:nvInipAlfSolo,alfInvolveRate:pct(nvInipTriggered,nvInipTotal),alfSoloRate:pct(nvInipAlfSolo,nvInipTriggered),topTags:nvInipTopTags,dow:nvInipDow,dowX:nvInipXDow,nvTotalDow:nvTotalDow};
+      nvRowsRaw.forEach(r=>{const d=new Date(r.createdAt);if(!isNaN(d))nvTotalDow[d.getDay()===0?6:d.getDay()-1]++;});
+      const nvInipStat={total:nvInipTotal,solo:nvInipSolo,toChannel:nvInipToChannel,other:Math.max(0,nvInipTotal-nvInipSolo-nvInipToChannel),involveRate:pct(nvInipTotal,nvRowsRaw.length),soloRate:pct(nvInipSolo,nvInipTotal),toChannelRate:pct(nvInipToChannel,nvInipTotal),triggered:nvInipTriggered,alfSolo:nvInipAlfSolo,alfInvolveRate:pct(nvInipTriggered,nvInipTotal),alfSoloRate:pct(nvInipAlfSolo,nvInipTriggered),topTags:nvInipTopTags,dow:nvInipDow,dowX:nvInipXDow,nvTotalDow:nvTotalDow};
       const chHistory=D.ch_history?[...D.ch_history]:[];
       const nvHistory=D.nv_history?[...D.nv_history]:[];
       const newChRow={dates:currDates,...chStat};
