@@ -427,6 +427,8 @@ function handleFile(file){
       const df=rows.filter(r=>!String(r.tags||'').includes('테스트'));
       // [보호 2단계] 처리 전 각 행의 개인정보 키 잔존 검증 및 강제 삭제
       df.forEach(r=>FORBIDDEN_FIELDS.forEach(f=>{if(f in r){console.warn('[보안] 개인정보 키 재발견, 강제 삭제:',f);delete r[f];}}));
+      console.log('[handleFile] 전체 rows:', rows.length, '/ 테스트 제외 df:', df.length, '/ 첫 행 키:', df.length?Object.keys(df[0]):[]);
+      if(!df.length){prog.textContent='❌ 처리할 데이터가 없습니다 (df 비어있음)';return;}
       const total=df.length;
       const isTrue=v=>['true','1','yes'].includes(String(v||'').toLowerCase());
       const alfTrig=r=>isTrue(r.alfTriggered);
@@ -518,10 +520,12 @@ function handleFile(file){
         detected.forEach(f=>{console.warn('⚠️ 개인정보 필드 ['+f+'] 감지 및 삭제됨');delete newD[f];});
       }
       Object.assign(D,newD);
+      console.log('[handleFile] renderDashboard 호출 전 D:', {total:D.total, alf_solo:D.alf_solo, curr_dates:D.curr_dates, triggered:D.alf_triggered});
       renderDashboard();
+      console.log('[handleFile] renderDashboard 완료. D.total='+D.total+', D.curr_dates='+D.curr_dates);
       prog.textContent='✅ 업로드 완료!';
       setTimeout(()=>{prog.style.display='none';document.getElementById('uploadOverlay').classList.remove('show');},1500);
-    }catch(err){prog.textContent='❌ 오류: '+err.message;console.error(err);}
+    }catch(err){console.error('[handleFile] 오류:', err);prog.textContent='❌ 오류: '+err.message;alert('엑셀 처리 오류:\n'+err.message+'\n\nF12 콘솔에서 상세 내용을 확인하세요.');}
   };
   reader.readAsArrayBuffer(file);
 }
