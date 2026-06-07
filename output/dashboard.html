@@ -95,6 +95,20 @@ body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#f5
   </div>
 </div>
 
+<!-- GitHub 토큰 입력 모달 -->
+<div class="upload-overlay" id="tokenOverlay">
+  <div class="upload-modal" style="text-align:left">
+    <h3 style="text-align:center">🔑 GitHub 토큰 입력</h3>
+    <p style="text-align:center">데이터를 GitHub에 자동 저장하려면<br>Personal Access Token(repo 권한)이 필요합니다.<br>입력한 토큰은 이 브라우저에만 저장됩니다.</p>
+    <div style="margin-bottom:16px">
+      <label style="font-size:12px;color:#888;display:block;margin-bottom:6px">GitHub Token</label>
+      <input type="password" id="tokenInput" placeholder="ghp_..." style="width:100%;border:1px solid #e5e5e0;border-radius:8px;padding:10px;font-size:13px;outline:none;box-sizing:border-box">
+    </div>
+    <button onclick="saveTokenAndUpload()" style="width:100%;background:#7c3aed;color:#fff;border:none;border-radius:8px;padding:11px;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:8px">저장하고 업로드</button>
+    <button class="upload-close" onclick="document.getElementById('tokenOverlay').classList.remove('show')" style="width:100%">취소</button>
+  </div>
+</div>
+
 <!-- 엑셀 업로드 모달 -->
 <div class="upload-overlay" id="uploadOverlay">
   <div class="upload-modal">
@@ -419,6 +433,69 @@ const D={"total": 120, "agent_assigned": 63, "avg_response_min": 20.7, "alf_trig
 // ─── GitHub 설정 ─────────────────────────────────────────────────────────────
 const GH_OWNER='letr-kim', GH_REPO='nelna-dashboard', GH_BRANCH='main';
 
+// ─── GitHub 토큰 관리 ─────────────────────────────────────────────────────────
+function getToken(){return localStorage.getItem('gh_token')||'';}
+function saveToken(t){localStorage.setItem('gh_token',t);}
+
+let _pendingGitHubData=null;
+
+function saveTokenAndUpload(){
+  const t=document.getElementById('tokenInput').value.trim();
+  if(!t){alert('토큰을 입력해주세요.');return;}
+  saveToken(t);
+  document.getElementById('tokenOverlay').classList.remove('show');
+  if(_pendingGitHubData){
+    const {newD,currDates}=_pendingGitHubData;
+    _pendingGitHubData=null;
+    document.getElementById('uploadOverlay').classList.add('show');
+    const prog=document.getElementById('uploadProgress');
+    prog.style.display='block';
+    saveToGitHub(newD,currDates,prog);
+  }
+}
+
+async function saveToGitHub(newD,currDates,prog){
+  const token=getToken();
+  if(!token){prog.textContent='⚠️ GitHub 토큰 없음';return;}
+  const weekKey=currDates.replace(/\//g,'-').replace(' ~ ','-to-');
+  const apiBase='https://api.github.com/repos/'+GH_OWNER+'/'+GH_REPO+'/contents/data/';
+  const headers={'Authorization':'token '+token,'Content-Type':'application/json'};
+  prog.textContent='☁️ GitHub 저장 중...';
+  try{
+    // weekKey.json 저장
+    const weekPath=apiBase+weekKey+'.json';
+    let weekSha='';
+    const weekCheck=await fetch(weekPath,{headers});
+    if(weekCheck.ok){const wj=await weekCheck.json();weekSha=wj.sha||'';}
+    const weekContent=btoa(unescape(encodeURIComponent(JSON.stringify(newD,null,2))));
+    const weekBody={message:'data: update '+weekKey,content:weekContent,branch:GH_BRANCH};
+    if(weekSha)weekBody.sha=weekSha;
+    const weekRes=await fetch(weekPath,{method:'PUT',headers,body:JSON.stringify(weekBody)});
+    if(!weekRes.ok)throw new Error('data 저장 실패 ('+weekRes.status+')');
+    // index.json 업데이트
+    const indexPath=apiBase+'index.json';
+    let indexSha='',indexData={weeks:[]};
+    const indexCheck=await fetch(indexPath,{headers});
+    if(indexCheck.ok){
+      const ij=await indexCheck.json();
+      indexSha=ij.sha||'';
+      try{indexData=JSON.parse(decodeURIComponent(escape(atob(ij.content.replace(/\n/g,'')))));}catch(e){}
+    }
+    if(!indexData.weeks.includes(weekKey))indexData.weeks.push(weekKey);
+    indexData.weeks.sort((a,b)=>a.localeCompare(b));
+    const idxContent=btoa(unescape(encodeURIComponent(JSON.stringify(indexData,null,2))));
+    const idxBody={message:'index: add '+weekKey,content:idxContent,branch:GH_BRANCH};
+    if(indexSha)idxBody.sha=indexSha;
+    const idxRes=await fetch(indexPath,{method:'PUT',headers,body:JSON.stringify(idxBody)});
+    if(!idxRes.ok)throw new Error('index 저장 실패 ('+idxRes.status+')');
+    prog.textContent='✅ GitHub 저장 완료!';
+    setTimeout(()=>{prog.style.display='none';document.getElementById('uploadOverlay').classList.remove('show');},2000);
+  }catch(err){
+    console.error('[saveToGitHub]',err);
+    prog.textContent='⚠️ GitHub 저장 실패. 토큰을 확인해주세요.';
+  }
+}
+
 // ─── 엑셀 업로드 ──────────────────────────────────────────────────────────────
 const FORBIDDEN_FIELDS=['name','nickname','mobileNumber','phoneNumber','email','avatarUrl','profile','user','member','customer','contact'];
 function sanitizeRow(r){FORBIDDEN_FIELDS.forEach(f=>delete r[f]);return r;}
@@ -540,8 +617,18 @@ function handleFile(file){
       console.log('[handleFile] renderDashboard 호출 전 D:', {total:D.total, alf_solo:D.alf_solo, curr_dates:D.curr_dates, triggered:D.alf_triggered});
       renderDashboard();
       console.log('[handleFile] renderDashboard 완료. D.total='+D.total+', D.curr_dates='+D.curr_dates);
-      prog.textContent='✅ 업로드 완료!';
-      setTimeout(()=>{prog.style.display='none';document.getElementById('uploadOverlay').classList.remove('show');},1500);
+      // GitHub 자동 저장
+      if(getToken()){
+        saveToGitHub(newD,currDates,prog);
+      }else{
+        prog.textContent='✅ 업로드 완료! (GitHub 미저장)';
+        _pendingGitHubData={newD,currDates};
+        setTimeout(()=>{
+          prog.style.display='none';
+          document.getElementById('uploadOverlay').classList.remove('show');
+          document.getElementById('tokenOverlay').classList.add('show');
+        },800);
+      }
     }catch(err){console.error('[handleFile] 오류:', err);prog.textContent='❌ 오류: '+err.message;alert('엑셀 처리 오류:\n'+err.message+'\n\nF12 콘솔에서 상세 내용을 확인하세요.');}
   };
   reader.readAsArrayBuffer(file);
