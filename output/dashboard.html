@@ -6,7 +6,6 @@
 <title>상담 인입 분석 대시보드</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#f5f5f2;color:#1a1a1a;font-size:14px}
@@ -49,7 +48,7 @@ body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#f5
 .upload-btn:disabled{opacity:0.7;cursor:not-allowed}
 .upload-btn svg{width:18px;height:18px;color:#7c3aed}
 @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
-.week-select-wrap{position:fixed;top:20px;right:200px;z-index:100;display:flex;align-items:center;gap:8px}
+.week-select-wrap{position:fixed;top:20px;right:155px;z-index:100;display:flex;align-items:center;gap:8px}
 .week-select{background:#fff;border:1px solid #e5e5e0;border-radius:10px;padding:8px 14px;font-size:13px;color:#555;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.08);outline:none;appearance:none;padding-right:28px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
 .date-range-btn{background:#fff;border:1px solid #e5e5e0;border-radius:10px;padding:8px 12px;font-size:13px;color:#555;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.08);white-space:nowrap}
 .date-range-btn:hover{background:#f5f5f2}
@@ -64,25 +63,6 @@ body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#f5
 .date-picker-apply{width:100%;background:#7c3aed;color:#fff;border:none;border-radius:8px;padding:11px;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:8px}
 .date-picker-apply:hover{background:#6d28d9}
 .date-picker-cancel{width:100%;background:none;border:0.5px solid #e0e0db;border-radius:8px;padding:8px;font-size:13px;color:#888;cursor:pointer}
-.upload-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:200;align-items:center;justify-content:center}
-.upload-overlay.show{display:flex}
-.upload-modal{background:#fff;border-radius:16px;padding:32px;width:480px;max-width:90vw;text-align:center}
-.upload-modal h3{font-size:17px;font-weight:600;margin-bottom:8px}
-.upload-modal p{font-size:13px;color:#888;margin-bottom:24px;line-height:1.6}
-.upload-drop{border:2px dashed #d1d5db;border-radius:12px;padding:40px 20px;cursor:pointer;transition:all 0.2s}
-.upload-drop:hover,.upload-drop.drag{border-color:#7c3aed;background:#f8f7ff}
-.upload-drop svg{width:40px;height:40px;color:#7c3aed;margin:0 auto 12px}
-.upload-drop p{font-size:13px;color:#888}
-.upload-drop strong{color:#7c3aed}
-.upload-progress{display:none;margin-top:16px;font-size:13px;color:#7c3aed}
-.upload-close{margin-top:20px;background:none;border:0.5px solid #e0e0db;border-radius:8px;padding:8px 20px;cursor:pointer;font-size:13px;color:#888}
-.token-modal{background:#fff;border-radius:16px;padding:32px;width:440px;max-width:90vw}
-.token-modal h3{font-size:17px;font-weight:600;margin-bottom:8px}
-.token-modal p{font-size:13px;color:#888;margin-bottom:20px;line-height:1.6}
-.token-input{width:100%;border:1px solid #e5e5e0;border-radius:8px;padding:10px 14px;font-size:13px;outline:none;margin-bottom:12px}
-.token-input:focus{border-color:#7c3aed}
-.token-save{width:100%;background:#7c3aed;color:#fff;border:none;border-radius:8px;padding:11px;font-size:14px;font-weight:600;cursor:pointer}
-.token-save:hover{background:#6d28d9}
 
 </style>
 </head>
@@ -110,44 +90,11 @@ body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#f5
 </div>
 
 <!-- 새로고침 버튼 -->
-<button class="upload-btn" id="refreshBtn" onclick="refreshDashboard()" style="right:340px">
+<button class="upload-btn" id="refreshBtn" onclick="refreshDashboard()">
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
   새로고침
 </button>
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-  엑셀 업로드
-</button>
 
-<!-- GitHub Token 입력 모달 -->
-<div class="upload-overlay" id="tokenOverlay">
-  <div class="token-modal">
-    <h3>🔑 GitHub 연동 설정</h3>
-    <p>엑셀 업로드 후 데이터를 GitHub에 자동 저장하려면<br>Personal Access Token이 필요해요.<br><span style="color:#aaa;font-size:12px">토큰은 이 기기 브라우저에만 저장되며 외부에 노출되지 않아요.</span></p>
-    <input class="token-input" id="tokenInput" type="password" placeholder="ghp_xxxxxxxxxxxx">
-    <button class="token-save" onclick="saveToken()">저장하고 계속하기</button>
-    <div style="margin-top:10px">
-      <button class="upload-close" onclick="document.getElementById('tokenOverlay').classList.remove('show');document.getElementById('uploadOverlay').classList.add('show')">토큰 없이 업로드만 하기</button>
-    </div>
-  </div>
-</div>
-
-<!-- 업로드 모달 -->
-<div class="upload-overlay" id="uploadOverlay">
-  <div class="upload-modal">
-    <h3>📊 금주 데이터 업로드</h3>
-    <p>전체상담건 엑셀 파일(.xlsx) 1개를 업로드하면<br>대시보드가 자동으로 업데이트됩니다.</p>
-    <div class="upload-drop" id="uploadDrop" onclick="document.getElementById('fileInput').click()"
-      ondragover="event.preventDefault();this.classList.add('drag')"
-      ondragleave="this.classList.remove('drag')"
-      ondrop="event.preventDefault();this.classList.remove('drag');handleFile(event.dataTransfer.files[0])">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
-      <p><strong>클릭하거나 파일을 드래그</strong>하세요<br>전체상담건_닉네임삭제.xlsx</p>
-    </div>
-    <input type="file" id="fileInput" accept=".xlsx" style="display:none" onchange="handleFile(this.files[0])">
-    <div class="upload-progress" id="uploadProgress">⏳ 데이터 처리 중...</div>
-    <button class="upload-close" onclick="document.getElementById('uploadOverlay').classList.remove('show')">닫기</button>
-  </div>
-</div>
 
 <div class="page">
 
@@ -425,34 +372,6 @@ const D={"total": 120, "agent_assigned": 63, "avg_response_min": 20.7, "alf_trig
 
 // ─── GitHub 설정 ─────────────────────────────────────────────────────────────
 const GH_OWNER='letr-kim', GH_REPO='nelna-dashboard', GH_BRANCH='main';
-function getToken(){return localStorage.getItem('gh_token');}
-function saveToken(){
-  const t=document.getElementById('tokenInput').value.trim();
-  if(!t)return alert('토큰을 입력해주세요.');
-  localStorage.setItem('gh_token',t);
-  document.getElementById('tokenOverlay').classList.remove('show');
-  document.getElementById('uploadOverlay').classList.add('show');
-}
-function checkTokenAndUpload(){
-  if(getToken()) document.getElementById('uploadOverlay').classList.add('show');
-  else document.getElementById('tokenOverlay').classList.add('show');
-}
-async function saveToGitHub(weekKey,data){
-  const token=getToken(); if(!token)return false;
-  const path='data/'+weekKey+'.json';
-  const content=btoa(unescape(encodeURIComponent(JSON.stringify(data,null,2))));
-  let sha=null;
-  try{
-    const r=await fetch('https://api.github.com/repos/'+GH_OWNER+'/'+GH_REPO+'/contents/'+path,{headers:{Authorization:'token '+token}});
-    if(r.ok){const j=await r.json();sha=j.sha;}
-  }catch(e){}
-  const body={message:'update '+weekKey,content,branch:GH_BRANCH};
-  if(sha)body.sha=sha;
-  const res=await fetch('https://api.github.com/repos/'+GH_OWNER+'/'+GH_REPO+'/contents/'+path,{
-    method:'PUT',headers:{Authorization:'token '+token,'Content-Type':'application/json'},body:JSON.stringify(body)});
-  if(res.ok) await updateIndexJson(weekKey, token);
-  return res.ok;
-}
 
 async function refreshDashboard(){
   const btn=document.getElementById('refreshBtn');
@@ -484,26 +403,6 @@ async function refreshDashboard(){
   }
 }
 
-async function updateIndexJson(newKey, token){
-  try{
-    let sha=null, weeks=[];
-    const ex=await fetch('https://api.github.com/repos/'+GH_OWNER+'/'+GH_REPO+'/contents/'+idxPath,
-      {headers:{Authorization:'token '+token}});
-    if(ex.ok){
-      const j=await ex.json();
-      sha=j.sha;
-      weeks=JSON.parse(atob(j.content.replace(/\n/g,''))).weeks||[];
-    }
-    if(!weeks.includes(newKey))weeks.push(newKey);
-    weeks.sort();
-    const content=btoa(unescape(encodeURIComponent(JSON.stringify({weeks},null,2))));
-    const body={message:'update index '+newKey,content,branch:GH_BRANCH};
-    if(sha)body.sha=sha;
-    await fetch('https://api.github.com/repos/'+GH_OWNER+'/'+GH_REPO+'/contents/'+idxPath,{
-      method:'PUT',headers:{Authorization:'token '+token,'Content-Type':'application/json'},
-      body:JSON.stringify(body)});
-  }catch(e){console.error('index.json 업데이트 실패:',e);}
-}
 async function loadWeekList(){
   try{
     // GitHub API 대신 index.json으로 파일 목록 로드 (토큰 불필요)
@@ -552,8 +451,6 @@ function handleSelectChange(val){
 
 async function loadWeekData(weekKey){
   if(!weekKey||weekKey==='current'){renderDashboard();return;}
-  const prog=document.getElementById('uploadProgress');
-  prog.textContent='⏳ 데이터 불러오는 중...';prog.style.display='block';
   try{
     const r=await fetch('https://raw.githubusercontent.com/'+GH_OWNER+'/'+GH_REPO+'/'+GH_BRANCH+'/data/'+weekKey+'.json');
     if(!r.ok)throw new Error('파일 없음');
@@ -561,12 +458,9 @@ async function loadWeekData(weekKey){
     Object.assign(D,data);
     renderDashboard();
   }catch(e){alert('데이터를 불러올 수 없어요: '+e.message);}
-  finally{prog.style.display='none';}
 }
 
 async function loadMonthData(monthKey){
-  const prog=document.getElementById('uploadProgress');
-  prog.textContent='⏳ 월별 데이터 합산 중...';prog.style.display='block';
   try{
     const r=await fetch('https://raw.githubusercontent.com/'+GH_OWNER+'/'+GH_REPO+'/'+GH_BRANCH+'/data/index.json');
     const index=await r.json();
@@ -576,7 +470,6 @@ async function loadMonthData(monthKey){
     const mNames={'01':'1월','02':'2월','03':'3월','04':'4월','05':'5월','06':'6월','07':'7월','08':'8월','09':'9월','10':'10월','11':'11월','12':'12월'};
     await mergeAndRender(weekKeys,'2026년 '+(mNames[mm]||mm));
   }catch(e){alert('오류: '+e.message);}
-  finally{prog.style.display='none';}
 }
 
 async function applyDateRange(){
@@ -585,8 +478,6 @@ async function applyDateRange(){
   if(!from||!to){alert('시작일과 종료일을 모두 선택해주세요.');return;}
   if(from>to){alert('시작일이 종료일보다 늦을 수 없어요.');return;}
   document.getElementById('datePickerOverlay').classList.remove('show');
-  const prog=document.getElementById('uploadProgress');
-  prog.textContent='⏳ 해당 기간 데이터 합산 중...';prog.style.display='block';
   try{
     const r=await fetch('https://raw.githubusercontent.com/'+GH_OWNER+'/'+GH_REPO+'/'+GH_BRANCH+'/data/index.json');
     const index=await r.json();
@@ -604,7 +495,6 @@ async function applyDateRange(){
     const label=from.slice(5)+' ~ '+to.slice(5);
     await mergeAndRender(weekKeys,label);
   }catch(e){alert('오류: '+e.message);}
-  finally{prog.style.display='none';}
 }
 
 async function mergeAndRender(weekKeys,label){
@@ -697,177 +587,6 @@ function mergeDetail(d){
   return d;
 }
 
-// ─── 엑셀 업로드 ──────────────────────────────────────────────────────────────
-async function handleFile(file){
-  if(!file)return;
-  const prog=document.getElementById('uploadProgress');
-  prog.textContent='⏳ 데이터 처리 중...';prog.style.display='block';
-  const reader=new FileReader();
-  reader.onload=async function(e){
-    try{
-      const wb=XLSX.read(e.target.result,{type:'array',cellDates:true});
-      const ws=wb.Sheets[wb.SheetNames[0]];
-      const rows=XLSX.utils.sheet_to_json(ws,{defval:''});
-      const df=rows.filter(r=>!String(r.tags||'').includes('테스트'));
-      const total=df.length;
-      const isTrue=v=>['true','1','yes'].includes(String(v||'').toLowerCase());
-      const alfTrig=r=>isTrue(r.alfTriggered);
-      const soloMask=r=>r.goalState==='waiting'&&alfTrig(r)&&!r.assigneeId;
-      const escMask=r=>r.goalState==='notAchieved'&&alfTrig(r)&&!!r.assigneeId;
-      const alfMask=r=>soloMask(r)||escMask(r);
-      const agentMask=r=>!alfMask(r)&&!!r.assigneeId;
-      const workMask=r=>!alfMask(r)&&!r.assigneeId;
-      const alfSolo=df.filter(soloMask).length;
-      const alfEsc=df.filter(escMask).length;
-      const agentOnly=df.filter(agentMask).length;
-      const workOnly=df.filter(workMask).length;
-      const triggered=df.filter(alfTrig).length;
-      const times=df.filter(r=>agentMask(r)||escMask(r)).map(r=>parseFloat(r.firstMemberHandlingTimeInOperation)).filter(v=>!isNaN(v));
-      const avgMin=times.length?+(times.reduce((a,b)=>a+b,0)/times.length/60).toFixed(1):0;
-      const dates=df.map(r=>new Date(r.createdAt)).filter(d=>!isNaN(d)).sort((a,b)=>a-b);
-      const fmt=d=>(d.getMonth()+1).toString().padStart(2,'0')+'/'+d.getDate().toString().padStart(2,'0');
-      const currDates=dates.length?fmt(dates[0])+' ~ '+fmt(dates[dates.length-1]):'';
-      const currDow=[0,0,0,0,0,0,0];
-      df.forEach(r=>{const d=new Date(r.createdAt);if(!isNaN(d))currDow[d.getDay()===0?6:d.getDay()-1]++;});
-      const soloIds=new Set(df.filter(soloMask).map(r=>String(r.id)));
-      const tagC={};
-      df.forEach(r=>{
-        const isAlf=soloIds.has(String(r.id));const seen=new Set();
-        iterTags(r.tags).forEach(t=>{
-          if(seen.has(t))return;seen.add(t);
-          if(!tagC[t])tagC[t]={tag:t,total:0,alf:0,agent:0};
-          tagC[t].total++;isAlf?tagC[t].alf++:tagC[t].agent++;
-        });
-      });
-      const top10=Object.values(tagC).sort((a,b)=>b.total-a.total).slice(0,10);
-      const escT={};
-      df.filter(escMask).forEach(r=>{const seen=new Set();iterTags(r.tags).forEach(t=>{if(!seen.has(t)){escT[t]=(escT[t]||0)+1;seen.add(t);}});});
-      const alfUnresTags=Object.entries(escT).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([tag,count])=>({tag,count}));
-      const soloC={};
-      df.filter(soloMask).forEach(r=>{const seen=new Set();iterTags(r.tags).forEach(t=>{if(!seen.has(t)){soloC[t]=(soloC[t]||0)+1;seen.add(t);}});});
-      const soloTop5=Object.entries(soloC).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([tag,curr])=>({tag,curr,prev:(D.solo_tag_counts||{})[tag]||0}));
-      const prevAllC=D.all_tag_counts||{};
-      const incTags=top10.filter(t=>t.total>(prevAllC[t.tag]||0)).map(t=>({tag:t.tag,curr:t.total,prev:prevAllC[t.tag]||0,delta:t.total-(prevAllC[t.tag]||0)})).sort((a,b)=>b.delta-a.delta);
-      const prodMap={'낼나 타이머':0,'디지털':0,'낼나 키링캠':0,'낼나 펜슬':0,'데일리 케이블':0};
-      df.forEach(r=>{const t=String(r.tags||'');if(t.includes('타이머'))prodMap['낼나 타이머']++;if(t.includes('디지털'))prodMap['디지털']++;if(t.includes('키링캠'))prodMap['낼나 키링캠']++;if(t.includes('낼나펜슬')||t.includes('펜슬'))prodMap['낼나 펜슬']++;if(t.includes('데일리케이블'))prodMap['데일리 케이블']++;});
-      const prevProd=Object.fromEntries((D.prod_ranking||[]).map(p=>[p.name,p.total]));
-      const prodRanking=Object.entries(prodMap).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([name,total])=>({name,total,prev:prevProd[name]||0,delta:total-(prevProd[name]||0),curr_pct:+(total/df.length*100).toFixed(1),prev_pct:0}));
-      const excMap={},retMap={};
-      df.forEach(r=>{String(r.tags||'').split(',').forEach(raw=>{const tag=raw.trim();if(!tag.includes('교환반품'))return;const p=tag.split('/'),s=(p[1]||'').trim(),d=mergeDetail((p[2]||'').trim());if(!d)return;if(s.includes('미수거재발송'))return;if(s.includes('맞교환')||(s.includes('교환')&&!s.includes('반품')))excMap[d]=(excMap[d]||0)+1;else if(s.includes('반품'))retMap[d]=(retMap[d]||0)+1;});});
-      const exchangeProducts=Object.entries(excMap).sort((a,b)=>b[1]-a[1]).map(([product,count])=>({product,count}));
-      const returnProducts=Object.entries(retMap).sort((a,b)=>b[1]-a[1]).map(([product,count])=>({product,count}));
-      const noAlf=df.filter(r=>!alfTrig(r));
-      const noAlfAgent=noAlf.filter(r=>!!r.assigneeId);
-      const reopen=noAlfAgent.filter(r=>isTrue(r.reopened)).length;
-      const direct=noAlfAgent.length-reopen;
-      const nalfC={};
-      noAlfAgent.filter(r=>!String(r.tags||'').includes('중복')).forEach(r=>{const seen=new Set();iterTags(r.tags).forEach(t=>{if(!seen.has(t)){nalfC[t]=(nalfC[t]||0)+1;seen.add(t);}});});
-      const allTagCounts={};df.forEach(r=>{const seen=new Set();iterTags(r.tags).forEach(t=>{if(!seen.has(t)){allTagCounts[t]=(allTagCounts[t]||0)+1;seen.add(t);}});});
-      const soloTagCounts={};df.filter(soloMask).forEach(r=>{const seen=new Set();iterTags(r.tags).forEach(t=>{if(!seen.has(t)){soloTagCounts[t]=(soloTagCounts[t]||0)+1;seen.add(t);}});});
-      const newD={...D,total,agent_assigned:alfEsc+agentOnly,avg_response_min:avgMin,alf_triggered:triggered,alf_solo:alfSolo,alf_escalated:alfEsc,agent_only:agentOnly,workflow_only:workOnly,curr_solo_rate:+(alfSolo/total*100).toFixed(1),prev_solo_rate:D.curr_solo_rate,prev_total:D.total,prev_total_real:D.total,prev_alf_solo:D.alf_solo,curr_dow:currDow,prev_dow:D.curr_dow,curr_dates:currDates,prev_dates:D.curr_dates,top10_tags:top10,alf_unresolved_tags:alfUnresTags,inc_tags:incTags,curr_solo_top5:soloTop5,prev_solo_top5:soloTop5,prod_ranking:prodRanking,exchange_products:exchangeProducts,return_products:returnProducts,no_alf_direct:direct,no_alf_reopen:reopen,no_alf_total:noAlf.length,no_alf_agent:noAlfAgent.length,no_alf_work:noAlf.filter(r=>!r.assigneeId).length,no_alf_tags:Object.entries(nalfC).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([tag,count])=>({tag,count})),all_tag_counts:allTagCounts,solo_tag_counts:soloTagCounts};
-
-      // 채널별 계산 (채널톡: mediumType=native, 네이버톡톡: mediumName=appNaverTalk)
-      const pct = (a,b) => b>0?+(a/b*100).toFixed(1):0;
-      const hasTokTokInip = r => String(r.tags||'').includes('톡톡/알프인입') && !String(r.tags||'').includes('톡톡/알프인입X');
-      const hasTokTokInipX = r => String(r.tags||'').includes('톡톡/알프인입X');
-      const hasDuplicate = r => String(r.tags||'').includes('중복');
-
-      function chStats(rows) {
-        const t=rows.length;
-        const trig=rows.filter(alfTrig).length;
-        const solo=rows.filter(soloMask).length;
-        return {total:t, triggered:trig, solo,
-          involveRate:pct(trig,t), soloRate:pct(solo,t),
-          resolveRate:pct(solo,trig)};
-      }
-
-      const chRows = df.filter(r=>r.mediumType==='native');
-      // 네이버톡톡: 알프인입X 건은 기존 로직, 알프인입 건은 별도 처리
-      const nvRows = df.filter(r=>r.mediumName==='appNaverTalk');
-      const nvRowsInipX = nvRows.filter(r=>hasTokTokInipX(r)||(!hasTokTokInip(r)&&!hasTokTokInipX(r)));
-      const nvRowsInip = nvRows.filter(r=>hasTokTokInip(r)); // 톡톡 원본건 (알프인입 태그)
-
-      const chStat = chStats(chRows);
-
-      // 네이버톡톡 기존 지표 (알프인입X + 태그없는 기존건)
-      const nvStat = chStats(nvRowsInipX);
-
-      // 네이버톡톡 알프인입 지표 (신규)
-      const nvInipTotal = nvRowsInip.length;
-      // 알프 단독해결: 톡톡/알프인입 + 중복 태그 포함 (alfTriggered 무관)
-      const nvInipSolo = nvRowsInip.filter(r=>hasDuplicate(r)).length;
-      // 상담원 연결: 채널톡 재문의건 (mediumType=native + 톡톡/알프인입)
-      const nvInipToChannel = chRows.filter(r=>hasTokTokInip(r)).length;
-      // 나머지: 톡톡에서 바로 종료 (알프 인입 후 채널톡 재문의 없이 미해결)
-      const nvInipOther = nvInipTotal - nvInipSolo - nvInipToChannel;
-
-      const nvInipStat = {
-        total: nvInipTotal,
-        solo: nvInipSolo,
-        toChannel: nvInipToChannel,
-        other: Math.max(0, nvInipOther),
-        involveRate: pct(nvInipTotal, nvRows.length), // 전체 톡톡 대비 알프인입 비율
-        soloRate: pct(nvInipSolo, nvInipTotal),
-        toChannelRate: pct(nvInipToChannel, nvInipTotal),
-      };
-
-      newD.ch_stat = chStat;
-      newD.nv_stat = nvStat;
-      newD.nv_inip_stat = nvInipStat; // 신규: 톡톡 알프인입 지표
-
-      // 채널별 히스토리 업데이트 (최근 3주 유지)
-      const chHistory = D.ch_history || [];
-      const nvHistory = D.nv_history || [];
-      const newChRow = {dates: currDates, ...chStat};
-      const newNvRow = {dates: currDates, ...nvStat};
-      // 같은 주차면 교체, 없으면 추가
-      const chIdx = chHistory.findIndex(r=>r.dates===currDates);
-      if(chIdx>=0) chHistory[chIdx]=newChRow; else chHistory.push(newChRow);
-      const nvIdx = nvHistory.findIndex(r=>r.dates===currDates);
-      if(nvIdx>=0) nvHistory[nvIdx]=newNvRow; else nvHistory.push(newNvRow);
-      // 최근 3주만 유지
-      newD.ch_history = chHistory.slice(-3);
-      newD.nv_history = nvHistory.slice(-3);
-
-      // KPI 히스토리 누적 (엑셀 업로드마다 추가)
-      const kpiHistory = D.kpi_history ? [...D.kpi_history] : [];
-      const newKpiRow = {
-        dates: currDates,
-        totalCount: total,
-        triggeredCount: triggered,
-        soloCount: alfSolo,
-        involveRate: +(triggered/total*100).toFixed(1),
-        soloRate: +(alfSolo/total*100).toFixed(1),
-        resolveRate: +(alfSolo/triggered*100).toFixed(1),
-        chInvolve: chStat.involveRate,
-        chResolve: chStat.resolveRate,
-        nvInvolve: nvStat.involveRate,
-        nvResolve: nvStat.resolveRate,
-      };
-      const kpiIdx = kpiHistory.findIndex(r=>r.dates===currDates);
-      if(kpiIdx>=0) kpiHistory[kpiIdx]=newKpiRow; else kpiHistory.push(newKpiRow);
-      newD.kpi_history = kpiHistory;
-      Object.assign(D,newD);
-      renderDashboard();
-      if(getToken()&&currDates){
-        prog.textContent='💾 GitHub에 저장 중...';prog.style.display='block';
-        const weekKey=currDates.replace(/\//g,'-').replace(' ~ ','-to-');
-        const saved=await saveToGitHub(weekKey,newD);
-        if(saved){
-          prog.textContent='✅ 저장 완료! ('+weekKey+')';
-          const sel=document.getElementById('weekSelect');
-          if(!sel.querySelector('option[value="'+weekKey+'"]')){const opt=document.createElement('option');opt.value=weekKey;opt.textContent='📅 '+weekKey;sel.insertBefore(opt,sel.querySelectorAll('option')[1]);}
-          let currOpt=sel.querySelector('option[value="current"]');
-          if(!currOpt){currOpt=document.createElement('option');currOpt.value='current';sel.insertBefore(currOpt,sel.querySelectorAll('option')[1]);}
-          currOpt.textContent='📌 '+currDates+' (현재)';
-        }else{prog.textContent='⚠️ GitHub 저장 실패. 토큰을 확인해주세요.';}
-        setTimeout(()=>{prog.style.display='none';},3000);
-      }
-      document.getElementById('uploadOverlay').classList.remove('show');
-    }catch(err){prog.textContent='❌ 오류: '+err.message;console.error(err);}
-  };
-  reader.readAsArrayBuffer(file);
-}
 
 // ─── 대시보드 렌더링 ──────────────────────────────────────────────────────────
 function renderProdTable(products){
