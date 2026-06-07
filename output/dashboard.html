@@ -382,6 +382,12 @@ body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#f5
       <div style="font-size:20px;font-weight:700;color:#3b82f6" id="nvInipXVal">-</div>
       <div style="font-size:11px;color:#3b82f6;margin-top:1px" id="nvInipXPct">-</div>
     </div>
+    <div style="color:#e5e5e0;font-size:20px">|</div>
+    <div style="text-align:center">
+      <div style="font-size:11px;color:#aaa;margin-bottom:2px">채널톡 미인입</div>
+      <div style="font-size:20px;font-weight:700;color:#6b7280" id="nvMiInipVal">-</div>
+      <div style="font-size:11px;color:#6b7280;margin-top:1px" id="nvMiInipPct">-</div>
+    </div>
   </div>
   <div style="display:flex;gap:12px;flex-wrap:wrap">
     <div class="card" id="nvInipTagCard" style="flex:1;min-width:220px;display:none">
@@ -1100,6 +1106,9 @@ function renderDashboard(){
     document.getElementById('nvInipInipPct').textContent=niTotalNv>0?Math.round(niTotalInip/niTotalNv*100)+'%':'-';
     document.getElementById('nvInipXVal').textContent=niTotalInipX+'건';
     document.getElementById('nvInipXPct').textContent=niTotalNv>0?Math.round(niTotalInipX/niTotalNv*100)+'%':'-';
+    const niTotalMiInip=niTotalNv-niTotalInip-niTotalInipX;
+    document.getElementById('nvMiInipVal').textContent=niTotalMiInip+'건';
+    document.getElementById('nvMiInipPct').textContent=niTotalNv>0?Math.round(niTotalMiInip/niTotalNv*100)+'%':'-';
     // 상담태그 테이블
     const topTags=ni.topTags||[];
     if(topTags.length){
