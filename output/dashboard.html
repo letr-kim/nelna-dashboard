@@ -405,7 +405,7 @@ body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#f5
   <div class="card" style="max-width:480px">
     <div class="card-title" style="margin-bottom:12px">요일별 알프인입 건수 · 비율</div>
     <table class="tbl">
-      <thead><tr><th>요일</th><th style="text-align:right">톡톡인입</th><th style="text-align:right">알프인입</th><th style="text-align:right">비율</th></tr></thead>
+      <thead><tr><th>날짜</th><th style="text-align:right">톡톡인입</th><th style="text-align:right">알프인입</th><th style="text-align:right">알프인입X</th><th style="text-align:right">비율</th></tr></thead>
       <tbody id="nvInipDowBody"></tbody>
     </table>
     <div id="nvInipNote" style="font-size:11px;color:#aaa;margin-top:8px;display:none">※ 톡톡인입·비율은 엑셀 재업로드 후 표시됩니다.</div>
@@ -603,9 +603,12 @@ function handleFile(file){
       const nvInipToChannel=chRows.filter(r=>hasTokTokInip(r)).length;
       const nvInipDow=[0,0,0,0,0,0,0];
       nvRowsInip.forEach(r=>{const d=new Date(r.createdAt);if(!isNaN(d))nvInipDow[d.getDay()===0?6:d.getDay()-1]++;});
+      const nvInipXRows=nvRows.filter(r=>hasTokTokInipX(r));
+      const nvInipXDow=[0,0,0,0,0,0,0];
+      nvInipXRows.forEach(r=>{const d=new Date(r.createdAt);if(!isNaN(d))nvInipXDow[d.getDay()===0?6:d.getDay()-1]++;});
       const nvTotalDow=[0,0,0,0,0,0,0];
       nvRows.forEach(r=>{const d=new Date(r.createdAt);if(!isNaN(d))nvTotalDow[d.getDay()===0?6:d.getDay()-1]++;});
-      const nvInipStat={total:nvInipTotal,solo:nvInipSolo,toChannel:nvInipToChannel,other:Math.max(0,nvInipTotal-nvInipSolo-nvInipToChannel),involveRate:pct(nvInipTotal,nvRows.length),soloRate:pct(nvInipSolo,nvInipTotal),toChannelRate:pct(nvInipToChannel,nvInipTotal),dow:nvInipDow,nvTotalDow:nvTotalDow};
+      const nvInipStat={total:nvInipTotal,solo:nvInipSolo,toChannel:nvInipToChannel,other:Math.max(0,nvInipTotal-nvInipSolo-nvInipToChannel),involveRate:pct(nvInipTotal,nvRows.length),soloRate:pct(nvInipSolo,nvInipTotal),toChannelRate:pct(nvInipToChannel,nvInipTotal),dow:nvInipDow,dowX:nvInipXDow,nvTotalDow:nvTotalDow};
       const chHistory=D.ch_history?[...D.ch_history]:[];
       const nvHistory=D.nv_history?[...D.nv_history]:[];
       const newChRow={dates:currDates,...chStat};
@@ -826,10 +829,10 @@ async function mergeAndRender(weekKeys,label){
   const totalAgent=valid.reduce((s,d)=>s+(d.agent_assigned||0),0);
   merged.avg_response_min=totalAgent?+(valid.reduce((s,d)=>s+(d.avg_response_min||0)*(d.agent_assigned||0),0)/totalAgent).toFixed(1):0;
   // nv_inip_stat 합산
-  const nvInipDowM=[0,0,0,0,0,0,0],nvTotDowM=[0,0,0,0,0,0,0];
+  const nvInipDowM=[0,0,0,0,0,0,0],nvInipXDowM=[0,0,0,0,0,0,0],nvTotDowM=[0,0,0,0,0,0,0];
   let nvInipTotM=0,nvTotM=0;
-  valid.forEach(d=>{if(d.nv_inip_stat){(d.nv_inip_stat.dow||[]).forEach((v,i)=>nvInipDowM[i]+=v);(d.nv_inip_stat.nvTotalDow||[]).forEach((v,i)=>nvTotDowM[i]+=v);nvInipTotM+=d.nv_inip_stat.total||0;}if(d.nv_stat)nvTotM+=d.nv_stat.total||0;});
-  merged.nv_inip_stat=nvInipTotM>0?{...(valid[valid.length-1].nv_inip_stat||{}),total:nvInipTotM,dow:nvInipDowM,nvTotalDow:nvTotDowM,involveRate:nvTotM>0?+(nvInipTotM/nvTotM*100).toFixed(1):0}:null;
+  valid.forEach(d=>{if(d.nv_inip_stat){(d.nv_inip_stat.dow||[]).forEach((v,i)=>nvInipDowM[i]+=v);(d.nv_inip_stat.dowX||[]).forEach((v,i)=>nvInipXDowM[i]+=v);(d.nv_inip_stat.nvTotalDow||[]).forEach((v,i)=>nvTotDowM[i]+=v);nvInipTotM+=d.nv_inip_stat.total||0;}if(d.nv_stat)nvTotM+=d.nv_stat.total||0;});
+  merged.nv_inip_stat=nvInipTotM>0?{...(valid[valid.length-1].nv_inip_stat||{}),total:nvInipTotM,dow:nvInipDowM,dowX:nvInipXDowM,nvTotalDow:nvTotDowM,involveRate:nvTotM>0?+(nvInipTotM/nvTotM*100).toFixed(1):0}:null;
   Object.assign(D,merged);
   renderDashboard();
 }
@@ -1025,33 +1028,41 @@ function renderDashboard(){
     const ni=D.nv_inip_stat;
     document.getElementById('nvInipSection').style.display='';
     const dow=ni.dow||[0,0,0,0,0,0,0];
+    const dowX=ni.dowX||[0,0,0,0,0,0,0];
     const nvTotalDow=ni.nvTotalDow||[0,0,0,0,0,0,0];
     const hasTotalData=nvTotalDow.some(v=>v>0);
     const dowNames=['월','화','수','목','금','토','일'];
-    // curr_dates 시작일 파싱 → 요일별 실제 날짜 계산
-    const cdm=(D.curr_dates||'').match(/(\d+)\/(\d+)/);
-    let dowLabels=dowNames;
+    // curr_dates 시작·종료일 파싱 → 실제 날짜 범위를 순서대로 표시
+    const cdm=(D.curr_dates||'').match(/(\d+)\/(\d+)\s*~\s*(\d+)\/(\d+)/);
+    let dateRows=[];
     if(cdm){
       const now=new Date();
       let sd=new Date(now.getFullYear(),parseInt(cdm[1])-1,parseInt(cdm[2]));
-      if(sd-now>180*24*3600*1000)sd=new Date(now.getFullYear()-1,parseInt(cdm[1])-1,parseInt(cdm[2]));
-      const sdDow=sd.getDay()===0?6:sd.getDay()-1;
-      dowLabels=dowNames.map((_,i)=>{
-        const d=new Date(sd);d.setDate(sd.getDate()+(i-sdDow+7)%7);
-        return (d.getMonth()+1).toString().padStart(2,'0')+'/'+d.getDate().toString().padStart(2,'0')+' ('+dowNames[i]+')';
-      });
+      let ed=new Date(now.getFullYear(),parseInt(cdm[3])-1,parseInt(cdm[4]));
+      if(sd>now)sd.setFullYear(sd.getFullYear()-1);
+      if(ed<sd)ed.setFullYear(ed.getFullYear()+1);
+      const cur=new Date(sd);
+      while(cur<=ed){
+        const di=cur.getDay()===0?6:cur.getDay()-1;
+        const label=(cur.getMonth()+1).toString().padStart(2,'0')+'/'+cur.getDate().toString().padStart(2,'0')+' ('+dowNames[di]+')';
+        dateRows.push({label,di});
+        cur.setDate(cur.getDate()+1);
+      }
+    } else {
+      dateRows=dowNames.map((name,i)=>({label:name,di:i}));
     }
     const totalInip=dow.reduce((a,b)=>a+b,0);
+    const totalInipX=dowX.reduce((a,b)=>a+b,0);
     const totalNv=nvTotalDow.reduce((a,b)=>a+b,0);
     document.getElementById('nvInipNote').style.display=hasTotalData?'none':'block';
     document.getElementById('nvInipDowBody').innerHTML=
-      dowLabels.map((label,i)=>{
-        const inip=dow[i]||0,nv=nvTotalDow[i]||0;
+      dateRows.map(({label,di})=>{
+        const inip=dow[di]||0,inipX=dowX[di]||0,nv=nvTotalDow[di]||0;
         const nvCell=hasTotalData?nv+'건':'-';
-        const rate=hasTotalData?(nv>0?Math.round(inip/nv*100)+'%':'-'):'-';
-        return `<tr><td>${label}</td><td style="text-align:right;color:#aaa">${nvCell}</td><td style="text-align:right;font-weight:600;color:#7c3aed">${inip}건</td><td style="text-align:right">${rate}</td></tr>`;
+        const rate=hasTotalData?(nv>0?Math.round((inip+inipX)/nv*100)+'%':'-'):'-';
+        return `<tr><td>${label}</td><td style="text-align:right;color:#aaa">${nvCell}</td><td style="text-align:right;font-weight:600;color:#7c3aed">${inip}건</td><td style="text-align:right;font-weight:600;color:#3b82f6">${inipX}건</td><td style="text-align:right">${rate}</td></tr>`;
       }).join('')+
-      `<tr style="border-top:1.5px solid #e5e5e0;font-weight:600"><td>합계</td><td style="text-align:right;color:#aaa">${hasTotalData?totalNv+'건':'-'}</td><td style="text-align:right;color:#7c3aed">${totalInip}건</td><td style="text-align:right;color:#3b82f6">${hasTotalData&&totalNv>0?Math.round(totalInip/totalNv*100)+'%':'-'}</td></tr>`;
+      `<tr style="border-top:1.5px solid #e5e5e0;font-weight:600"><td>합계</td><td style="text-align:right;color:#aaa">${hasTotalData?totalNv+'건':'-'}</td><td style="text-align:right;color:#7c3aed">${totalInip}건</td><td style="text-align:right;color:#3b82f6">${totalInipX}건</td><td style="text-align:right">${hasTotalData&&totalNv>0?Math.round((totalInip+totalInipX)/totalNv*100)+'%':'-'}</td></tr>`;
   } else {
     document.getElementById('nvInipSection').style.display='none';
   }
