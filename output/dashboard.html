@@ -671,6 +671,8 @@ async function refreshDashboard(){
   }
 }
 
+let _latestWeekKey='';
+
 async function loadWeekList(){
   try{
     // GitHub API 대신 index.json으로 파일 목록 로드 (토큰 불필요)
@@ -678,10 +680,12 @@ async function loadWeekList(){
     if(!r.ok)return;
     const index=await r.json();
     const weeks=(index.weeks||[]).slice().sort((a,b)=>b.localeCompare(a));
+    _latestWeekKey=weeks[0]||'';
+    const latestDates=_latestWeekKey?_latestWeekKey.replace(/-to-/,' ~ ').replace(/-/g,'/'):D.curr_dates;
     const sel=document.getElementById('weekSelect');
     while(sel.options.length>1)sel.remove(1);
     const currOpt=document.createElement('option');
-    currOpt.value='current';currOpt.textContent='📌 '+D.curr_dates+' (현재)';
+    currOpt.value='current';currOpt.textContent='📌 '+latestDates+' (현재)';
     sel.appendChild(currOpt);
     const monthGroups={};
     weeks.forEach(key=>{
@@ -712,7 +716,7 @@ async function loadWeekList(){
 
 function handleSelectChange(val){
   if(!val||val==='')return;
-  if(val==='current'){renderDashboard();return;}
+  if(val==='current'){if(_latestWeekKey)loadWeekData(_latestWeekKey);else renderDashboard();return;}
   if(val.startsWith('month:')){loadMonthData(val.replace('month:',''));}
   else{loadWeekData(val);}
 }
