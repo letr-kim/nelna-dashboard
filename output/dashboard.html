@@ -405,9 +405,10 @@ body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#f5
   <div class="card" style="max-width:480px">
     <div class="card-title" style="margin-bottom:12px">요일별 알프인입 건수 · 비율</div>
     <table class="tbl">
-      <thead><tr><th>요일</th><th style="text-align:right">알프인입</th><th style="text-align:right">톡톡전체</th><th style="text-align:right">비율</th></tr></thead>
+      <thead><tr><th>요일</th><th style="text-align:right">톡톡인입</th><th style="text-align:right">알프인입</th><th style="text-align:right">비율</th></tr></thead>
       <tbody id="nvInipDowBody"></tbody>
     </table>
+    <div id="nvInipNote" style="font-size:11px;color:#aaa;margin-top:8px;display:none">※ 톡톡인입·비율은 엑셀 재업로드 후 표시됩니다.</div>
   </div>
 </div>
 
@@ -1023,14 +1024,15 @@ function renderDashboard(){
     const days=['월','화','수','목','금','토','일'];
     const totalInip=dow.reduce((a,b)=>a+b,0);
     const totalNv=nvTotalDow.reduce((a,b)=>a+b,0);
+    document.getElementById('nvInipNote').style.display=hasTotalData?'none':'block';
     document.getElementById('nvInipDowBody').innerHTML=
       days.map((d,i)=>{
         const inip=dow[i]||0,nv=nvTotalDow[i]||0;
-        const rate=hasTotalData?(nv>0?Math.round(inip/nv*100)+'%':'-'):'-';
         const nvCell=hasTotalData?nv+'건':'-';
-        return `<tr><td>${d}</td><td style="text-align:right;font-weight:600;color:#7c3aed">${inip}건</td><td style="text-align:right;color:#aaa">${nvCell}</td><td style="text-align:right">${rate}</td></tr>`;
+        const rate=hasTotalData?(nv>0?Math.round(inip/nv*100)+'%':'-'):'-';
+        return `<tr><td>${d}</td><td style="text-align:right;color:#aaa">${nvCell}</td><td style="text-align:right;font-weight:600;color:#7c3aed">${inip}건</td><td style="text-align:right">${rate}</td></tr>`;
       }).join('')+
-      `<tr style="border-top:1.5px solid #e5e5e0;font-weight:600"><td>합계</td><td style="text-align:right;color:#7c3aed">${totalInip}건</td><td style="text-align:right;color:#aaa">${hasTotalData?totalNv+'건':'-'}</td><td style="text-align:right;color:#3b82f6">${hasTotalData&&totalNv>0?Math.round(totalInip/totalNv*100)+'%':'-'}</td></tr>`;
+      `<tr style="border-top:1.5px solid #e5e5e0;font-weight:600"><td>합계</td><td style="text-align:right;color:#aaa">${hasTotalData?totalNv+'건':'-'}</td><td style="text-align:right;color:#7c3aed">${totalInip}건</td><td style="text-align:right;color:#3b82f6">${hasTotalData&&totalNv>0?Math.round(totalInip/totalNv*100)+'%':'-'}</td></tr>`;
   }
 }
 
