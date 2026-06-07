@@ -567,7 +567,7 @@ function handleFile(file){
       const alfUnresTags=Object.entries(escT).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([tag,count])=>({tag,count}));
       const soloC={};
       df.filter(soloMask).forEach(r=>{const seen=new Set();iterTags(r.tags).forEach(t=>{if(!seen.has(t)){soloC[t]=(soloC[t]||0)+1;seen.add(t);}});});
-      const soloTop5=Object.entries(soloC).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([tag,curr])=>({tag,curr,prev:(D.solo_tag_counts||{})[tag]||0}));
+      const soloTop5=Object.entries(soloC).filter(([tag])=>!tag.includes('톡톡/알프인입')).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([tag,curr])=>({tag,curr,prev:(D.solo_tag_counts||{})[tag]||0}));
       const prevAllC=D.all_tag_counts||{};
       const incTags=top10.filter(t=>t.total>(prevAllC[t.tag]||0)).map(t=>({tag:t.tag,curr:t.total,prev:prevAllC[t.tag]||0,delta:t.total-(prevAllC[t.tag]||0)})).sort((a,b)=>b.delta-a.delta);
       const prodMap={'낼나 타이머':0,'디지털':0,'낼나 키링캠':0,'낼나 펜슬':0,'데일리 케이블':0};
