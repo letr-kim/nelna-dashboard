@@ -411,6 +411,8 @@ const D={"total": 120, "agent_assigned": 63, "avg_response_min": 20.7, "alf_trig
 const GH_OWNER='letr-kim', GH_REPO='nelna-dashboard', GH_BRANCH='main';
 
 // ─── 엑셀 업로드 ──────────────────────────────────────────────────────────────
+const FORBIDDEN_FIELDS=['name','nickname','mobileNumber','phoneNumber','email','avatarUrl','profile','user','member','customer','contact'];
+
 function handleFile(file){
   if(!file)return;
   const prog=document.getElementById('uploadProgress');
@@ -421,7 +423,11 @@ function handleFile(file){
       const wb=XLSX.read(e.target.result,{type:'array',cellDates:true});
       const ws=wb.Sheets[wb.SheetNames[0]];
       const rows=XLSX.utils.sheet_to_json(ws,{defval:''});
+      // [보호 1단계] rows 변환 직후 모든 행에서 개인정보 키 즉시 삭제 (값 읽기 전)
+      rows.forEach(r=>FORBIDDEN_FIELDS.forEach(f=>delete r[f]));
       const df=rows.filter(r=>!String(r.tags||'').includes('테스트'));
+      // [보호 2단계] 처리 전 각 행의 개인정보 키 잔존 검증 및 강제 삭제
+      df.forEach(r=>FORBIDDEN_FIELDS.forEach(f=>{if(f in r){console.warn('[보안] 개인정보 키 재발견, 강제 삭제:',f);delete r[f];}}));
       const total=df.length;
       const isTrue=v=>['true','1','yes'].includes(String(v||'').toLowerCase());
       const alfTrig=r=>isTrue(r.alfTriggered);
@@ -507,6 +513,15 @@ function handleFile(file){
       const kpiIdx=kpiHistory.findIndex(r=>r.dates===currDates);
       if(kpiIdx>=0)kpiHistory[kpiIdx]=newKpiRow;else kpiHistory.push(newKpiRow);
       const newD={...D,total,agent_assigned:alfEsc+agentOnly,avg_response_min:avgMin,alf_triggered:triggered,alf_solo:alfSolo,alf_escalated:alfEsc,agent_only:agentOnly,workflow_only:workOnly,curr_solo_rate:+(alfSolo/total*100).toFixed(1),prev_solo_rate:D.curr_solo_rate,prev_total:D.total,prev_total_real:D.total,prev_alf_solo:D.alf_solo,curr_dow:currDow,prev_dow:D.curr_dow,curr_dates:currDates,prev_dates:D.curr_dates,top10_tags:top10,alf_unresolved_tags:alfUnresTags,inc_tags:incTags,curr_solo_top5:soloTop5,prev_solo_top5:soloTop5,prod_ranking:prodRanking,exchange_products:exchangeProducts,return_products:returnProducts,no_alf_direct:direct,no_alf_reopen:reopen,no_alf_total:noAlf.length,no_alf_agent:noAlfAgent.length,no_alf_work:noAlf.filter(r=>!r.assigneeId).length,no_alf_tags:Object.entries(nalfC).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([tag,count])=>({tag,count})),all_tag_counts:allTagCounts,solo_tag_counts:soloTagCounts,ch_stat:chStat,nv_stat:nvStat,nv_inip_stat:nvInipStat,ch_history:chHistory.slice(-3),nv_history:nvHistory.slice(-3),kpi_history:kpiHistory};
+      // [보호 3단계] 최종 저장 직전 JSON 문자열에서 개인정보 키 포함 여부 검사
+      const serialized=JSON.stringify(newD);
+      const detected=FORBIDDEN_FIELDS.filter(f=>new RegExp('"'+f+'"\\s*:').test(serialized));
+      if(detected.length){
+        const msg='[보안 오류] 개인정보 키 감지됨: '+detected.join(', ')+' — 저장 중단';
+        console.error(msg);
+        prog.textContent='🚫 '+msg;
+        return;
+      }
       Object.assign(D,newD);
       renderDashboard();
       prog.textContent='✅ 업로드 완료!';
