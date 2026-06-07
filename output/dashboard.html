@@ -264,43 +264,6 @@ body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#f5
   </div>
 </div>
 
-<!-- ⑤ 알프 미관여 분석 -->
-<div class="section">
-  <div class="section-title">알프 미관여 분석 <span class="badge" id="noAlfBadge">23건</span></div>
-  <div class="def-box" id="noAlfText">
-    알프가 관여하지 못한 건은 총 <strong>23건</strong>으로, <strong>상담원 배정 20건</strong>과 <strong>문의 미진행 3건</strong>으로 나뉩니다.<br>
-    알프 개입 없이 바로 1:1 상담으로 시작된 케이스로, 재오픈 상담·외부 채널 유입·수동 배정 등이 주요 원인입니다.
-  </div>
-  <div class="grid-2">
-    <div class="card">
-      <div class="card-title" id="noAlfAgentTitle">상담원 배정 20건 · 태그 TOP10</div>
-      <table class="tbl">
-        <thead><tr><th>태그</th><th style="text-align:right">건수</th></tr></thead>
-        <tbody id="noAlfTagsBody"></tbody>
-      </table>
-    </div>
-    <div class="card">
-      <div class="card-title">💡 알프 미관여 주요 원인</div>
-      <div style="display:flex;flex-direction:column;gap:10px;font-size:12px;color:#555;line-height:1.8">
-        <div style="padding:10px 14px;background:#fafaf8;border-radius:8px;border-left:3px solid #6366f1">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
-            <span style="font-weight:600;color:#1a1a1a">상담원 직접 연결</span>
-            <span style="font-weight:700;color:#6366f1" id="noAlfDirectCnt">16건</span>
-          </div>
-          처음부터 알프 워크플로우 없이 상담원으로 바로 연결된 케이스 (외부 채널 유입 포함 가능)
-        </div>
-        <div style="padding:10px 14px;background:#fafaf8;border-radius:8px;border-left:3px solid #d97706">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
-            <span style="font-weight:600;color:#1a1a1a">재오픈 상담</span>
-            <span style="font-weight:700;color:#d97706" id="noAlfReopenCnt">3건</span>
-          </div>
-          이전 종료 상담을 고객이 다시 열면 알프를 거치지 않고 상담원에게 바로 연결
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
 <!-- ⑥ 알프 미해결 분석 -->
 <div class="section">
   <div class="section-title">알프 미해결 분석 <span class="badge" id="alfBadge"></span></div>
@@ -429,15 +392,39 @@ body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#f5
   </div>
 </div>
 
-<!-- ⑨ 메모 -->
+<!-- ⑤ 알프 미관여 분석 -->
 <div class="section">
-  <div class="section-title">📝 메모</div>
-  <div class="card">
-    <div style="font-size:12px;color:#aaa;margin-bottom:10px">브라우저를 닫으면 사라집니다. 중요한 내용은 별도로 저장해두세요.</div>
-    <textarea id="memoArea" placeholder="여기에 메모를 입력하세요..." style="width:100%;height:160px;border:0.5px solid #e5e5e0;border-radius:8px;padding:12px;font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;font-size:13px;color:#1a1a1a;background:#fafaf8;resize:vertical;outline:none;line-height:1.7"></textarea>
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-top:8px">
-      <span style="font-size:11px;color:#aaa" id="memoCount">0자</span>
-      <button onclick="document.getElementById('memoArea').value='';document.getElementById('memoCount').textContent='0자'" style="font-size:12px;color:#aaa;background:none;border:0.5px solid #e0e0db;border-radius:5px;padding:4px 12px;cursor:pointer">지우기</button>
+  <div class="section-title">알프 미관여 분석 <span class="badge" id="noAlfBadge">23건</span></div>
+  <div class="def-box" id="noAlfText">
+    알프가 관여하지 못한 건은 총 <strong>23건</strong>으로, <strong>상담원 배정 20건</strong>과 <strong>문의 미진행 3건</strong>으로 나뉩니다.<br>
+    알프 개입 없이 바로 1:1 상담으로 시작된 케이스로, 재오픈 상담·외부 채널 유입·수동 배정 등이 주요 원인입니다.
+  </div>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title" id="noAlfAgentTitle">상담원 배정 20건 · 태그 TOP10</div>
+      <table class="tbl">
+        <thead><tr><th>태그</th><th style="text-align:right">건수</th></tr></thead>
+        <tbody id="noAlfTagsBody"></tbody>
+      </table>
+    </div>
+    <div class="card">
+      <div class="card-title">💡 알프 미관여 주요 원인</div>
+      <div style="display:flex;flex-direction:column;gap:10px;font-size:12px;color:#555;line-height:1.8">
+        <div style="padding:10px 14px;background:#fafaf8;border-radius:8px;border-left:3px solid #6366f1">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+            <span style="font-weight:600;color:#1a1a1a">상담원 직접 연결</span>
+            <span style="font-weight:700;color:#6366f1" id="noAlfDirectCnt">16건</span>
+          </div>
+          처음부터 알프 워크플로우 없이 상담원으로 바로 연결된 케이스 (외부 채널 유입 포함 가능)
+        </div>
+        <div style="padding:10px 14px;background:#fafaf8;border-radius:8px;border-left:3px solid #d97706">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+            <span style="font-weight:600;color:#1a1a1a">재오픈 상담</span>
+            <span style="font-weight:700;color:#d97706" id="noAlfReopenCnt">3건</span>
+          </div>
+          이전 종료 상담을 고객이 다시 열면 알프를 거치지 않고 상담원에게 바로 연결
+        </div>
+      </div>
     </div>
   </div>
 </div>
