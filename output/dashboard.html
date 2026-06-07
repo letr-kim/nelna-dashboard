@@ -383,12 +383,21 @@ body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#f5
       <div style="font-size:11px;color:#3b82f6;margin-top:1px" id="nvInipXPct">-</div>
     </div>
   </div>
-  <div class="card" id="nvInipTagCard" style="max-width:360px;display:none">
-    <div class="card-title" style="margin-bottom:12px">상담 태그</div>
-    <table class="tbl">
-      <thead><tr><th>태그</th><th style="text-align:right">건수</th></tr></thead>
-      <tbody id="nvInipTagBody"></tbody>
-    </table>
+  <div style="display:flex;gap:12px;flex-wrap:wrap">
+    <div class="card" id="nvInipTagCard" style="flex:1;min-width:220px;display:none">
+      <div class="card-title" style="margin-bottom:12px">채널톡 미인입 상담태그</div>
+      <table class="tbl">
+        <thead><tr><th>태그</th><th style="text-align:right">건수</th></tr></thead>
+        <tbody id="nvInipTagBody"></tbody>
+      </table>
+    </div>
+    <div class="card" id="chInipSoloTagCard" style="flex:1;min-width:220px;display:none">
+      <div class="card-title" style="margin-bottom:12px">채널톡 인입 · 알프 단독해결 태그</div>
+      <table class="tbl">
+        <thead><tr><th>태그</th><th style="text-align:right">건수</th></tr></thead>
+        <tbody id="chInipSoloTagBody"></tbody>
+      </table>
+    </div>
   </div>
 </div>
 
@@ -618,13 +627,16 @@ function handleFile(file){
       const nvInipTagC={};
       nvRowsInip.forEach(r=>{const seen=new Set();iterTags(r.tags).forEach(t=>{if(!seen.has(t)&&!t.startsWith('톡톡/')){nvInipTagC[t]=(nvInipTagC[t]||0)+1;seen.add(t);}});});
       const nvInipTopTags=Object.entries(nvInipTagC).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([tag,count])=>({tag,count}));
+      const chInipSoloTagC={};
+      chRows.filter(r=>hasTokTokInip(r)&&soloMask(r)).forEach(r=>{const seen=new Set();iterTags(r.tags).forEach(t=>{if(!seen.has(t)&&!t.startsWith('톡톡/')){chInipSoloTagC[t]=(chInipSoloTagC[t]||0)+1;seen.add(t);}});});
+      const chInipSoloTopTags=Object.entries(chInipSoloTagC).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([tag,count])=>({tag,count}));
       const nvInipDow=[0,0,0,0,0,0,0];
       nvRowsInip.forEach(r=>{const d=new Date(r.createdAt);if(!isNaN(d))nvInipDow[d.getDay()===0?6:d.getDay()-1]++;});
       const nvInipXDow=[0,0,0,0,0,0,0];
       nvInipXRows.forEach(r=>{const d=new Date(r.createdAt);if(!isNaN(d))nvInipXDow[d.getDay()===0?6:d.getDay()-1]++;});
       const nvTotalDow=[0,0,0,0,0,0,0];
       nvRowsRaw.forEach(r=>{const d=new Date(r.createdAt);if(!isNaN(d))nvTotalDow[d.getDay()===0?6:d.getDay()-1]++;});
-      const nvInipStat={total:nvInipTotal,solo:nvInipSolo,toChannel:nvInipToChannel,other:Math.max(0,nvInipTotal-nvInipSolo-nvInipToChannel),involveRate:pct(nvInipTotal,nvRowsRaw.length),soloRate:pct(nvInipSolo,nvInipTotal),toChannelRate:pct(nvInipToChannel,nvInipTotal),triggered:nvInipTriggered,alfSolo:nvInipAlfSolo,alfInvolveRate:pct(nvInipTriggered,nvInipTotal),alfSoloRate:pct(nvInipAlfSolo,nvInipTriggered),topTags:nvInipTopTags,dow:nvInipDow,dowX:nvInipXDow,nvTotalDow:nvTotalDow};
+      const nvInipStat={total:nvInipTotal,solo:nvInipSolo,toChannel:nvInipToChannel,other:Math.max(0,nvInipTotal-nvInipSolo-nvInipToChannel),involveRate:pct(nvInipTotal,nvRowsRaw.length),soloRate:pct(nvInipSolo,nvInipTotal),toChannelRate:pct(nvInipToChannel,nvInipTotal),triggered:nvInipTriggered,alfSolo:nvInipAlfSolo,alfInvolveRate:pct(nvInipTriggered,nvInipTotal),alfSoloRate:pct(nvInipAlfSolo,nvInipTriggered),topTags:nvInipTopTags,chInipSoloTopTags,dow:nvInipDow,dowX:nvInipXDow,nvTotalDow:nvTotalDow};
       const chHistory=D.ch_history?[...D.ch_history]:[];
       const nvHistory=D.nv_history?[...D.nv_history]:[];
       const newChRow={dates:currDates,...chStat};
@@ -862,7 +874,7 @@ async function mergeAndRender(weekKeys,label){
   // nv_inip_stat 합산
   const nvInipDowM=[0,0,0,0,0,0,0],nvInipXDowM=[0,0,0,0,0,0,0],nvTotDowM=[0,0,0,0,0,0,0];
   let nvInipTotM=0,nvTotM=0,nvInipTrigM=0,nvInipAlfSoloM=0;
-  const nvInipTagMapM={};
+  const nvInipTagMapM={},chInipSoloTagMapM={};
   valid.forEach(d=>{
     if(d.nv_inip_stat){
       (d.nv_inip_stat.dow||[]).forEach((v,i)=>nvInipDowM[i]+=v);
@@ -872,11 +884,13 @@ async function mergeAndRender(weekKeys,label){
       nvInipTrigM+=d.nv_inip_stat.triggered||0;
       nvInipAlfSoloM+=d.nv_inip_stat.alfSolo||0;
       (d.nv_inip_stat.topTags||[]).forEach(({tag,count})=>{nvInipTagMapM[tag]=(nvInipTagMapM[tag]||0)+count;});
+      (d.nv_inip_stat.chInipSoloTopTags||[]).forEach(({tag,count})=>{chInipSoloTagMapM[tag]=(chInipSoloTagMapM[tag]||0)+count;});
     }
     if(d.nv_stat)nvTotM+=d.nv_stat.total||0;
   });
   const nvInipTopTagsM=Object.entries(nvInipTagMapM).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([tag,count])=>({tag,count}));
-  merged.nv_inip_stat=nvInipTotM>0?{...(valid[valid.length-1].nv_inip_stat||{}),total:nvInipTotM,triggered:nvInipTrigM,alfSolo:nvInipAlfSoloM,alfInvolveRate:nvInipTotM>0?+(nvInipTrigM/nvInipTotM*100).toFixed(1):0,alfSoloRate:nvInipTrigM>0?+(nvInipAlfSoloM/nvInipTrigM*100).toFixed(1):0,topTags:nvInipTopTagsM,dow:nvInipDowM,dowX:nvInipXDowM,nvTotalDow:nvTotDowM,involveRate:nvTotM>0?+(nvInipTotM/nvTotM*100).toFixed(1):0}:null;
+  const chInipSoloTopTagsM=Object.entries(chInipSoloTagMapM).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([tag,count])=>({tag,count}));
+  merged.nv_inip_stat=nvInipTotM>0?{...(valid[valid.length-1].nv_inip_stat||{}),total:nvInipTotM,triggered:nvInipTrigM,alfSolo:nvInipAlfSoloM,alfInvolveRate:nvInipTotM>0?+(nvInipTrigM/nvInipTotM*100).toFixed(1):0,alfSoloRate:nvInipTrigM>0?+(nvInipAlfSoloM/nvInipTrigM*100).toFixed(1):0,topTags:nvInipTopTagsM,chInipSoloTopTags:chInipSoloTopTagsM,dow:nvInipDowM,dowX:nvInipXDowM,nvTotalDow:nvTotDowM,involveRate:nvTotM>0?+(nvInipTotM/nvTotM*100).toFixed(1):0}:null;
   Object.assign(D,merged);
   renderDashboard();
 }
@@ -1094,6 +1108,14 @@ function renderDashboard(){
         `<tr><td>${tag}</td><td style="text-align:right;font-weight:600">${count}건</td></tr>`).join('');
     } else {
       document.getElementById('nvInipTagCard').style.display='none';
+    }
+    const chSoloTags=ni.chInipSoloTopTags||[];
+    if(chSoloTags.length){
+      document.getElementById('chInipSoloTagCard').style.display='';
+      document.getElementById('chInipSoloTagBody').innerHTML=chSoloTags.map(({tag,count})=>
+        `<tr><td>${tag}</td><td style="text-align:right;font-weight:600">${count}건</td></tr>`).join('');
+    } else {
+      document.getElementById('chInipSoloTagCard').style.display='none';
     }
   } else {
     document.getElementById('nvInipSection').style.display='none';
