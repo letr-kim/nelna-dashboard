@@ -613,7 +613,7 @@ function handleFile(file){
       const hasDuplicate=r=>String(r.tags||'').includes('중복');
       function chStats(rows){
         const t=rows.length,trig=rows.filter(alfTrig).length,solo=rows.filter(soloMask).length;
-        return{total:t,triggered:trig,solo,involveRate:pct(trig,t),soloRate:pct(solo,t),resolveRate:pct(solo,trig)};
+        return{total:t,triggered:trig,solo,involveRate:pct(trig,t),soloRate:pct(solo,trig),resolveRate:pct(solo,trig)};
       }
       const chRows=df.filter(r=>r.mediumType==='native');
       const nvRows=df.filter(r=>r.mediumName==='appNaverTalk');
@@ -622,7 +622,7 @@ function handleFile(file){
         const nvTrig=r=>hasTokTokInip(r)||alfTrig(r);
         const nvSolo=r=>hasTokTokInip(r)?(r.goalState==='waiting'&&!r.assigneeId):soloMask(r);
         const trig=rows.filter(nvTrig).length,solo=rows.filter(nvSolo).length;
-        return{total:t,triggered:trig,solo,involveRate:pct(trig,t),soloRate:pct(solo,t),resolveRate:pct(solo,trig)};
+        return{total:t,triggered:trig,solo,involveRate:pct(trig,t),soloRate:pct(solo,trig),resolveRate:pct(solo,trig)};
       }
       const chStat=chStats(chRows);
       const nvStat=nvChStats(nvRows);
@@ -656,10 +656,10 @@ function handleFile(file){
       const nvIdx=nvHistory.findIndex(r=>r.dates===currDates);
       if(nvIdx>=0)nvHistory[nvIdx]=newNvRow;else nvHistory.push(newNvRow);
       const kpiHistory=D.kpi_history?[...D.kpi_history]:[];
-      const newKpiRow={dates:currDates,totalCount:total,triggeredCount:triggered,soloCount:alfSolo,involveRate:+(triggered/total*100).toFixed(1),soloRate:+(alfSolo/total*100).toFixed(1),resolveRate:+(alfSolo/triggered*100).toFixed(1),chInvolve:chStat.involveRate,chResolve:chStat.resolveRate,nvInvolve:nvStat.involveRate,nvResolve:nvStat.resolveRate,dow:currDow,solo_tag_counts:soloTagCounts};
+      const newKpiRow={dates:currDates,totalCount:total,triggeredCount:triggered,soloCount:alfSolo,involveRate:+(triggered/total*100).toFixed(1),soloRate:+(alfSolo/triggered*100).toFixed(1),resolveRate:+(alfSolo/triggered*100).toFixed(1),chInvolve:chStat.involveRate,chResolve:chStat.resolveRate,nvInvolve:nvStat.involveRate,nvResolve:nvStat.resolveRate,dow:currDow,solo_tag_counts:soloTagCounts};
       const kpiIdx=kpiHistory.findIndex(r=>r.dates===currDates);
       if(kpiIdx>=0)kpiHistory[kpiIdx]=newKpiRow;else kpiHistory.push(newKpiRow);
-      const newD={...D,total,agent_assigned:alfEsc+agentOnly,avg_response_min:avgMin,alf_triggered:triggered,alf_solo:alfSolo,alf_escalated:alfEsc,agent_only:agentOnly,workflow_only:workOnly,curr_solo_rate:+(alfSolo/total*100).toFixed(1),prev_solo_rate:isSameWeek?D.prev_solo_rate:D.curr_solo_rate,prev_total:isSameWeek?(D.prev_total||0):D.total,prev_total_real:isSameWeek?(D.prev_total_real||0):D.total,prev_alf_solo:isSameWeek?D.prev_alf_solo:D.alf_solo,curr_dow:currDow,prev_dow:isSameWeek?D.prev_dow:D.curr_dow,curr_dates:currDates,prev_dates:isSameWeek?D.prev_dates:D.curr_dates,top10_tags:top10,alf_unresolved_tags:alfUnresTags,inc_tags:incTags,curr_solo_top5:soloTop5,prev_solo_top5:soloTop5,prod_ranking:prodRanking,exchange_products:exchangeProducts,return_products:returnProducts,no_alf_direct:direct,no_alf_reopen:reopen,no_alf_total:noAlf.length,no_alf_agent:noAlfAgent.length,no_alf_work:noAlf.filter(r=>!r.assigneeId).length,no_alf_tags:Object.entries(nalfC).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([tag,count])=>({tag,count})),all_tag_counts:allTagCounts,solo_tag_counts:soloTagCounts,ch_stat:chStat,nv_stat:nvStat,nv_inip_stat:nvInipStat,ch_history:chHistory,nv_history:nvHistory,kpi_history:kpiHistory};
+      const newD={...D,total,agent_assigned:alfEsc+agentOnly,avg_response_min:avgMin,alf_triggered:triggered,alf_solo:alfSolo,alf_escalated:alfEsc,agent_only:agentOnly,workflow_only:workOnly,curr_solo_rate:+(alfSolo/triggered*100).toFixed(1),prev_solo_rate:isSameWeek?D.prev_solo_rate:D.curr_solo_rate,prev_total:isSameWeek?(D.prev_total||0):D.total,prev_total_real:isSameWeek?(D.prev_total_real||0):D.total,prev_alf_solo:isSameWeek?D.prev_alf_solo:D.alf_solo,curr_dow:currDow,prev_dow:isSameWeek?D.prev_dow:D.curr_dow,curr_dates:currDates,prev_dates:isSameWeek?D.prev_dates:D.curr_dates,top10_tags:top10,alf_unresolved_tags:alfUnresTags,inc_tags:incTags,curr_solo_top5:soloTop5,prev_solo_top5:soloTop5,prod_ranking:prodRanking,exchange_products:exchangeProducts,return_products:returnProducts,no_alf_direct:direct,no_alf_reopen:reopen,no_alf_total:noAlf.length,no_alf_agent:noAlfAgent.length,no_alf_work:noAlf.filter(r=>!r.assigneeId).length,no_alf_tags:Object.entries(nalfC).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([tag,count])=>({tag,count})),all_tag_counts:allTagCounts,solo_tag_counts:soloTagCounts,ch_stat:chStat,nv_stat:nvStat,nv_inip_stat:nvInipStat,ch_history:chHistory,nv_history:nvHistory,kpi_history:kpiHistory};
       // [보호 3단계] 최종 저장 직전 JSON 문자열에서 개인정보 키 검사 → 감지 시 해당 키만 삭제 후 계속
       const detected=FORBIDDEN_FIELDS.filter(f=>new RegExp('"'+f+'"\\s*:').test(JSON.stringify(newD)));
       if(detected.length){
@@ -847,7 +847,7 @@ async function mergeAndRender(weekKeys,label){
   merged.alf_triggered=valid.reduce((s,d)=>s+d.alf_triggered,0);
   merged.agent_assigned=valid.reduce((s,d)=>s+d.agent_assigned,0);
   const tot=merged.total;
-  merged.curr_solo_rate=tot?+(merged.alf_solo/tot*100).toFixed(1):0;
+  merged.curr_solo_rate=merged.alf_triggered?+(merged.alf_solo/merged.alf_triggered*100).toFixed(1):0;
   merged.curr_dow=valid.reduce((acc,d)=>acc.map((v,i)=>v+(d.curr_dow?.[i]||0)),[0,0,0,0,0,0,0]);
   merged.prev_dow=[0,0,0,0,0,0,0];
   merged.prev_total=0;merged.prev_alf_solo=0;merged.prev_solo_rate=0;merged.inc_tags=[];
@@ -957,7 +957,7 @@ function renderDashboard(){
   const _prevH=_currIdx>0?_hist[_currIdx-1]:null;
   const prevTotal=_prevH?(+(_prevH.totalCount)||0):(D.prev_total||0);
   const prevAlfSolo=_prevH?(+(_prevH.soloCount)||0):(D.prev_alf_solo||0);
-  const prevSoloRate=_prevH?(_prevH.soloRate||0):(D.prev_solo_rate||0);
+  const prevSoloRate=_prevH?(_prevH.resolveRate||_prevH.soloRate||0):(D.prev_solo_rate||0);
   const prevDates=_prevH?_prevH.dates:(D.prev_dates||'');
   const prevDow=(_prevH&&_prevH.dow)?_prevH.dow:(D.prev_dow||[0,0,0,0,0,0,0]);
   document.getElementById('pageSub').textContent='금주: '+D.curr_dates+' · 직전주: '+prevDates+' · 테스트 건 제외';
@@ -967,7 +967,7 @@ function renderDashboard(){
   document.getElementById('kAgentSub').textContent='전체의 '+Math.round(D.agent_assigned/D.total*100)+'%';
   document.getElementById('kAvg').innerHTML=D.avg_response_min+'<span style="font-size:14px;font-weight:400">분</span>';
   document.getElementById('kSolo').textContent=D.alf_solo;
-  document.getElementById('kSoloSub').textContent='전체의 '+(D.alf_solo/D.total*100).toFixed(1)+'%';
+  document.getElementById('kSoloSub').textContent='관여 '+D.alf_triggered+'건 중 '+(D.alf_triggered>0?(D.alf_solo/D.alf_triggered*100).toFixed(1):0)+'%';
   document.getElementById('kEsc').textContent=D.alf_escalated;
   document.getElementById('kEscSub').textContent='전체의 '+(D.alf_escalated/D.total*100).toFixed(1)+'%';
   const involveRate=+(D.alf_triggered/D.total*100).toFixed(1);
@@ -991,14 +991,15 @@ function renderDashboard(){
   new Chart(document.getElementById('tagChart'),{type:'bar',data:{labels:t10.map(t=>t.tag),datasets:[{label:'알프',data:t10.map(t=>t.alf),backgroundColor:'#818cf8',borderRadius:3,datalabels:{anchor:'center',align:'center',color:'#fff',font:{size:11,weight:'700'},formatter:v=>v===0?'':v}},{label:'상담원',data:t10.map(t=>t.agent),backgroundColor:'#fb923c',borderRadius:3,datalabels:{labels:{inner:{anchor:'center',align:'center',color:'#fff',font:{size:11,weight:'700'},formatter:v=>v===0?'':v},total:{anchor:'end',align:'end',color:'#333',font:{size:12,weight:'700'},formatter:(v,c)=>t10[c.dataIndex].total+'건'}}}}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,layout:{padding:{right:40}},plugins:{legend:{position:'bottom'},tooltip:{callbacks:{label:c=>c.dataset.label+': '+c.parsed.x+'건'}}},scales:{x:{beginAtZero:true,stacked:true,grid:{color:'#f0f0ee'}},y:{stacked:true,grid:{display:false},ticks:{font:{size:10},color:'#555'}}}}});
   const pr=D.prod_ranking;
   document.getElementById('prodRankDow').innerHTML=pr.map((p,i)=>{const delta=p.delta,dStr=(delta>0?'+':'')+delta+'건',dColor=delta>0?'#dc2626':delta<0?'#16a34a':'#888';return '<tr><td style="color:#aaa">'+(i+1)+'위</td><td style="font-weight:500">'+p.name.replace('낼나 ','')+'</td><td style="text-align:right;color:#aaa">'+p.prev+'건</td><td style="text-align:right;font-weight:600">'+p.total+'건</td><td style="text-align:right;font-weight:600;color:'+dColor+'">'+dStr+'</td></tr>';}).join('');
-  const prevTotalRate=prevTotal>0?+(prevAlfSolo/prevTotal*100).toFixed(1):prevSoloRate;
-  const currTotalRate=+(D.alf_solo/D.total*100).toFixed(1);
+  const prevTriggered=_prevH?(+(_prevH.triggeredCount)||0):0;
+  const prevTotalRate=prevTriggered>0?+(prevAlfSolo/prevTriggered*100).toFixed(1):prevSoloRate;
+  const currTotalRate=D.alf_triggered>0?+(D.alf_solo/D.alf_triggered*100).toFixed(1):0;
   document.getElementById('prevAlfPeriod').textContent='('+prevDates+')';
   document.getElementById('currAlfPeriod').textContent='('+D.curr_dates+')';
   document.getElementById('prevRate').textContent=prevTotalRate+'%';
   document.getElementById('currRate').textContent=currTotalRate+'%';
-  document.getElementById('prevAlfDetail').textContent=prevAlfSolo+'건 / 전체 '+prevTotal+'건';
-  document.getElementById('currAlfDetail').textContent=D.alf_solo+'건 / 전체 '+D.total+'건';
+  document.getElementById('prevAlfDetail').textContent=prevAlfSolo+'건 / 관여 '+prevTriggered+'건';
+  document.getElementById('currAlfDetail').textContent=D.alf_solo+'건 / 관여 '+D.alf_triggered+'건';
   const rd=+(currTotalRate-prevTotalRate).toFixed(1);
   const diffEl2=document.getElementById('diffBadge');
   diffEl2.textContent=(rd>0?'+':'')+rd+'%p';
@@ -1028,11 +1029,11 @@ function renderDashboard(){
   document.getElementById('kpiTotalVal').textContent = D.total+'건';
   document.getElementById('kpiTotalSub').textContent = D.curr_dates;
   const involveRate2 = +(D.alf_triggered/D.total*100).toFixed(1);
-  const soloRate2 = +(D.alf_solo/D.total*100).toFixed(1);
+  const soloRate2 = D.alf_triggered>0?+(D.alf_solo/D.alf_triggered*100).toFixed(1):0;
   document.getElementById('kpiTotalInvolveVal').textContent = involveRate2+'%';
   document.getElementById('kpiTotalInvolveSub').textContent = D.alf_triggered+' / '+D.total+'건';
   document.getElementById('kpiTotalResolveVal').textContent = soloRate2+'%';
-  document.getElementById('kpiTotalResolveSub').textContent = D.alf_solo+' / '+D.total+'건';
+  document.getElementById('kpiTotalResolveSub').textContent = D.alf_solo+' / '+D.alf_triggered+'건';
 
   // KPI 차트 재빌드
   if(typeof buildKpiCharts === 'function') buildKpiCharts();
@@ -1052,11 +1053,11 @@ function renderDashboard(){
       kh.map(r=>`<tr><td>${r.dates}</td>
         <td style="text-align:right;color:#aaa">${r.totalCount||'-'}건</td>
         <td style="text-align:right">${r.involveRate}%</td>
-        <td style="text-align:right">${r.soloRate||'-'}%</td></tr>`).join('') +
+        <td style="text-align:right">${r.resolveRate??r.soloRate??'-'}%</td></tr>`).join('') +
       `<tr style="border-top:1.5px solid #e5e5e0;font-weight:600"><td>합산</td>
         <td style="text-align:right;color:#aaa">${totalSum.total||'-'}건</td>
         <td style="text-align:right;color:#3b82f6">${totalSum.triggered&&totalSum.total?+(totalSum.triggered/totalSum.total*100).toFixed(1):'-'}%</td>
-        <td style="text-align:right;color:#3b82f6">${totalSum.solo&&totalSum.total?+(totalSum.solo/totalSum.total*100).toFixed(1):'-'}%</td></tr>`;
+        <td style="text-align:right;color:#3b82f6">${totalSum.solo&&totalSum.triggered?+(totalSum.solo/totalSum.triggered*100).toFixed(1):'-'}%</td></tr>`;
   }
 
   // 채널별 알프 지표 표 업데이트
@@ -1066,7 +1067,7 @@ function renderDashboard(){
     return `<tr ${style}><td>${label}</td>
       <td style="text-align:right;color:#aaa">${r.total}건</td>
       <td style="text-align:right${isSummary?';color:#3b82f6':''}">${r.involveRate}%</td>
-      <td style="text-align:right${isSummary?';color:#3b82f6':''}">${r.soloRate}%</td></tr>`;
+      <td style="text-align:right${isSummary?';color:#3b82f6':''}">${r.resolveRate??r.soloRate}%</td></tr>`;
   }
 
   if(D.ch_history && D.ch_history.length) {
@@ -1076,7 +1077,7 @@ function renderDashboard(){
     }), {total:0,triggered:0,solo:0});
     const chSumRow = {dates:'합산', total:chSum.total,
       involveRate:+(chSum.triggered/chSum.total*100).toFixed(1),
-      soloRate:+(chSum.solo/chSum.total*100).toFixed(1),
+      soloRate:+(chSum.solo/chSum.triggered*100).toFixed(1),
       resolveRate:+(chSum.solo/chSum.triggered*100).toFixed(1)};
     document.getElementById('chTableBody').innerHTML =
       chH.map(r=>chRow(r,false)).join('') + chRow(chSumRow,true);
@@ -1094,7 +1095,7 @@ function renderDashboard(){
     }), {total:0,triggered:0,solo:0});
     const nvSumRow = {dates:'합산', total:nvSum.total,
       involveRate:+(nvSum.triggered/nvSum.total*100).toFixed(1),
-      soloRate:+(nvSum.solo/nvSum.total*100).toFixed(1),
+      soloRate:+(nvSum.solo/nvSum.triggered*100).toFixed(1),
       resolveRate:+(nvSum.solo/nvSum.triggered*100).toFixed(1)};
     document.getElementById('nvTableBody').innerHTML =
       nvH.map(r=>chRow(r,false)).join('') + chRow(nvSumRow,true);
