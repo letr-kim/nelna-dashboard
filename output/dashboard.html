@@ -385,6 +385,17 @@ body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#f5
 
 
 
+<!-- ⑧ 톡톡 알프인입 분석 -->
+<div class="section" id="nvInipSection" style="display:none">
+  <div class="section-title">톡톡 알프인입 분석</div>
+  <div class="card" style="max-width:480px">
+    <table class="tbl">
+      <thead><tr><th>항목</th><th style="text-align:right">건수</th><th style="text-align:right">비율</th></tr></thead>
+      <tbody id="nvInipBody"></tbody>
+    </table>
+  </div>
+</div>
+
 <!-- ⑨ 메모 -->
 <div class="section">
   <div class="section-title">📝 메모</div>
@@ -493,10 +504,16 @@ function handleFile(file){
       }
       const chRows=df.filter(r=>r.mediumType==='native');
       const nvRows=df.filter(r=>r.mediumName==='appNaverTalk');
-      const nvRowsInipX=nvRows.filter(r=>hasTokTokInipX(r)||(!hasTokTokInip(r)&&!hasTokTokInipX(r)));
       const nvRowsInip=nvRows.filter(r=>hasTokTokInip(r));
+      function nvChStats(rows){
+        const t=rows.length;
+        const nvTrig=r=>hasTokTokInip(r)||alfTrig(r);
+        const nvSolo=r=>hasTokTokInip(r)?(r.goalState==='waiting'&&!r.assigneeId):soloMask(r);
+        const trig=rows.filter(nvTrig).length,solo=rows.filter(nvSolo).length;
+        return{total:t,triggered:trig,solo,involveRate:pct(trig,t),soloRate:pct(solo,t),resolveRate:pct(solo,trig)};
+      }
       const chStat=chStats(chRows);
-      const nvStat=chStats(nvRowsInipX);
+      const nvStat=nvChStats(nvRows);
       const nvInipTotal=nvRowsInip.length;
       const nvInipSolo=nvRowsInip.filter(r=>hasDuplicate(r)).length;
       const nvInipToChannel=chRows.filter(r=>hasTokTokInip(r)).length;
@@ -513,7 +530,7 @@ function handleFile(file){
       const newKpiRow={dates:currDates,totalCount:total,triggeredCount:triggered,soloCount:alfSolo,involveRate:+(triggered/total*100).toFixed(1),soloRate:+(alfSolo/total*100).toFixed(1),resolveRate:+(alfSolo/triggered*100).toFixed(1),chInvolve:chStat.involveRate,chResolve:chStat.resolveRate,nvInvolve:nvStat.involveRate,nvResolve:nvStat.resolveRate};
       const kpiIdx=kpiHistory.findIndex(r=>r.dates===currDates);
       if(kpiIdx>=0)kpiHistory[kpiIdx]=newKpiRow;else kpiHistory.push(newKpiRow);
-      const newD={...D,total,agent_assigned:alfEsc+agentOnly,avg_response_min:avgMin,alf_triggered:triggered,alf_solo:alfSolo,alf_escalated:alfEsc,agent_only:agentOnly,workflow_only:workOnly,curr_solo_rate:+(alfSolo/total*100).toFixed(1),prev_solo_rate:D.curr_solo_rate,prev_total:D.total,prev_total_real:D.total,prev_alf_solo:D.alf_solo,curr_dow:currDow,prev_dow:D.curr_dow,curr_dates:currDates,prev_dates:D.curr_dates,top10_tags:top10,alf_unresolved_tags:alfUnresTags,inc_tags:incTags,curr_solo_top5:soloTop5,prev_solo_top5:soloTop5,prod_ranking:prodRanking,exchange_products:exchangeProducts,return_products:returnProducts,no_alf_direct:direct,no_alf_reopen:reopen,no_alf_total:noAlf.length,no_alf_agent:noAlfAgent.length,no_alf_work:noAlf.filter(r=>!r.assigneeId).length,no_alf_tags:Object.entries(nalfC).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([tag,count])=>({tag,count})),all_tag_counts:allTagCounts,solo_tag_counts:soloTagCounts,ch_stat:chStat,nv_stat:nvStat,nv_inip_stat:nvInipStat,ch_history:chHistory.slice(-3),nv_history:nvHistory.slice(-3),kpi_history:kpiHistory};
+      const newD={...D,total,agent_assigned:alfEsc+agentOnly,avg_response_min:avgMin,alf_triggered:triggered,alf_solo:alfSolo,alf_escalated:alfEsc,agent_only:agentOnly,workflow_only:workOnly,curr_solo_rate:+(alfSolo/total*100).toFixed(1),prev_solo_rate:D.curr_solo_rate,prev_total:D.total,prev_total_real:D.total,prev_alf_solo:D.alf_solo,curr_dow:currDow,prev_dow:D.curr_dow,curr_dates:currDates,prev_dates:D.curr_dates,top10_tags:top10,alf_unresolved_tags:alfUnresTags,inc_tags:incTags,curr_solo_top5:soloTop5,prev_solo_top5:soloTop5,prod_ranking:prodRanking,exchange_products:exchangeProducts,return_products:returnProducts,no_alf_direct:direct,no_alf_reopen:reopen,no_alf_total:noAlf.length,no_alf_agent:noAlfAgent.length,no_alf_work:noAlf.filter(r=>!r.assigneeId).length,no_alf_tags:Object.entries(nalfC).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([tag,count])=>({tag,count})),all_tag_counts:allTagCounts,solo_tag_counts:soloTagCounts,ch_stat:chStat,nv_stat:nvStat,nv_inip_stat:nvInipStat,ch_history:chHistory,nv_history:nvHistory,kpi_history:kpiHistory};
       // [보호 3단계] 최종 저장 직전 JSON 문자열에서 개인정보 키 검사 → 감지 시 해당 키만 삭제 후 계속
       const detected=FORBIDDEN_FIELDS.filter(f=>new RegExp('"'+f+'"\\s*:').test(JSON.stringify(newD)));
       if(detected.length){
@@ -865,7 +882,7 @@ function renderDashboard(){
     const chSum = chH.reduce((a,r)=>({
       total:a.total+r.total, triggered:a.triggered+r.triggered, solo:a.solo+r.solo
     }), {total:0,triggered:0,solo:0});
-    const chSumRow = {dates:'3주 합산', total:chSum.total,
+    const chSumRow = {dates:'합산', total:chSum.total,
       involveRate:+(chSum.triggered/chSum.total*100).toFixed(1),
       soloRate:+(chSum.solo/chSum.total*100).toFixed(1),
       resolveRate:+(chSum.solo/chSum.triggered*100).toFixed(1)};
@@ -875,7 +892,7 @@ function renderDashboard(){
     // KPI 카드 업데이트 (채널별 합산 — ch_history/nv_history 기반)
     const firstDate = chH[0].dates.split(' ~ ')[0];
     const lastDate = chH[chH.length-1].dates.split(' ~ ')[1] || chH[chH.length-1].dates;
-    document.getElementById('chTableBadge').textContent = '3주 합산 · '+firstDate+'~'+lastDate;
+    document.getElementById('chTableBadge').textContent = '전체 합산 · '+firstDate+'~'+lastDate;
   }
 
   if(D.nv_history && D.nv_history.length) {
@@ -883,7 +900,7 @@ function renderDashboard(){
     const nvSum = nvH.reduce((a,r)=>({
       total:a.total+r.total, triggered:a.triggered+r.triggered, solo:a.solo+r.solo
     }), {total:0,triggered:0,solo:0});
-    const nvSumRow = {dates:'3주 합산', total:nvSum.total,
+    const nvSumRow = {dates:'합산', total:nvSum.total,
       involveRate:+(nvSum.triggered/nvSum.total*100).toFixed(1),
       soloRate:+(nvSum.solo/nvSum.total*100).toFixed(1),
       resolveRate:+(nvSum.solo/nvSum.triggered*100).toFixed(1)};
@@ -893,6 +910,17 @@ function renderDashboard(){
     // 전체 합산 상담건
     const allTotal = (D.ch_history||[]).reduce((a,r)=>a+r.total,0) + nvSum.total;
     document.getElementById('kpiTotalVal').textContent = allTotal+'건';
+  }
+
+  // 톡톡 알프인입 분석
+  if(D.nv_inip_stat) {
+    const ni=D.nv_inip_stat;
+    const nvTotal=(D.nv_stat||{}).total||0;
+    document.getElementById('nvInipSection').style.display='';
+    document.getElementById('nvInipBody').innerHTML=
+      `<tr><td>톡톡 전체 인입</td><td style="text-align:right;color:#aaa">${nvTotal}건</td><td style="text-align:right">-</td></tr>`+
+      `<tr><td>알프인입 건수</td><td style="text-align:right;color:#aaa">${ni.total}건</td><td style="text-align:right">${ni.involveRate}%</td></tr>`+
+      `<tr><td>알프인입 중 알프해결</td><td style="text-align:right;color:#aaa">${ni.solo}건</td><td style="text-align:right;color:#3b82f6">${ni.soloRate}%</td></tr>`;
   }
 }
 
