@@ -566,7 +566,7 @@ function handleFile(file){
           tagC[t].total++;isAlf?tagC[t].alf++:tagC[t].agent++;
         });
       });
-      const top10=Object.values(tagC).sort((a,b)=>b.total-a.total).slice(0,10);
+      const top10=Object.values(tagC).filter(t=>!t.tag.includes('톡톡/알프인입')).sort((a,b)=>b.total-a.total).slice(0,10);
       const escT={};
       df.filter(escMask).forEach(r=>{const seen=new Set();iterTags(r.tags).forEach(t=>{if(!seen.has(t)){escT[t]=(escT[t]||0)+1;seen.add(t);}});});
       const alfUnresTags=Object.entries(escT).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([tag,count])=>({tag,count}));
@@ -806,7 +806,7 @@ async function mergeAndRender(weekKeys,label){
     if(!tagMap[t.tag])tagMap[t.tag]={tag:t.tag,total:0,alf:0,agent:0};
     tagMap[t.tag].total+=t.total;tagMap[t.tag].alf+=t.alf;tagMap[t.tag].agent+=t.agent;
   }));
-  merged.top10_tags=Object.values(tagMap).sort((a,b)=>b.total-a.total).slice(0,10);
+  merged.top10_tags=Object.values(tagMap).filter(t=>!t.tag.includes('톡톡/알프인입')).sort((a,b)=>b.total-a.total).slice(0,10);
   const escMap={};
   valid.forEach(d=>(d.alf_unresolved_tags||[]).forEach(t=>{escMap[t.tag]=(escMap[t.tag]||0)+t.count;}));
   merged.alf_unresolved_tags=Object.entries(escMap).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([tag,count])=>({tag,count}));
