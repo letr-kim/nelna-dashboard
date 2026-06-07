@@ -44,12 +44,13 @@ body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#f5
 .tbl tr:last-child td{border-bottom:none}
 .tbl tr:hover td{background:#fafaf8}
 @media(max-width:700px){.kpi-row{grid-template-columns:1fr 1fr}.grid-2{grid-template-columns:1fr}}
-.upload-btn{position:fixed;top:20px;right:24px;z-index:100;display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #e5e5e0;border-radius:10px;padding:8px 14px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.08);font-size:13px;color:#555;transition:all 0.2s}
+.controls-bar{display:flex;align-items:center;gap:8px;padding:12px 20px;max-width:1200px;margin:0 auto}
+.upload-btn{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid #e5e5e0;border-radius:10px;padding:8px 14px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.08);font-size:13px;color:#555;transition:all 0.2s;white-space:nowrap}
 .upload-btn:hover{background:#f5f5f2;border-color:#ccc}
 .upload-btn:disabled{opacity:0.7;cursor:not-allowed}
 .upload-btn svg{width:18px;height:18px;color:#7c3aed}
 @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
-.week-select-wrap{position:fixed;top:20px;right:310px;z-index:100;display:flex;align-items:center;gap:8px}
+.week-select-wrap{display:flex;align-items:center;gap:8px;margin-right:auto}
 .week-select{background:#fff;border:1px solid #e5e5e0;border-radius:10px;padding:8px 14px;font-size:13px;color:#555;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.08);outline:none;appearance:none;padding-right:28px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
 .date-range-btn{background:#fff;border:1px solid #e5e5e0;border-radius:10px;padding:8px 12px;font-size:13px;color:#555;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.08);white-space:nowrap}
 .date-range-btn:hover{background:#f5f5f2}
@@ -80,14 +81,6 @@ body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#f5
 </style>
 </head>
 <body>
-<!-- 주차/월별/날짜 선택 -->
-<div class="week-select-wrap">
-  <select class="week-select" id="weekSelect" onchange="handleSelectChange(this.value)">
-    <option value="">📅 기간 선택</option>
-  </select>
-  <button class="date-range-btn" onclick="document.getElementById('datePickerOverlay').classList.add('show')">📆 날짜 범위</button>
-</div>
-
 <!-- 날짜 범위 선택 모달 -->
 <div class="date-picker-overlay" id="datePickerOverlay">
   <div class="date-picker-modal">
@@ -101,18 +94,6 @@ body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#f5
     <button class="date-picker-cancel" onclick="document.getElementById('datePickerOverlay').classList.remove('show')">취소</button>
   </div>
 </div>
-
-<!-- 새로고침 버튼 -->
-<button class="upload-btn" id="refreshBtn" onclick="refreshDashboard()">
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
-  새로고침
-</button>
-
-<!-- 엑셀 업로드 버튼 -->
-<button class="upload-btn" id="excelBtn" onclick="document.getElementById('uploadOverlay').classList.add('show')" style="right:145px">
-  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-  엑셀 업로드
-</button>
 
 <!-- 엑셀 업로드 모달 -->
 <div class="upload-overlay" id="uploadOverlay">
@@ -132,6 +113,23 @@ body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#f5
   </div>
 </div>
 
+<!-- 상단 컨트롤 바 -->
+<div class="controls-bar">
+  <div class="week-select-wrap">
+    <select class="week-select" id="weekSelect" onchange="handleSelectChange(this.value)">
+      <option value="">📅 기간 선택</option>
+    </select>
+    <button class="date-range-btn" onclick="document.getElementById('datePickerOverlay').classList.add('show')">📆 날짜 범위</button>
+  </div>
+  <button class="upload-btn" id="excelBtn" onclick="document.getElementById('uploadOverlay').classList.add('show')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+    엑셀 업로드
+  </button>
+  <button class="upload-btn" id="refreshBtn" onclick="refreshDashboard()">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
+    새로고침
+  </button>
+</div>
 
 <div class="page">
 
