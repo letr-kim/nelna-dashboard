@@ -402,16 +402,22 @@ body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#f5
 <!-- ⑧ 톡톡 알프인입 분석 -->
 <div class="section" id="nvInipSection" style="display:none">
   <div class="section-title">톡톡 알프인입 분석</div>
-  <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:12px">
-    <div class="card" style="flex:1;min-width:140px;max-width:180px;text-align:center">
-      <div style="font-size:11px;color:#aaa;margin-bottom:4px">알프 관여율</div>
-      <div style="font-size:22px;font-weight:700;color:#7c3aed" id="nvInipInvolveVal">-</div>
-      <div style="font-size:11px;color:#aaa;margin-top:2px" id="nvInipInvolveSub">-</div>
+  <div class="card" style="margin-bottom:12px;display:flex;gap:24px;flex-wrap:wrap;align-items:center">
+    <div style="text-align:center">
+      <div style="font-size:11px;color:#aaa;margin-bottom:2px">톡톡 인입</div>
+      <div style="font-size:20px;font-weight:700;color:#1a1a1a" id="nvInipTotalVal">-</div>
     </div>
-    <div class="card" style="flex:1;min-width:140px;max-width:180px;text-align:center">
-      <div style="font-size:11px;color:#aaa;margin-bottom:4px">알프 단독해결율</div>
-      <div style="font-size:22px;font-weight:700;color:#16a34a" id="nvInipSoloVal">-</div>
-      <div style="font-size:11px;color:#aaa;margin-top:2px" id="nvInipSoloSub">-</div>
+    <div style="color:#e5e5e0;font-size:20px">|</div>
+    <div style="text-align:center">
+      <div style="font-size:11px;color:#aaa;margin-bottom:2px">알프인입</div>
+      <div style="font-size:20px;font-weight:700;color:#7c3aed" id="nvInipInipVal">-</div>
+      <div style="font-size:11px;color:#7c3aed;margin-top:1px" id="nvInipInipPct">-</div>
+    </div>
+    <div style="color:#e5e5e0;font-size:20px">|</div>
+    <div style="text-align:center">
+      <div style="font-size:11px;color:#aaa;margin-bottom:2px">알프인입X</div>
+      <div style="font-size:20px;font-weight:700;color:#3b82f6" id="nvInipXVal">-</div>
+      <div style="font-size:11px;color:#3b82f6;margin-top:1px" id="nvInipXPct">-</div>
     </div>
   </div>
   <div style="display:flex;gap:12px;flex-wrap:wrap">
@@ -1092,12 +1098,14 @@ function renderDashboard(){
   if(D.nv_inip_stat) {
     const ni=D.nv_inip_stat;
     document.getElementById('nvInipSection').style.display='';
-    // 관여율 카드
-    const niTrig=ni.triggered||0,niSolo=ni.alfSolo||0,niTot=ni.total||0;
-    document.getElementById('nvInipInvolveVal').textContent=(niTot>0?+(niTrig/niTot*100).toFixed(1):0)+'%';
-    document.getElementById('nvInipInvolveSub').textContent=niTrig+' / '+niTot+'건';
-    document.getElementById('nvInipSoloVal').textContent=(niTrig>0?+(niSolo/niTrig*100).toFixed(1):0)+'%';
-    document.getElementById('nvInipSoloSub').textContent=niSolo+' / '+niTrig+'건 (관여)';
+    // 금주 합계 요약
+    const niDow=ni.dow||[0,0,0,0,0,0,0],niDowX=ni.dowX||[0,0,0,0,0,0,0],niTotDow=ni.nvTotalDow||[0,0,0,0,0,0,0];
+    const niTotalNv=niTotDow.reduce((a,b)=>a+b,0),niTotalInip=niDow.reduce((a,b)=>a+b,0),niTotalInipX=niDowX.reduce((a,b)=>a+b,0);
+    document.getElementById('nvInipTotalVal').textContent=niTotalNv>0?niTotalNv+'건':ni.total+'건';
+    document.getElementById('nvInipInipVal').textContent=niTotalInip+'건';
+    document.getElementById('nvInipInipPct').textContent=niTotalNv>0?Math.round(niTotalInip/niTotalNv*100)+'%':'-';
+    document.getElementById('nvInipXVal').textContent=niTotalInipX+'건';
+    document.getElementById('nvInipXPct').textContent=niTotalNv>0?Math.round(niTotalInipX/niTotalNv*100)+'%':'-';
     // 상담태그 테이블
     const topTags=ni.topTags||[];
     if(topTags.length){
