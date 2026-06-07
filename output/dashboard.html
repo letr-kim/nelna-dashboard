@@ -885,7 +885,15 @@ function renderProdTable(products){
 
 function renderDashboard(){
   ['dowChart','tagChart','soloTagChart','alfUnresChart'].forEach(id=>{const c=Chart.getChart(id);if(c)c.destroy();});
-  document.getElementById('pageSub').textContent='금주: '+D.curr_dates+' · 직전주: '+D.prev_dates+' · 테스트 건 제외';
+  // kpi_history를 신뢰 소스로 이전 주 데이터 재계산 (저장된 prev_total이 깨져있을 수 있음)
+  const _hist=D.kpi_history||[];
+  const _currIdx=_hist.findIndex(h=>h.dates.replace(/\s/g,'').replace(/~/,'-to-')===(D.curr_dates||'').replace(/\s/g,'').replace(/~/,'-to-'));
+  const _prevH=_currIdx>0?_hist[_currIdx-1]:null;
+  const prevTotal=_prevH?(+(_prevH.totalCount)||0):(D.prev_total||0);
+  const prevAlfSolo=_prevH?(+(_prevH.soloCount)||0):(D.prev_alf_solo||0);
+  const prevSoloRate=_prevH?(_prevH.soloRate||0):(D.prev_solo_rate||0);
+  const prevDates=_prevH?_prevH.dates:(D.prev_dates||'');
+  document.getElementById('pageSub').textContent='금주: '+D.curr_dates+' · 직전주: '+prevDates+' · 테스트 건 제외';
   document.getElementById('kTot').textContent=D.total;
   document.getElementById('kTotSub').textContent='테스트 건 제외';
   document.getElementById('kAgent').textContent=D.agent_assigned;
@@ -898,7 +906,7 @@ function renderDashboard(){
   const involveRate=+(D.alf_triggered/D.total*100).toFixed(1);
   document.getElementById('kInvolve').textContent=involveRate+'%';
   document.getElementById('kInvolveSub').textContent=D.alf_triggered+'건 / 전체 '+D.total+'건';
-  const diff=D.total-D.prev_total;
+  const diff=D.total-prevTotal;
   const diffEl=document.getElementById('kDiff');
   diffEl.textContent=(diff>0?'+':'')+diff+'건';
   diffEl.style.color=diff>0?'#dc2626':diff<0?'#16a34a':'#1a1a1a';
@@ -910,19 +918,19 @@ function renderDashboard(){
   document.getElementById('bVerify').textContent='✓ '+D.alf_solo+' + '+D.alf_escalated+' + '+D.agent_only+' + '+D.workflow_only+' = '+(D.alf_solo+D.alf_escalated+D.agent_only+D.workflow_only);
   document.getElementById('alfBadge').textContent=D.alf_escalated+'건';
   const dow=['월','화','수','목','금','토','일'];
-  document.getElementById('dowNote').textContent='직전주: '+D.prev_dates+' / 금주: '+D.curr_dates;
+  document.getElementById('dowNote').textContent='직전주: '+prevDates+' / 금주: '+D.curr_dates;
   new Chart(document.getElementById('dowChart'),{type:'bar',data:{labels:dow,datasets:[{label:'직전주',data:D.prev_dow,backgroundColor:'#d1d5db',borderRadius:4,datalabels:{anchor:'end',align:'end',color:'#6b7280',font:{size:11,weight:'600'},formatter:v=>v===0?'':v+'건'}},{label:'금주',data:D.curr_dow,backgroundColor:'#3b82f6',borderRadius:4,datalabels:{anchor:'end',align:'end',color:'#1d4ed8',font:{size:11,weight:'600'},formatter:v=>v===0?'':v+'건'}}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{position:'bottom'},tooltip:{callbacks:{label:c=>c.dataset.label+': '+c.parsed.y+'건'}}},scales:{y:{beginAtZero:true,grid:{color:'#f0f0ee'},max:Math.max(...(D.curr_dow||[0]),...(D.prev_dow||[0]))+10},x:{grid:{display:false}}}}});
   const t10=D.top10_tags;
   new Chart(document.getElementById('tagChart'),{type:'bar',data:{labels:t10.map(t=>t.tag),datasets:[{label:'알프',data:t10.map(t=>t.alf),backgroundColor:'#818cf8',borderRadius:3,datalabels:{anchor:'center',align:'center',color:'#fff',font:{size:11,weight:'700'},formatter:v=>v===0?'':v}},{label:'상담원',data:t10.map(t=>t.agent),backgroundColor:'#fb923c',borderRadius:3,datalabels:{labels:{inner:{anchor:'center',align:'center',color:'#fff',font:{size:11,weight:'700'},formatter:v=>v===0?'':v},total:{anchor:'end',align:'end',color:'#333',font:{size:12,weight:'700'},formatter:(v,c)=>t10[c.dataIndex].total+'건'}}}}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,layout:{padding:{right:40}},plugins:{legend:{position:'bottom'},tooltip:{callbacks:{label:c=>c.dataset.label+': '+c.parsed.x+'건'}}},scales:{x:{beginAtZero:true,stacked:true,grid:{color:'#f0f0ee'}},y:{stacked:true,grid:{display:false},ticks:{font:{size:10},color:'#555'}}}}});
   const pr=D.prod_ranking;
   document.getElementById('prodRankDow').innerHTML=pr.map((p,i)=>{const delta=p.delta,dStr=(delta>0?'+':'')+delta+'건',dColor=delta>0?'#dc2626':delta<0?'#16a34a':'#888';return '<tr><td style="color:#aaa">'+(i+1)+'위</td><td style="font-weight:500">'+p.name.replace('낼나 ','')+'</td><td style="text-align:right;color:#aaa">'+p.prev+'건</td><td style="text-align:right;font-weight:600">'+p.total+'건</td><td style="text-align:right;font-weight:600;color:'+dColor+'">'+dStr+'</td></tr>';}).join('');
-  const prevTotalRate=+(D.prev_alf_solo/(D.prev_total_real||D.prev_total||1)*100).toFixed(1);
+  const prevTotalRate=prevTotal>0?+(prevAlfSolo/prevTotal*100).toFixed(1):prevSoloRate;
   const currTotalRate=+(D.alf_solo/D.total*100).toFixed(1);
-  document.getElementById('prevAlfPeriod').textContent='('+D.prev_dates+')';
+  document.getElementById('prevAlfPeriod').textContent='('+prevDates+')';
   document.getElementById('currAlfPeriod').textContent='('+D.curr_dates+')';
   document.getElementById('prevRate').textContent=prevTotalRate+'%';
   document.getElementById('currRate').textContent=currTotalRate+'%';
-  document.getElementById('prevAlfDetail').textContent=D.prev_alf_solo+'건 / 전체 '+D.prev_total_real+'건';
+  document.getElementById('prevAlfDetail').textContent=prevAlfSolo+'건 / 전체 '+prevTotal+'건';
   document.getElementById('currAlfDetail').textContent=D.alf_solo+'건 / 전체 '+D.total+'건';
   const rd=+(currTotalRate-prevTotalRate).toFixed(1);
   const diffEl2=document.getElementById('diffBadge');
