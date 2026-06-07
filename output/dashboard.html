@@ -1024,9 +1024,13 @@ function renderDashboard(){
 // KPI 목표값
 const KPI_GOAL_INVOLVE = 80, KPI_GOAL_RESOLVE = 60;
 
-// 초기 렌더링
-renderDashboard();
-loadWeekList();
+// 초기 렌더링 — GitHub 최신 데이터 자동 로드
+async function initDashboard(){
+  renderDashboard(); // 하드코딩 기본값으로 먼저 그리기 (레이아웃 표시)
+  await loadWeekList(); // 드롭다운 구성 + _latestWeekKey 세팅
+  if(_latestWeekKey) await loadWeekData(_latestWeekKey); // 최신 주차 자동 로드
+}
+initDashboard();
 
 // ─── KPI 차트 (동적 — 엑셀 업로드 시 자동 업데이트) ────────────────────────
 // D.kpi_history: [{dates, involveRate, resolveRate, chInvolve, chResolve, nvInvolve, nvResolve}]
