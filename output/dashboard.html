@@ -6,6 +6,7 @@
 <title>상담 인입 분석 대시보드</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#f5f5f2;color:#1a1a1a;font-size:14px}
@@ -48,7 +49,7 @@ body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#f5
 .upload-btn:disabled{opacity:0.7;cursor:not-allowed}
 .upload-btn svg{width:18px;height:18px;color:#7c3aed}
 @keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
-.week-select-wrap{position:fixed;top:20px;right:155px;z-index:100;display:flex;align-items:center;gap:8px}
+.week-select-wrap{position:fixed;top:20px;right:310px;z-index:100;display:flex;align-items:center;gap:8px}
 .week-select{background:#fff;border:1px solid #e5e5e0;border-radius:10px;padding:8px 14px;font-size:13px;color:#555;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.08);outline:none;appearance:none;padding-right:28px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
 .date-range-btn{background:#fff;border:1px solid #e5e5e0;border-radius:10px;padding:8px 12px;font-size:13px;color:#555;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,0.08);white-space:nowrap}
 .date-range-btn:hover{background:#f5f5f2}
@@ -63,6 +64,18 @@ body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#f5
 .date-picker-apply{width:100%;background:#7c3aed;color:#fff;border:none;border-radius:8px;padding:11px;font-size:14px;font-weight:600;cursor:pointer;margin-bottom:8px}
 .date-picker-apply:hover{background:#6d28d9}
 .date-picker-cancel{width:100%;background:none;border:0.5px solid #e0e0db;border-radius:8px;padding:8px;font-size:13px;color:#888;cursor:pointer}
+.upload-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:200;align-items:center;justify-content:center}
+.upload-overlay.show{display:flex}
+.upload-modal{background:#fff;border-radius:16px;padding:32px;width:480px;max-width:90vw;text-align:center}
+.upload-modal h3{font-size:17px;font-weight:600;margin-bottom:8px}
+.upload-modal p{font-size:13px;color:#888;margin-bottom:24px;line-height:1.6}
+.upload-drop{border:2px dashed #d1d5db;border-radius:12px;padding:40px 20px;cursor:pointer;transition:all 0.2s}
+.upload-drop:hover,.upload-drop.drag{border-color:#7c3aed;background:#f8f7ff}
+.upload-drop svg{width:40px;height:40px;color:#7c3aed;margin:0 auto 12px;display:block}
+.upload-drop p{font-size:13px;color:#888}
+.upload-drop strong{color:#7c3aed}
+.upload-progress{display:none;margin-top:16px;font-size:13px;color:#7c3aed}
+.upload-close{margin-top:20px;background:none;border:0.5px solid #e0e0db;border-radius:8px;padding:8px 20px;cursor:pointer;font-size:13px;color:#888}
 
 </style>
 </head>
@@ -94,6 +107,30 @@ body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#f5
   <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15"/></svg>
   새로고침
 </button>
+
+<!-- 엑셀 업로드 버튼 -->
+<button class="upload-btn" id="excelBtn" onclick="document.getElementById('uploadOverlay').classList.add('show')" style="right:145px">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+  엑셀 업로드
+</button>
+
+<!-- 엑셀 업로드 모달 -->
+<div class="upload-overlay" id="uploadOverlay">
+  <div class="upload-modal">
+    <h3>📊 금주 데이터 업로드</h3>
+    <p>전체상담건 엑셀 파일(.xlsx) 1개를 업로드하면<br>대시보드가 자동으로 업데이트됩니다.</p>
+    <div class="upload-drop" id="uploadDrop" onclick="document.getElementById('fileInput').click()"
+      ondragover="event.preventDefault();this.classList.add('drag')"
+      ondragleave="this.classList.remove('drag')"
+      ondrop="event.preventDefault();this.classList.remove('drag');handleFile(event.dataTransfer.files[0])">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+      <p><strong>클릭하거나 파일을 드래그</strong>하세요<br>전체상담건_닉네임삭제.xlsx</p>
+    </div>
+    <input type="file" id="fileInput" accept=".xlsx" style="display:none" onchange="handleFile(this.files[0])">
+    <div class="upload-progress" id="uploadProgress">⏳ 데이터 처리 중...</div>
+    <button class="upload-close" onclick="document.getElementById('uploadOverlay').classList.remove('show')">닫기</button>
+  </div>
+</div>
 
 
 <div class="page">
@@ -372,6 +409,112 @@ const D={"total": 120, "agent_assigned": 63, "avg_response_min": 20.7, "alf_trig
 
 // ─── GitHub 설정 ─────────────────────────────────────────────────────────────
 const GH_OWNER='letr-kim', GH_REPO='nelna-dashboard', GH_BRANCH='main';
+
+// ─── 엑셀 업로드 ──────────────────────────────────────────────────────────────
+function handleFile(file){
+  if(!file)return;
+  const prog=document.getElementById('uploadProgress');
+  prog.textContent='⏳ 데이터 처리 중...';prog.style.display='block';
+  const reader=new FileReader();
+  reader.onload=function(e){
+    try{
+      const wb=XLSX.read(e.target.result,{type:'array',cellDates:true});
+      const ws=wb.Sheets[wb.SheetNames[0]];
+      const rows=XLSX.utils.sheet_to_json(ws,{defval:''});
+      const df=rows.filter(r=>!String(r.tags||'').includes('테스트'));
+      const total=df.length;
+      const isTrue=v=>['true','1','yes'].includes(String(v||'').toLowerCase());
+      const alfTrig=r=>isTrue(r.alfTriggered);
+      const soloMask=r=>r.goalState==='waiting'&&alfTrig(r)&&!r.assigneeId;
+      const escMask=r=>r.goalState==='notAchieved'&&alfTrig(r)&&!!r.assigneeId;
+      const alfMask=r=>soloMask(r)||escMask(r);
+      const agentMask=r=>!alfMask(r)&&!!r.assigneeId;
+      const alfSolo=df.filter(soloMask).length;
+      const alfEsc=df.filter(escMask).length;
+      const agentOnly=df.filter(agentMask).length;
+      const workOnly=df.filter(r=>!alfMask(r)&&!r.assigneeId).length;
+      const triggered=df.filter(alfTrig).length;
+      const times=df.filter(r=>agentMask(r)||escMask(r)).map(r=>parseFloat(r.firstMemberHandlingTimeInOperation)).filter(v=>!isNaN(v));
+      const avgMin=times.length?+(times.reduce((a,b)=>a+b,0)/times.length/60).toFixed(1):0;
+      const dates=df.map(r=>new Date(r.createdAt)).filter(d=>!isNaN(d)).sort((a,b)=>a-b);
+      const fmt=d=>(d.getMonth()+1).toString().padStart(2,'0')+'/'+d.getDate().toString().padStart(2,'0');
+      const currDates=dates.length?fmt(dates[0])+' ~ '+fmt(dates[dates.length-1]):'';
+      const currDow=[0,0,0,0,0,0,0];
+      df.forEach(r=>{const d=new Date(r.createdAt);if(!isNaN(d))currDow[d.getDay()===0?6:d.getDay()-1]++;});
+      const soloIds=new Set(df.filter(soloMask).map(r=>String(r.id)));
+      const tagC={};
+      df.forEach(r=>{
+        const isAlf=soloIds.has(String(r.id));const seen=new Set();
+        iterTags(r.tags).forEach(t=>{
+          if(seen.has(t))return;seen.add(t);
+          if(!tagC[t])tagC[t]={tag:t,total:0,alf:0,agent:0};
+          tagC[t].total++;isAlf?tagC[t].alf++:tagC[t].agent++;
+        });
+      });
+      const top10=Object.values(tagC).sort((a,b)=>b.total-a.total).slice(0,10);
+      const escT={};
+      df.filter(escMask).forEach(r=>{const seen=new Set();iterTags(r.tags).forEach(t=>{if(!seen.has(t)){escT[t]=(escT[t]||0)+1;seen.add(t);}});});
+      const alfUnresTags=Object.entries(escT).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([tag,count])=>({tag,count}));
+      const soloC={};
+      df.filter(soloMask).forEach(r=>{const seen=new Set();iterTags(r.tags).forEach(t=>{if(!seen.has(t)){soloC[t]=(soloC[t]||0)+1;seen.add(t);}});});
+      const soloTop5=Object.entries(soloC).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([tag,curr])=>({tag,curr,prev:(D.solo_tag_counts||{})[tag]||0}));
+      const prevAllC=D.all_tag_counts||{};
+      const incTags=top10.filter(t=>t.total>(prevAllC[t.tag]||0)).map(t=>({tag:t.tag,curr:t.total,prev:prevAllC[t.tag]||0,delta:t.total-(prevAllC[t.tag]||0)})).sort((a,b)=>b.delta-a.delta);
+      const prodMap={'낼나 타이머':0,'디지털':0,'낼나 키링캠':0,'낼나 펜슬':0,'데일리 케이블':0};
+      df.forEach(r=>{const t=String(r.tags||'');if(t.includes('타이머'))prodMap['낼나 타이머']++;if(t.includes('디지털'))prodMap['디지털']++;if(t.includes('키링캠'))prodMap['낼나 키링캠']++;if(t.includes('낼나펜슬')||t.includes('펜슬'))prodMap['낼나 펜슬']++;if(t.includes('데일리케이블'))prodMap['데일리 케이블']++;});
+      const prevProd=Object.fromEntries((D.prod_ranking||[]).map(p=>[p.name,p.total]));
+      const prodRanking=Object.entries(prodMap).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([name,total])=>({name,total,prev:prevProd[name]||0,delta:total-(prevProd[name]||0),curr_pct:+(total/df.length*100).toFixed(1),prev_pct:0}));
+      const excMap={},retMap={};
+      df.forEach(r=>{String(r.tags||'').split(',').forEach(raw=>{const tag=raw.trim();if(!tag.includes('교환반품'))return;const p=tag.split('/'),s=(p[1]||'').trim(),d=mergeDetail((p[2]||'').trim());if(!d)return;if(s.includes('미수거재발송'))return;if(s.includes('맞교환')||(s.includes('교환')&&!s.includes('반품')))excMap[d]=(excMap[d]||0)+1;else if(s.includes('반품'))retMap[d]=(retMap[d]||0)+1;});});
+      const exchangeProducts=Object.entries(excMap).sort((a,b)=>b[1]-a[1]).map(([product,count])=>({product,count}));
+      const returnProducts=Object.entries(retMap).sort((a,b)=>b[1]-a[1]).map(([product,count])=>({product,count}));
+      const noAlf=df.filter(r=>!alfTrig(r));
+      const noAlfAgent=noAlf.filter(r=>!!r.assigneeId);
+      const reopen=noAlfAgent.filter(r=>isTrue(r.reopened)).length;
+      const direct=noAlfAgent.length-reopen;
+      const nalfC={};
+      noAlfAgent.filter(r=>!String(r.tags||'').includes('중복')).forEach(r=>{const seen=new Set();iterTags(r.tags).forEach(t=>{if(!seen.has(t)){nalfC[t]=(nalfC[t]||0)+1;seen.add(t);}});});
+      const allTagCounts={};df.forEach(r=>{const seen=new Set();iterTags(r.tags).forEach(t=>{if(!seen.has(t)){allTagCounts[t]=(allTagCounts[t]||0)+1;seen.add(t);}});});
+      const soloTagCounts={};df.filter(soloMask).forEach(r=>{const seen=new Set();iterTags(r.tags).forEach(t=>{if(!seen.has(t)){soloTagCounts[t]=(soloTagCounts[t]||0)+1;seen.add(t);}});});
+      const pct=(a,b)=>b>0?+(a/b*100).toFixed(1):0;
+      const hasTokTokInip=r=>String(r.tags||'').includes('톡톡/알프인입')&&!String(r.tags||'').includes('톡톡/알프인입X');
+      const hasTokTokInipX=r=>String(r.tags||'').includes('톡톡/알프인입X');
+      const hasDuplicate=r=>String(r.tags||'').includes('중복');
+      function chStats(rows){
+        const t=rows.length,trig=rows.filter(alfTrig).length,solo=rows.filter(soloMask).length;
+        return{total:t,triggered:trig,solo,involveRate:pct(trig,t),soloRate:pct(solo,t),resolveRate:pct(solo,trig)};
+      }
+      const chRows=df.filter(r=>r.mediumType==='native');
+      const nvRows=df.filter(r=>r.mediumName==='appNaverTalk');
+      const nvRowsInipX=nvRows.filter(r=>hasTokTokInipX(r)||(!hasTokTokInip(r)&&!hasTokTokInipX(r)));
+      const nvRowsInip=nvRows.filter(r=>hasTokTokInip(r));
+      const chStat=chStats(chRows);
+      const nvStat=chStats(nvRowsInipX);
+      const nvInipTotal=nvRowsInip.length;
+      const nvInipSolo=nvRowsInip.filter(r=>hasDuplicate(r)).length;
+      const nvInipToChannel=chRows.filter(r=>hasTokTokInip(r)).length;
+      const nvInipStat={total:nvInipTotal,solo:nvInipSolo,toChannel:nvInipToChannel,other:Math.max(0,nvInipTotal-nvInipSolo-nvInipToChannel),involveRate:pct(nvInipTotal,nvRows.length),soloRate:pct(nvInipSolo,nvInipTotal),toChannelRate:pct(nvInipToChannel,nvInipTotal)};
+      const chHistory=D.ch_history?[...D.ch_history]:[];
+      const nvHistory=D.nv_history?[...D.nv_history]:[];
+      const newChRow={dates:currDates,...chStat};
+      const newNvRow={dates:currDates,...nvStat};
+      const chIdx=chHistory.findIndex(r=>r.dates===currDates);
+      if(chIdx>=0)chHistory[chIdx]=newChRow;else chHistory.push(newChRow);
+      const nvIdx=nvHistory.findIndex(r=>r.dates===currDates);
+      if(nvIdx>=0)nvHistory[nvIdx]=newNvRow;else nvHistory.push(newNvRow);
+      const kpiHistory=D.kpi_history?[...D.kpi_history]:[];
+      const newKpiRow={dates:currDates,totalCount:total,triggeredCount:triggered,soloCount:alfSolo,involveRate:+(triggered/total*100).toFixed(1),soloRate:+(alfSolo/total*100).toFixed(1),resolveRate:+(alfSolo/triggered*100).toFixed(1),chInvolve:chStat.involveRate,chResolve:chStat.resolveRate,nvInvolve:nvStat.involveRate,nvResolve:nvStat.resolveRate};
+      const kpiIdx=kpiHistory.findIndex(r=>r.dates===currDates);
+      if(kpiIdx>=0)kpiHistory[kpiIdx]=newKpiRow;else kpiHistory.push(newKpiRow);
+      const newD={...D,total,agent_assigned:alfEsc+agentOnly,avg_response_min:avgMin,alf_triggered:triggered,alf_solo:alfSolo,alf_escalated:alfEsc,agent_only:agentOnly,workflow_only:workOnly,curr_solo_rate:+(alfSolo/total*100).toFixed(1),prev_solo_rate:D.curr_solo_rate,prev_total:D.total,prev_total_real:D.total,prev_alf_solo:D.alf_solo,curr_dow:currDow,prev_dow:D.curr_dow,curr_dates:currDates,prev_dates:D.curr_dates,top10_tags:top10,alf_unresolved_tags:alfUnresTags,inc_tags:incTags,curr_solo_top5:soloTop5,prev_solo_top5:soloTop5,prod_ranking:prodRanking,exchange_products:exchangeProducts,return_products:returnProducts,no_alf_direct:direct,no_alf_reopen:reopen,no_alf_total:noAlf.length,no_alf_agent:noAlfAgent.length,no_alf_work:noAlf.filter(r=>!r.assigneeId).length,no_alf_tags:Object.entries(nalfC).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([tag,count])=>({tag,count})),all_tag_counts:allTagCounts,solo_tag_counts:soloTagCounts,ch_stat:chStat,nv_stat:nvStat,nv_inip_stat:nvInipStat,ch_history:chHistory.slice(-3),nv_history:nvHistory.slice(-3),kpi_history:kpiHistory};
+      Object.assign(D,newD);
+      renderDashboard();
+      prog.textContent='✅ 업로드 완료!';
+      setTimeout(()=>{prog.style.display='none';document.getElementById('uploadOverlay').classList.remove('show');},1500);
+    }catch(err){prog.textContent='❌ 오류: '+err.message;console.error(err);}
+  };
+  reader.readAsArrayBuffer(file);
+}
 
 async function refreshDashboard(){
   const btn=document.getElementById('refreshBtn');
