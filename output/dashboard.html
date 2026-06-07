@@ -402,11 +402,26 @@ body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#f5
 <!-- ⑧ 톡톡 알프인입 분석 -->
 <div class="section" id="nvInipSection" style="display:none">
   <div class="section-title">톡톡 알프인입 분석</div>
-  <div class="card" style="max-width:480px">
-    <table class="tbl">
-      <thead><tr><th>항목</th><th style="text-align:right">건수</th><th style="text-align:right">비율</th></tr></thead>
-      <tbody id="nvInipBody"></tbody>
-    </table>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px">
+    <div class="card" style="text-align:center;padding:16px">
+      <div style="font-size:11px;color:#888;margin-bottom:4px">알프인입 건수</div>
+      <div style="font-size:22px;font-weight:700;color:#7c3aed" id="nvInipTotal">-</div>
+      <div style="font-size:11px;color:#aaa" id="nvInipTotalSub"></div>
+    </div>
+    <div class="card" style="text-align:center;padding:16px">
+      <div style="font-size:11px;color:#888;margin-bottom:4px">알프인입 비율</div>
+      <div style="font-size:22px;font-weight:700;color:#7c3aed" id="nvInipRate">-</div>
+      <div style="font-size:11px;color:#aaa">톡톡 전체 대비</div>
+    </div>
+    <div class="card" style="text-align:center;padding:16px">
+      <div style="font-size:11px;color:#888;margin-bottom:4px">채널톡 재문의</div>
+      <div style="font-size:22px;font-weight:700;color:#f59e0b" id="nvInipToChannel">-</div>
+      <div style="font-size:11px;color:#aaa" id="nvInipToChannelSub"></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title" style="margin-bottom:12px">요일별 알프인입 건수</div>
+    <div style="height:200px"><canvas id="nvInipDowChart"></canvas></div>
   </div>
 </div>
 
@@ -594,7 +609,9 @@ function handleFile(file){
       const nvInipTotal=nvRowsInip.length;
       const nvInipSolo=nvRowsInip.filter(r=>hasDuplicate(r)).length;
       const nvInipToChannel=chRows.filter(r=>hasTokTokInip(r)).length;
-      const nvInipStat={total:nvInipTotal,solo:nvInipSolo,toChannel:nvInipToChannel,other:Math.max(0,nvInipTotal-nvInipSolo-nvInipToChannel),involveRate:pct(nvInipTotal,nvRows.length),soloRate:pct(nvInipSolo,nvInipTotal),toChannelRate:pct(nvInipToChannel,nvInipTotal)};
+      const nvInipDow=[0,0,0,0,0,0,0];
+      nvRowsInip.forEach(r=>{const d=new Date(r.createdAt);if(!isNaN(d))nvInipDow[d.getDay()===0?6:d.getDay()-1]++;});
+      const nvInipStat={total:nvInipTotal,solo:nvInipSolo,toChannel:nvInipToChannel,other:Math.max(0,nvInipTotal-nvInipSolo-nvInipToChannel),involveRate:pct(nvInipTotal,nvRows.length),soloRate:pct(nvInipSolo,nvInipTotal),toChannelRate:pct(nvInipToChannel,nvInipTotal),dow:nvInipDow};
       const chHistory=D.ch_history?[...D.ch_history]:[];
       const nvHistory=D.nv_history?[...D.nv_history]:[];
       const newChRow={dates:currDates,...chStat};
@@ -856,7 +873,7 @@ function renderProdTable(products){
 }
 
 function renderDashboard(){
-  ['dowChart','tagChart','soloTagChart','alfUnresChart'].forEach(id=>{const c=Chart.getChart(id);if(c)c.destroy();});
+  ['dowChart','tagChart','soloTagChart','alfUnresChart','nvInipDowChart'].forEach(id=>{const c=Chart.getChart(id);if(c)c.destroy();});
   document.getElementById('pageSub').textContent='금주: '+D.curr_dates+' · 직전주: '+D.prev_dates+' · 테스트 건 제외';
   document.getElementById('kTot').textContent=D.total;
   document.getElementById('kTotSub').textContent='테스트 건 제외';
@@ -900,12 +917,12 @@ function renderDashboard(){
   const diffEl2=document.getElementById('diffBadge');
   diffEl2.textContent=(rd>0?'+':'')+rd+'%p';
   diffEl2.style.color=rd>0?'#16a34a':rd<0?'#dc2626':'#888';
-  const cs=D.curr_solo_top5,ps=D.prev_solo_top5||cs;
+  const cs=(D.curr_solo_top5||[]).filter(t=>!t.tag.includes('톡톡/알프인입')),ps=(D.prev_solo_top5||D.curr_solo_top5||[]).filter(t=>!t.tag.includes('톡톡/알프인입'));
   const soloLabels=cs.map(t=>t.tag);
   const p5=ps[4]?.tag,c5=cs[4]?.tag;
   document.getElementById('soloNote').textContent=(p5!==c5)?'* 5위: 직전주 '+p5+'('+ps[4]?.prev+'건) · 금주 '+c5+'('+cs[4]?.curr+'건)':'';
   new Chart(document.getElementById('soloTagChart'),{type:'bar',data:{labels:soloLabels,datasets:[{label:'직전주',data:cs.map(t=>t.prev),backgroundColor:'#d1d5db',borderRadius:4,datalabels:{anchor:'end',align:'top',color:'#6b7280',font:{size:11,weight:'600'},formatter:v=>v===0?'':v+'건'}},{label:'금주',data:cs.map(t=>t.curr),backgroundColor:'#16a34a',borderRadius:4,datalabels:{anchor:'end',align:'top',color:'#15803d',font:{size:11,weight:'600'},formatter:v=>v===0?'':v+'건'}}]},options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:28}},plugins:{legend:{position:'bottom'},tooltip:{callbacks:{label:c=>c.dataset.label+': '+c.parsed.y+'건'}}},scales:{y:{beginAtZero:true,grid:{color:'#f0f0ee'},max:(cs.length?Math.max(...cs.map(t=>t.curr)):0)+10},x:{grid:{display:false},ticks:{font:{size:11}}}}}});
-  const newItems=D.curr_solo_top5.filter(t=>t.curr>t.prev).sort((a,b)=>(b.curr-b.prev)-(a.curr-a.prev)).slice(0,3);
+  const newItems=cs.filter(t=>t.curr>t.prev).sort((a,b)=>(b.curr-b.prev)-(a.curr-a.prev)).slice(0,3);
   document.getElementById('soloInsight').textContent='단순문의 증가와 함께 알프가 이전보다 다양한 유형을 잘 처리하고 있습니다.';
   document.getElementById('soloNewItems').innerHTML=newItems.map(t=>{const delta=t.curr-t.prev,isNew=t.prev===0;return '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#f0fdf4;border-radius:8px;border-left:3px solid #16a34a"><span style="font-size:12px;color:#333">'+t.tag+'</span><div style="display:flex;align-items:center;gap:10px"><span style="font-size:12px;color:#aaa">'+t.prev+'건 →</span><span style="font-size:15px;font-weight:700;color:#16a34a">'+t.curr+'건</span><span style="font-size:11px;background:#dcfce7;color:#16a34a;padding:2px 7px;border-radius:10px;font-weight:600">'+(isNew?'🆕 신규':'+'+delta+'건')+'</span></div></div>';}).join('');
   const aufT=D.alf_unresolved_tags;
@@ -1004,10 +1021,14 @@ function renderDashboard(){
     const ni=D.nv_inip_stat;
     const nvTotal=(D.nv_stat||{}).total||0;
     document.getElementById('nvInipSection').style.display='';
-    document.getElementById('nvInipBody').innerHTML=
-      `<tr><td>톡톡 전체 인입</td><td style="text-align:right;color:#aaa">${nvTotal}건</td><td style="text-align:right">-</td></tr>`+
-      `<tr><td>알프인입 건수</td><td style="text-align:right;color:#aaa">${ni.total}건</td><td style="text-align:right">${ni.involveRate}%</td></tr>`+
-      `<tr><td>알프인입 중 알프해결</td><td style="text-align:right;color:#aaa">${ni.solo}건</td><td style="text-align:right;color:#3b82f6">${ni.soloRate}%</td></tr>`;
+    document.getElementById('nvInipTotal').textContent=ni.total+'건';
+    document.getElementById('nvInipTotalSub').textContent='/ 톡톡 전체 '+nvTotal+'건';
+    document.getElementById('nvInipRate').textContent=ni.involveRate+'%';
+    document.getElementById('nvInipToChannel').textContent=(ni.toChannel||0)+'건';
+    document.getElementById('nvInipToChannelSub').textContent='/ 알프인입 '+ni.total+'건';
+    const dow=ni.dow||[0,0,0,0,0,0,0];
+    const maxDow=(dow.length?Math.max(...dow):0)+2;
+    new Chart(document.getElementById('nvInipDowChart'),{type:'bar',data:{labels:['월','화','수','목','금','토','일'],datasets:[{data:dow,backgroundColor:dow.map((_,i)=>i<5?'#7c3aed':'#c4b5fd'),borderRadius:4,datalabels:{anchor:'end',align:'top',color:'#5b21b6',font:{size:11,weight:'600'},formatter:v=>v===0?'':v+'건'}}]},options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:24}},plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.parsed.y+'건'}}},scales:{y:{beginAtZero:true,grid:{color:'#f0f0ee'},max:maxDow},x:{grid:{display:false},ticks:{font:{size:13}}}}}});
   }
 }
 
