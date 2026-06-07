@@ -702,7 +702,32 @@
     "alfSolo": 8,
     "alfInvolveRate": 0,
     "alfSoloRate": 0,
-    "topTags": [],
+    "topTags": [
+      {
+        "tag": "실물/AS문의/타이머",
+        "count": 2
+      },
+      {
+        "tag": "교환",
+        "count": 2
+      },
+      {
+        "tag": "B2B/구매문의/구매문의",
+        "count": 1
+      },
+      {
+        "tag": "교환반품",
+        "count": 1
+      },
+      {
+        "tag": "실물/이상주장/펜촉",
+        "count": 1
+      },
+      {
+        "tag": "실물/이상주장/낼나펜슬",
+        "count": 1
+      }
+    ],
     "chInipSoloTopTags": [
       {
         "tag": "실물/제품문의/O링",
