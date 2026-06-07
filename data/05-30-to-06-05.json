@@ -8,10 +8,10 @@
   "agent_only": 20,
   "workflow_only": 20,
   "curr_solo_rate": 51,
-  "prev_solo_rate": 43.7,
-  "prev_total": 426,
-  "prev_total_real": 426,
-  "prev_alf_solo": 186,
+  "prev_solo_rate": 37.5,
+  "prev_total": 120,
+  "prev_total_real": 120,
+  "prev_alf_solo": 45,
   "curr_dow": [
     32,
     34,
@@ -22,13 +22,13 @@
     8
   ],
   "prev_dow": [
-    85,
-    71,
-    82,
-    66,
-    47,
-    37,
-    38
+    11,
+    19,
+    23,
+    29,
+    27,
+    4,
+    7
   ],
   "top10_tags": [
     {
@@ -142,10 +142,28 @@
       "delta": 12
     },
     {
+      "tag": "디지털/사용문의/가계부",
+      "curr": 17,
+      "prev": 7,
+      "delta": 10
+    },
+    {
       "tag": "톡톡/알프인입X",
       "curr": 8,
       "prev": 0,
       "delta": 8
+    },
+    {
+      "tag": "디지털/오류문의/가계부",
+      "curr": 7,
+      "prev": 1,
+      "delta": 6
+    },
+    {
+      "tag": "실물/이상주장/타이머",
+      "curr": 10,
+      "prev": 5,
+      "delta": 5
     },
     {
       "tag": "실물/이상주장/낼나펜슬",
@@ -154,44 +172,44 @@
       "delta": 5
     },
     {
+      "tag": "미수거재발송",
+      "curr": 7,
+      "prev": 3,
+      "delta": 4
+    },
+    {
+      "tag": "실물/제품문의/필름",
+      "curr": 6,
+      "prev": 2,
+      "delta": 4
+    },
+    {
       "tag": "디지털",
       "curr": 5,
-      "prev": 0,
-      "delta": 5
-    },
-    {
-      "tag": "디지털/오류문의/가계부",
-      "curr": 7,
-      "prev": 5,
-      "delta": 2
-    },
-    {
-      "tag": "실물/이상주장/타이머",
-      "curr": 10,
-      "prev": 9,
-      "delta": 1
+      "prev": 1,
+      "delta": 4
     }
   ],
   "curr_solo_top5": [
     {
       "tag": "디지털/사용문의/가계부",
       "curr": 16,
-      "prev": 20
+      "prev": 4
     },
     {
       "tag": "실물/이상주장/타이머",
       "curr": 7,
-      "prev": 5
+      "prev": 2
     },
     {
       "tag": "실물/제품문의/필름",
       "curr": 6,
-      "prev": 11
+      "prev": 1
     },
     {
       "tag": "디지털/오류문의/가계부",
       "curr": 5,
-      "prev": 2
+      "prev": 0
     },
     {
       "tag": "결제/결제문의/국가선택",
@@ -203,22 +221,22 @@
     {
       "tag": "디지털/사용문의/가계부",
       "curr": 16,
-      "prev": 20
+      "prev": 4
     },
     {
       "tag": "실물/이상주장/타이머",
       "curr": 7,
-      "prev": 5
+      "prev": 2
     },
     {
       "tag": "실물/제품문의/필름",
       "curr": 6,
-      "prev": 11
+      "prev": 1
     },
     {
       "tag": "디지털/오류문의/가계부",
       "curr": 5,
-      "prev": 2
+      "prev": 0
     },
     {
       "tag": "결제/결제문의/국가선택",
@@ -230,49 +248,49 @@
     {
       "name": "디지털",
       "total": 30,
-      "prev": 33,
-      "delta": -3,
+      "prev": 9,
+      "delta": 21,
       "curr_pct": 20.4,
       "prev_pct": 0
     },
     {
       "name": "낼나 타이머",
       "total": 17,
-      "prev": 19,
-      "delta": -2,
+      "prev": 18,
+      "delta": -1,
       "curr_pct": 11.6,
       "prev_pct": 0
     },
     {
       "name": "낼나 펜슬",
       "total": 13,
-      "prev": 7,
-      "delta": 6,
+      "prev": 9,
+      "delta": 4,
       "curr_pct": 8.8,
       "prev_pct": 0
     },
     {
       "name": "낼나 키링캠",
       "total": 5,
-      "prev": 11,
-      "delta": -6,
+      "prev": 13,
+      "delta": -8,
       "curr_pct": 3.4,
       "prev_pct": 0
     },
     {
       "name": "데일리 케이블",
       "total": 0,
-      "prev": 1,
-      "delta": -1,
+      "prev": 0,
+      "delta": 0,
       "curr_pct": 0,
       "prev_pct": 0
     }
   ],
   "curr_dates": "05/30 ~ 06/05",
-  "prev_dates": "2026년 4월",
-  "channelio_solo": 80,
-  "channelio_triggered": 126,
-  "channelio_rate": 63.5,
+  "prev_dates": "05/23 ~ 05/29",
+  "channelio_solo": 72,
+  "channelio_triggered": 107,
+  "channelio_rate": 67.3,
   "mon_top6": [],
   "mon_agent": 0,
   "mon_alf_esc": 0,
@@ -358,6 +376,24 @@
   ],
   "ch_history": [
     {
+      "dates": "04/25 ~ 05/01",
+      "total": 138,
+      "triggered": 110,
+      "solo": 73,
+      "involveRate": 79.7,
+      "soloRate": 52.9,
+      "resolveRate": 66.4
+    },
+    {
+      "dates": "05/02 ~ 05/08",
+      "total": 89,
+      "triggered": 77,
+      "solo": 42,
+      "involveRate": 86.5,
+      "soloRate": 47.2,
+      "resolveRate": 54.5
+    },
+    {
       "dates": "05/09 ~ 05/15",
       "total": 127,
       "triggered": 107,
@@ -395,6 +431,24 @@
     }
   ],
   "nv_history": [
+    {
+      "dates": "04/25 ~ 05/01",
+      "total": 33,
+      "triggered": 16,
+      "solo": 8,
+      "involveRate": 48.5,
+      "soloRate": 24.2,
+      "resolveRate": 50
+    },
+    {
+      "dates": "05/02 ~ 05/08",
+      "total": 25,
+      "triggered": 14,
+      "solo": 5,
+      "involveRate": 56,
+      "soloRate": 20,
+      "resolveRate": 35.7
+    },
     {
       "dates": "05/09 ~ 05/15",
       "total": 29,
