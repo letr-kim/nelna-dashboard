@@ -622,7 +622,7 @@ function handleFile(file){
       const nvIdx=nvHistory.findIndex(r=>r.dates===currDates);
       if(nvIdx>=0)nvHistory[nvIdx]=newNvRow;else nvHistory.push(newNvRow);
       const kpiHistory=D.kpi_history?[...D.kpi_history]:[];
-      const newKpiRow={dates:currDates,totalCount:total,triggeredCount:triggered,soloCount:alfSolo,involveRate:+(triggered/total*100).toFixed(1),soloRate:+(alfSolo/total*100).toFixed(1),resolveRate:+(alfSolo/triggered*100).toFixed(1),chInvolve:chStat.involveRate,chResolve:chStat.resolveRate,nvInvolve:nvStat.involveRate,nvResolve:nvStat.resolveRate,dow:currDow};
+      const newKpiRow={dates:currDates,totalCount:total,triggeredCount:triggered,soloCount:alfSolo,involveRate:+(triggered/total*100).toFixed(1),soloRate:+(alfSolo/total*100).toFixed(1),resolveRate:+(alfSolo/triggered*100).toFixed(1),chInvolve:chStat.involveRate,chResolve:chStat.resolveRate,nvInvolve:nvStat.involveRate,nvResolve:nvStat.resolveRate,dow:currDow,solo_tag_counts:soloTagCounts};
       const kpiIdx=kpiHistory.findIndex(r=>r.dates===currDates);
       if(kpiIdx>=0)kpiHistory[kpiIdx]=newKpiRow;else kpiHistory.push(newKpiRow);
       const newD={...D,total,agent_assigned:alfEsc+agentOnly,avg_response_min:avgMin,alf_triggered:triggered,alf_solo:alfSolo,alf_escalated:alfEsc,agent_only:agentOnly,workflow_only:workOnly,curr_solo_rate:+(alfSolo/total*100).toFixed(1),prev_solo_rate:isSameWeek?D.prev_solo_rate:D.curr_solo_rate,prev_total:isSameWeek?(D.prev_total||0):D.total,prev_total_real:isSameWeek?(D.prev_total_real||0):D.total,prev_alf_solo:isSameWeek?D.prev_alf_solo:D.alf_solo,curr_dow:currDow,prev_dow:isSameWeek?D.prev_dow:D.curr_dow,curr_dates:currDates,prev_dates:isSameWeek?D.prev_dates:D.curr_dates,top10_tags:top10,alf_unresolved_tags:alfUnresTags,inc_tags:incTags,curr_solo_top5:soloTop5,prev_solo_top5:soloTop5,prod_ranking:prodRanking,exchange_products:exchangeProducts,return_products:returnProducts,no_alf_direct:direct,no_alf_reopen:reopen,no_alf_total:noAlf.length,no_alf_agent:noAlfAgent.length,no_alf_work:noAlf.filter(r=>!r.assigneeId).length,no_alf_tags:Object.entries(nalfC).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([tag,count])=>({tag,count})),all_tag_counts:allTagCounts,solo_tag_counts:soloTagCounts,ch_stat:chStat,nv_stat:nvStat,nv_inip_stat:nvInipStat,ch_history:chHistory,nv_history:nvHistory,kpi_history:kpiHistory};
@@ -740,15 +740,19 @@ async function loadWeekData(weekKey){
     const data=await r.json();
     if(!data.nv_inip_stat)D.nv_inip_stat=null;
     Object.assign(D,data);
-    // kpi_history 이전 항목에 dow 없으면 해당 주차 파일에서 자동 보완
+    // kpi_history 이전 항목에 dow·solo_tag_counts 없으면 해당 주차 파일에서 자동 보완
     const _h=D.kpi_history||[];
     const _norm=s=>(s||'').replace(/\s/g,'');
     const _ci=_h.findIndex(h=>_norm(h.dates)===_norm(D.curr_dates));
-    if(_ci>0&&!_h[_ci-1].dow){
+    if(_ci>0&&(!_h[_ci-1].dow||!_h[_ci-1].solo_tag_counts)){
       try{
         const _pk=_h[_ci-1].dates.replace(/\s*~\s*/,' ~ ').replace(/\//g,'-').replace(' ~ ','-to-');
         const _pr=await fetch('https://raw.githubusercontent.com/'+GH_OWNER+'/'+GH_REPO+'/'+GH_BRANCH+'/data/'+_pk+'.json');
-        if(_pr.ok){const _pj=await _pr.json();if(_pj.curr_dow)_h[_ci-1].dow=_pj.curr_dow;}
+        if(_pr.ok){
+          const _pj=await _pr.json();
+          if(!_h[_ci-1].dow&&_pj.curr_dow)_h[_ci-1].dow=_pj.curr_dow;
+          if(!_h[_ci-1].solo_tag_counts&&_pj.solo_tag_counts)_h[_ci-1].solo_tag_counts=_pj.solo_tag_counts;
+        }
       }catch(e){}
     }
     renderDashboard();
@@ -949,6 +953,8 @@ function renderDashboard(){
   diffEl2.textContent=(rd>0?'+':'')+rd+'%p';
   diffEl2.style.color=rd>0?'#16a34a':rd<0?'#dc2626':'#888';
   const cs=(D.curr_solo_top5||[]).filter(t=>!t.tag.includes('톡톡/알프인입')),ps=(D.prev_solo_top5||D.curr_solo_top5||[]).filter(t=>!t.tag.includes('톡톡/알프인입'));
+  // kpi_history 이전 주 solo_tag_counts로 prev 보정 (재업로드 버그로 깨진 값 복구)
+  if(_prevH&&_prevH.solo_tag_counts){cs.forEach(t=>{t.prev=_prevH.solo_tag_counts[t.tag]||0;});}
   const soloLabels=cs.map(t=>t.tag);
   const p5=ps[4]?.tag,c5=cs[4]?.tag;
   document.getElementById('soloNote').textContent=(p5!==c5)?'* 5위: 직전주 '+p5+'('+ps[4]?.prev+'건) · 금주 '+c5+'('+cs[4]?.curr+'건)':'';
