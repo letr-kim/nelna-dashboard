@@ -752,8 +752,7 @@ function renderProdTable(products){
 }
 
 function renderDashboard(){
-  const kpiIds=new Set(['kpiChart1','kpiChart2']);
-  Chart.helpers.each(Chart.instances,c=>{if(!kpiIds.has(c.canvas.id))c.destroy();});
+  ['dowChart','tagChart','soloTagChart','alfUnresChart'].forEach(id=>{const c=Chart.getChart(id);if(c)c.destroy();});
   document.getElementById('pageSub').textContent='금주: '+D.curr_dates+' · 직전주: '+D.prev_dates+' · 테스트 건 제외';
   document.getElementById('kTot').textContent=D.total;
   document.getElementById('kTotSub').textContent='테스트 건 제외';
@@ -801,12 +800,12 @@ function renderDashboard(){
   const soloLabels=cs.map(t=>t.tag);
   const p5=ps[4]?.tag,c5=cs[4]?.tag;
   document.getElementById('soloNote').textContent=(p5!==c5)?'* 5위: 직전주 '+p5+'('+ps[4]?.prev+'건) · 금주 '+c5+'('+cs[4]?.curr+'건)':'';
-  new Chart(document.getElementById('soloTagChart'),{type:'bar',data:{labels:soloLabels,datasets:[{label:'직전주',data:cs.map(t=>t.prev),backgroundColor:'#d1d5db',borderRadius:4,datalabels:{anchor:'end',align:'top',color:'#6b7280',font:{size:11,weight:'600'},formatter:v=>v===0?'':v+'건'}},{label:'금주',data:cs.map(t=>t.curr),backgroundColor:'#16a34a',borderRadius:4,datalabels:{anchor:'end',align:'top',color:'#15803d',font:{size:11,weight:'600'},formatter:v=>v===0?'':v+'건'}}]},options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:28}},plugins:{legend:{position:'bottom'},tooltip:{callbacks:{label:c=>c.dataset.label+': '+c.parsed.y+'건'}}},scales:{y:{beginAtZero:true,grid:{color:'#f0f0ee'},max:Math.max(...cs.map(t=>t.curr))+10},x:{grid:{display:false},ticks:{font:{size:11}}}}}});
+  new Chart(document.getElementById('soloTagChart'),{type:'bar',data:{labels:soloLabels,datasets:[{label:'직전주',data:cs.map(t=>t.prev),backgroundColor:'#d1d5db',borderRadius:4,datalabels:{anchor:'end',align:'top',color:'#6b7280',font:{size:11,weight:'600'},formatter:v=>v===0?'':v+'건'}},{label:'금주',data:cs.map(t=>t.curr),backgroundColor:'#16a34a',borderRadius:4,datalabels:{anchor:'end',align:'top',color:'#15803d',font:{size:11,weight:'600'},formatter:v=>v===0?'':v+'건'}}]},options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:28}},plugins:{legend:{position:'bottom'},tooltip:{callbacks:{label:c=>c.dataset.label+': '+c.parsed.y+'건'}}},scales:{y:{beginAtZero:true,grid:{color:'#f0f0ee'},max:(cs.length?Math.max(...cs.map(t=>t.curr)):0)+10},x:{grid:{display:false},ticks:{font:{size:11}}}}}});
   const newItems=D.curr_solo_top5.filter(t=>t.curr>t.prev).sort((a,b)=>(b.curr-b.prev)-(a.curr-a.prev)).slice(0,3);
   document.getElementById('soloInsight').textContent='단순문의 증가와 함께 알프가 이전보다 다양한 유형을 잘 처리하고 있습니다.';
   document.getElementById('soloNewItems').innerHTML=newItems.map(t=>{const delta=t.curr-t.prev,isNew=t.prev===0;return '<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:#f0fdf4;border-radius:8px;border-left:3px solid #16a34a"><span style="font-size:12px;color:#333">'+t.tag+'</span><div style="display:flex;align-items:center;gap:10px"><span style="font-size:12px;color:#aaa">'+t.prev+'건 →</span><span style="font-size:15px;font-weight:700;color:#16a34a">'+t.curr+'건</span><span style="font-size:11px;background:#dcfce7;color:#16a34a;padding:2px 7px;border-radius:10px;font-weight:600">'+(isNew?'🆕 신규':'+'+delta+'건')+'</span></div></div>';}).join('');
   const aufT=D.alf_unresolved_tags;
-  new Chart(document.getElementById('alfUnresChart'),{type:'bar',data:{labels:aufT.map(t=>t.tag),datasets:[{data:aufT.map(t=>t.count),backgroundColor:'#f87171',borderRadius:3}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},datalabels:{anchor:'end',align:'end',color:'#b91c1c',font:{size:11,weight:'700'},formatter:v=>v+'건'}},scales:{x:{beginAtZero:true,grid:{color:'#f0f0ee'},max:Math.max(...aufT.map(t=>t.count))+5},y:{grid:{display:false},ticks:{font:{size:10}}}}}});
+  new Chart(document.getElementById('alfUnresChart'),{type:'bar',data:{labels:aufT.map(t=>t.tag),datasets:[{data:aufT.map(t=>t.count),backgroundColor:'#f87171',borderRadius:3}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},datalabels:{anchor:'end',align:'end',color:'#b91c1c',font:{size:11,weight:'700'},formatter:v=>v+'건'}},scales:{x:{beginAtZero:true,grid:{color:'#f0f0ee'},max:(aufT.length?Math.max(...aufT.map(t=>t.count)):0)+5},y:{grid:{display:false},ticks:{font:{size:10}}}}}});
   document.getElementById('noAlfTagsBody').innerHTML=(D.no_alf_tags||[]).map(t=>'<tr><td>'+t.tag+'</td><td style="text-align:right;font-weight:600">'+t.count+'건</td></tr>').join('')||'<tr><td colspan="2" style="color:#aaa">데이터 없음</td></tr>';
 
   // 알프 미관여 분석 업데이트
