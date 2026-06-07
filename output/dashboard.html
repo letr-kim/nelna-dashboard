@@ -402,9 +402,12 @@ body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#f5
 <!-- ⑧ 톡톡 알프인입 분석 -->
 <div class="section" id="nvInipSection" style="display:none">
   <div class="section-title">톡톡 알프인입 분석</div>
-  <div class="card">
+  <div class="card" style="max-width:480px">
     <div class="card-title" style="margin-bottom:12px">요일별 알프인입 건수 · 비율</div>
-    <div style="height:230px"><canvas id="nvInipDowChart"></canvas></div>
+    <table class="tbl">
+      <thead><tr><th>요일</th><th style="text-align:right">알프인입</th><th style="text-align:right">톡톡전체</th><th style="text-align:right">비율</th></tr></thead>
+      <tbody id="nvInipDowBody"></tbody>
+    </table>
   </div>
 </div>
 
@@ -867,7 +870,7 @@ function renderProdTable(products){
 }
 
 function renderDashboard(){
-  ['dowChart','tagChart','soloTagChart','alfUnresChart','nvInipDowChart'].forEach(id=>{const c=Chart.getChart(id);if(c)c.destroy();});
+  ['dowChart','tagChart','soloTagChart','alfUnresChart'].forEach(id=>{const c=Chart.getChart(id);if(c)c.destroy();});
   document.getElementById('pageSub').textContent='금주: '+D.curr_dates+' · 직전주: '+D.prev_dates+' · 테스트 건 제외';
   document.getElementById('kTot').textContent=D.total;
   document.getElementById('kTotSub').textContent='테스트 건 제외';
@@ -1016,8 +1019,18 @@ function renderDashboard(){
     document.getElementById('nvInipSection').style.display='';
     const dow=ni.dow||[0,0,0,0,0,0,0];
     const nvTotalDow=ni.nvTotalDow||[0,0,0,0,0,0,0];
-    const maxDow=(dow.length?Math.max(...dow):0)+3;
-    new Chart(document.getElementById('nvInipDowChart'),{type:'bar',data:{labels:['월','화','수','목','금','토','일'],datasets:[{data:dow,backgroundColor:dow.map((_,i)=>i<5?'#7c3aed':'#c4b5fd'),borderRadius:4,datalabels:{anchor:'end',align:'top',color:'#5b21b6',font:{size:11,weight:'600'},formatter:(v,ctx)=>{if(v===0)return'';const t=nvTotalDow[ctx.dataIndex]||0;const r=t>0?Math.round(v/t*100):0;return v+'건 ('+r+'%)';}}}]},options:{responsive:true,maintainAspectRatio:false,layout:{padding:{top:30}},plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>{const t=nvTotalDow[c.dataIndex]||0;const r=t>0?Math.round(c.parsed.y/t*100):0;return c.parsed.y+'건 (톡톡 전체 대비 '+r+'%)';}}}},scales:{y:{beginAtZero:true,grid:{color:'#f0f0ee'},max:maxDow},x:{grid:{display:false},ticks:{font:{size:13}}}}}});
+    const hasTotalData=nvTotalDow.some(v=>v>0);
+    const days=['월','화','수','목','금','토','일'];
+    const totalInip=dow.reduce((a,b)=>a+b,0);
+    const totalNv=nvTotalDow.reduce((a,b)=>a+b,0);
+    document.getElementById('nvInipDowBody').innerHTML=
+      days.map((d,i)=>{
+        const inip=dow[i]||0,nv=nvTotalDow[i]||0;
+        const rate=hasTotalData?(nv>0?Math.round(inip/nv*100)+'%':'-'):'-';
+        const nvCell=hasTotalData?nv+'건':'-';
+        return `<tr><td>${d}</td><td style="text-align:right;font-weight:600;color:#7c3aed">${inip}건</td><td style="text-align:right;color:#aaa">${nvCell}</td><td style="text-align:right">${rate}</td></tr>`;
+      }).join('')+
+      `<tr style="border-top:1.5px solid #e5e5e0;font-weight:600"><td>합계</td><td style="text-align:right;color:#7c3aed">${totalInip}건</td><td style="text-align:right;color:#aaa">${hasTotalData?totalNv+'건':'-'}</td><td style="text-align:right;color:#3b82f6">${hasTotalData&&totalNv>0?Math.round(totalInip/totalNv*100)+'%':'-'}</td></tr>`;
   }
 }
 
