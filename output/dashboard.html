@@ -1030,7 +1030,7 @@ function renderDashboard(){
     document.getElementById('chTableBody').innerHTML =
       chH.map(r=>chRow(r,false)).join('') + chRow(chSumRow,true);
 
-    // KPI 카드 업데이트 (채널별 합산 — ch_history/nv_history 기반)
+    // 채널별 날짜 범위 배지
     const firstDate = chH[0].dates.split(' ~ ')[0];
     const lastDate = chH[chH.length-1].dates.split(' ~ ')[1] || chH[chH.length-1].dates;
     document.getElementById('chTableBadge').textContent = '전체 합산 · '+firstDate+'~'+lastDate;
@@ -1047,10 +1047,6 @@ function renderDashboard(){
       resolveRate:+(nvSum.solo/nvSum.triggered*100).toFixed(1)};
     document.getElementById('nvTableBody').innerHTML =
       nvH.map(r=>chRow(r,false)).join('') + chRow(nvSumRow,true);
-
-    // 전체 합산 상담건
-    const allTotal = (D.ch_history||[]).reduce((a,r)=>a+r.total,0) + nvSum.total;
-    document.getElementById('kpiTotalVal').textContent = allTotal+'건';
   }
 
   // 톡톡 알프인입 분석
