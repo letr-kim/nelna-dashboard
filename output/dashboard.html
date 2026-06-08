@@ -152,6 +152,8 @@ body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#f5
   <div class="page-sub" id="pageSub"></div>
 </div>
 
+<div style="font-size:12px;color:#aaa;margin-bottom:16px;text-align:right" id="dataDateLabel"></div>
+
 <!-- ① KPI -->
 <div class="section">
   <div class="section-title">전체 상담 현황 <span class="badge">금주 기준</span></div>
@@ -617,8 +619,8 @@ function handleFile(file){
         return{total:t,triggered:trig,solo,involveRate:pct(trig,t),soloRate:pct(solo,t),resolveRate:pct(solo,trig)};
       }
       const chRows=df.filter(r=>r.mediumType==='native');
-      // nvRows: 테스트 제외 전체 톡톡 (중복 태그 있어도 알프인입 행은 포함)
-      const nvRows=nvRowsRaw.filter(r=>!hasDuplicate(r)||hasTokTokInip(r));
+      // nvRows: 테스트·중복 모두 제외된 기준 (df 기반)
+      const nvRows=df.filter(r=>r.mediumName==='appNaverTalk');
       function nvChStats(rows){
         const t=rows.length;
         const nvTrig=r=>hasTokTokInip(r)||alfTrig(r);
@@ -635,7 +637,7 @@ function handleFile(file){
       const nvInipAlfSolo=nvRowsInip.filter(r=>r.goalState==='waiting'&&!r.assigneeId).length;
       const nvInipTagC={};
       nvRows.forEach(r=>{const seen=new Set();iterTags(r.tags).forEach(t=>{if(!seen.has(t)){nvInipTagC[t]=(nvInipTagC[t]||0)+1;seen.add(t);}});});
-      const nvInipTopTags=Object.entries(nvInipTagC).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([tag,count])=>({tag,count}));
+      const nvInipTopTags=Object.entries(nvInipTagC).filter(([t])=>!t.startsWith('톡톡/')&&t!=='알프'&&!t.startsWith('중복/')).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([tag,count])=>({tag,count}));
       const chInipSoloTagC={};
       chRows.filter(r=>hasTokTokInip(r)&&soloMask(r)).forEach(r=>{const seen=new Set();iterTags(r.tags).forEach(t=>{if(!seen.has(t)&&!t.startsWith('톡톡/')){chInipSoloTagC[t]=(chInipSoloTagC[t]||0)+1;seen.add(t);}});});
       const chInipSoloTopTags=Object.entries(chInipSoloTagC).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([tag,count])=>({tag,count}));
@@ -963,6 +965,7 @@ function renderDashboard(){
   const prevDates=_prevH?_prevH.dates:(D.prev_dates||'');
   const prevDow=(_prevH&&_prevH.dow)?_prevH.dow:(D.prev_dow||[0,0,0,0,0,0,0]);
   document.getElementById('pageSub').textContent='금주: '+D.curr_dates+' · 직전주: '+prevDates+' · 테스트 건 제외';
+  document.getElementById('dataDateLabel').textContent='데이터 기준: '+(D.curr_dates||'-');
   document.getElementById('kTot').textContent=D.total;
   document.getElementById('kTotSub').textContent='테스트 건 제외';
   document.getElementById('kAgent').textContent=D.agent_assigned;
