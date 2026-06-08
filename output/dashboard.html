@@ -645,8 +645,8 @@ function handleFile(file){
       const nvInipXDow=[0,0,0,0,0,0,0];
       nvInipXRows.forEach(r=>{const d=new Date(r.createdAt);if(!isNaN(d))nvInipXDow[d.getDay()===0?6:d.getDay()-1]++;});
       const nvTotalDow=[0,0,0,0,0,0,0];
-      nvRowsRaw.forEach(r=>{const d=new Date(r.createdAt);if(!isNaN(d))nvTotalDow[d.getDay()===0?6:d.getDay()-1]++;});
-      const nvInipStat={total:nvInipTotal,solo:nvInipSolo,toChannel:nvInipToChannel,other:Math.max(0,nvInipTotal-nvInipSolo-nvInipToChannel),involveRate:pct(nvInipTotal,nvRowsRaw.length),soloRate:pct(nvInipSolo,nvInipTotal),toChannelRate:pct(nvInipToChannel,nvInipTotal),triggered:nvInipTriggered,alfSolo:nvInipAlfSolo,alfInvolveRate:pct(nvInipTriggered,nvInipTotal),alfSoloRate:pct(nvInipAlfSolo,nvInipTriggered),topTags:nvInipTopTags,chInipSoloTopTags,chAgentTopTags,dow:nvInipDow,dowX:nvInipXDow,nvTotalDow:nvTotalDow};
+      nvRows.forEach(r=>{const d=new Date(r.createdAt);if(!isNaN(d))nvTotalDow[d.getDay()===0?6:d.getDay()-1]++;});
+      const nvInipStat={total:nvInipTotal,nvTotal:nvRows.length,solo:nvInipSolo,toChannel:nvInipToChannel,other:Math.max(0,nvInipTotal-nvInipSolo-nvInipToChannel),involveRate:pct(nvInipTotal,nvRows.length),soloRate:pct(nvInipSolo,nvInipTotal),toChannelRate:pct(nvInipToChannel,nvInipTotal),triggered:nvInipTriggered,alfSolo:nvInipAlfSolo,alfInvolveRate:pct(nvInipTriggered,nvInipTotal),alfSoloRate:pct(nvInipAlfSolo,nvInipTriggered),topTags:nvInipTopTags,chInipSoloTopTags,chAgentTopTags,dow:nvInipDow,dowX:nvInipXDow,nvTotalDow:nvTotalDow};
       const chHistory=D.ch_history?[...D.ch_history]:[];
       const nvHistory=D.nv_history?[...D.nv_history]:[];
       const newChRow={dates:currDates,...chStat};
