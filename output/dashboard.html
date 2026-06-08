@@ -545,13 +545,13 @@ function handleFile(file){
       const nvRowsRaw=rows.filter(r=>!String(r.tags||'').includes('테스트')&&r.mediumName==='appNaverTalk');
       const nvRowsInip=nvRowsRaw.filter(hasTokTokInip);
       const nvInipXRows=nvRowsRaw.filter(hasTokTokInipX);
-      // 메인 df: 테스트·중복·톡톡알프인입 제외
-      const df=rows.filter(r=>!String(r.tags||'').includes('테스트')&&!String(r.tags||'').includes('중복')&&!(r.mediumName==='appNaverTalk'&&String(r.tags||'').includes('톡톡/알프인입')));
+      // 메인 df: 테스트·중복 제외 (톡톡/알프인입 포함 — nvRows 분리 처리로 중복 방지)
+      const df=rows.filter(r=>!String(r.tags||'').includes('테스트')&&!String(r.tags||'').includes('중복'));
       // [보호 2단계] 처리 전 각 행의 개인정보 키 잔존 검증 및 강제 삭제
       df.forEach(r=>FORBIDDEN_FIELDS.forEach(f=>{if(f in r){console.warn('[보안] 개인정보 키 재발견, 강제 삭제:',f);delete r[f];}}));
       console.log('[handleFile] 전체 rows:', rows.length, '/ 테스트 제외 df:', df.length, '/ 첫 행 키:', df.length?Object.keys(df[0]):[]);
       if(!df.length){prog.textContent='❌ 처리할 데이터가 없습니다 (df 비어있음)';return;}
-      const total=df.length;
+      const total=df.filter(r=>!(r.mediumName==='appNaverTalk'&&hasTokTokInip(r))).length;
       const isTrue=v=>['true','1','yes'].includes(String(v||'').toLowerCase());
       const alfTrig=r=>isTrue(r.alfTriggered);
       const soloMask=r=>r.goalState==='waiting'&&alfTrig(r)&&!r.assigneeId;
@@ -617,6 +617,7 @@ function handleFile(file){
       }
       const chRows=df.filter(r=>r.mediumType==='native');
       const nvRows=df.filter(r=>r.mediumName==='appNaverTalk');
+      const nvRowsPure=nvRows.filter(r=>!hasTokTokInip(r)); // 알프인입 제외 순수 톡톡 (nv_stat 알프 지표용)
       function nvChStats(rows){
         const t=rows.length;
         const nvTrig=r=>hasTokTokInip(r)||alfTrig(r);
@@ -625,7 +626,7 @@ function handleFile(file){
         return{total:t,triggered:trig,solo,involveRate:pct(trig,t),soloRate:pct(solo,t),resolveRate:pct(solo,trig)};
       }
       const chStat=chStats(chRows);
-      const nvStat=nvChStats(nvRows);
+      const nvStat={...nvChStats(nvRowsPure),total:nvRows.length};
       const nvInipTotal=nvRowsInip.length;
       const nvInipSolo=nvRowsInip.filter(r=>hasDuplicate(r)).length;
       const nvInipToChannel=chRows.filter(r=>hasTokTokInip(r)).length;
