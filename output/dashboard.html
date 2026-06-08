@@ -902,7 +902,7 @@ async function mergeAndRender(weekKeys,label){
   const nvInipTopTagsM=Object.entries(nvInipTagMapM).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([tag,count])=>({tag,count}));
   const chInipSoloTopTagsM=Object.entries(chInipSoloTagMapM).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([tag,count])=>({tag,count}));
   const chAgentTopTagsM=Object.entries(chAgentTagMapM).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([tag,count])=>({tag,count}));
-  merged.nv_inip_stat=nvInipTotM>0?{...(valid[valid.length-1].nv_inip_stat||{}),total:nvInipTotM,triggered:nvInipTrigM,alfSolo:nvInipAlfSoloM,alfInvolveRate:nvInipTotM>0?+(nvInipTrigM/nvInipTotM*100).toFixed(1):0,alfSoloRate:nvInipTrigM>0?+(nvInipAlfSoloM/nvInipTrigM*100).toFixed(1):0,topTags:nvInipTopTagsM,chInipSoloTopTags:chInipSoloTopTagsM,chAgentTopTags:chAgentTopTagsM,dow:nvInipDowM,dowX:nvInipXDowM,nvTotalDow:nvTotDowM,involveRate:nvTotM>0?+(nvInipTotM/nvTotM*100).toFixed(1):0}:null;
+  merged.nv_inip_stat=nvInipTotM>0?{...(valid[valid.length-1].nv_inip_stat||{}),total:nvInipTotM,nvTotal:nvTotM,triggered:nvInipTrigM,alfSolo:nvInipAlfSoloM,alfInvolveRate:nvInipTotM>0?+(nvInipTrigM/nvInipTotM*100).toFixed(1):0,alfSoloRate:nvInipTrigM>0?+(nvInipAlfSoloM/nvInipTrigM*100).toFixed(1):0,topTags:nvInipTopTagsM,chInipSoloTopTags:chInipSoloTopTagsM,chAgentTopTags:chAgentTopTagsM,dow:nvInipDowM,dowX:nvInipXDowM,nvTotalDow:nvTotDowM,involveRate:nvTotM>0?+(nvInipTotM/nvTotM*100).toFixed(1):0}:null;
   Object.assign(D,merged);
   renderDashboard();
 }
@@ -1107,7 +1107,7 @@ function renderDashboard(){
     document.getElementById('nvInipSection').style.display='';
     // 금주 합계 요약
     const niDow=ni.dow||[0,0,0,0,0,0,0],niDowX=ni.dowX||[0,0,0,0,0,0,0],niTotDow=ni.nvTotalDow||[0,0,0,0,0,0,0];
-    const niTotalNv=niTotDow.reduce((a,b)=>a+b,0),niTotalInip=niDow.reduce((a,b)=>a+b,0),niTotalInipX=niDowX.reduce((a,b)=>a+b,0);
+    const niTotalNv=ni.nvTotal||niTotDow.reduce((a,b)=>a+b,0),niTotalInip=niDow.reduce((a,b)=>a+b,0),niTotalInipX=niDowX.reduce((a,b)=>a+b,0);
     document.getElementById('nvInipTotalVal').textContent=niTotalNv>0?niTotalNv+'건':ni.total+'건';
     document.getElementById('nvInipInipVal').textContent=niTotalInip+'건';
     document.getElementById('nvInipInipPct').textContent=niTotalNv>0?Math.round(niTotalInip/niTotalNv*100)+'%':'-';
