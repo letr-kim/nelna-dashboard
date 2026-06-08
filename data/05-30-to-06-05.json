@@ -692,10 +692,11 @@
   },
   "nv_inip_stat": {
     "total": 8,
+    "nvTotal": 10,
     "solo": 5,
     "toChannel": 6,
     "other": 0,
-    "involveRate": 29.6,
+    "involveRate": 80,
     "soloRate": 62.5,
     "toChannelRate": 75,
     "triggered": 0,
@@ -812,10 +813,10 @@
     ],
     "nvTotalDow": [
       4,
-      8,
-      2,
-      8,
-      4,
+      3,
+      0,
+      1,
+      1,
       1,
       0
     ]
