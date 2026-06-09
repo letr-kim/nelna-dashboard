@@ -553,8 +553,6 @@ function handleFile(file){
       df.forEach(r=>FORBIDDEN_FIELDS.forEach(f=>{if(f in r){console.warn('[보안] 개인정보 키 재발견, 강제 삭제:',f);delete r[f];}}));
       console.log('[handleFile] 전체 rows:', rows.length, '/ 테스트 제외 df:', df.length, '/ 첫 행 키:', df.length?Object.keys(df[0]):[]);
       if(!df.length){prog.textContent='❌ 처리할 데이터가 없습니다 (df 비어있음)';return;}
-      // total: native 채널 + 톡톡 전체 (알프인입이 중복 태그를 갖더라도 포함)
-      const total=df.filter(r=>r.mediumType==='native').length+nvRowsRaw.filter(r=>!String(r.tags||'').includes('중복')||hasTokTokInip(r)).length;
       const isTrue=v=>['true','1','yes'].includes(String(v||'').toLowerCase());
       const alfTrig=r=>isTrue(r.alfTriggered);
       const soloMask=r=>r.goalState==='waiting'&&alfTrig(r)&&!r.assigneeId;
@@ -621,6 +619,9 @@ function handleFile(file){
       const chRows=df.filter(r=>r.mediumType==='native');
       // nvRows: 테스트·중복 모두 제외된 기준 (df 기반)
       const nvRows=df.filter(r=>r.mediumName==='appNaverTalk');
+      // total: 채널톡(native) + 네이버톡톡(appNaverTalk) 합산
+      // chRows에 톡톡/알프인입 재인입 건이 포함되나, nvRows는 mediumName 기준이라 중복 없음
+      const total=chRows.length+nvRows.length;
       function nvChStats(rows){
         const t=rows.length;
         const nvTrig=r=>hasTokTokInip(r)||alfTrig(r);
