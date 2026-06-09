@@ -637,7 +637,7 @@ function handleFile(file){
       const nvInipTriggered=nvRowsInip.filter(alfTrig).length;
       const nvInipAlfSolo=nvRowsInip.filter(r=>r.goalState==='waiting'&&!r.assigneeId).length;
       const nvInipTagC={};
-      nvRows.forEach(r=>{const seen=new Set();iterTags(r.tags).forEach(t=>{if(!seen.has(t)){nvInipTagC[t]=(nvInipTagC[t]||0)+1;seen.add(t);}});});
+      nvRows.filter(r=>!hasTokTokInip(r)).forEach(r=>{const seen=new Set();iterTags(r.tags).forEach(t=>{if(!seen.has(t)&&!t.startsWith('톡톡/')&&t!=='알프'&&!t.startsWith('중복/')){nvInipTagC[t]=(nvInipTagC[t]||0)+1;seen.add(t);}});});
       const nvInipTopTags=Object.entries(nvInipTagC).filter(([t])=>!t.startsWith('톡톡/')&&t!=='알프'&&!t.startsWith('중복/')).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([tag,count])=>({tag,count}));
       const chInipSoloTagC={};
       chRows.filter(r=>hasTokTokInip(r)&&soloMask(r)).forEach(r=>{const seen=new Set();iterTags(r.tags).forEach(t=>{if(!seen.has(t)&&!t.startsWith('톡톡/')){chInipSoloTagC[t]=(chInipSoloTagC[t]||0)+1;seen.add(t);}});});
