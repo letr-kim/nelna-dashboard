@@ -1,13 +1,13 @@
 {
-  "total": 140,
-  "agent_assigned": 49,
-  "avg_response_min": 25.4,
-  "alf_triggered": 105,
-  "alf_solo": 72,
-  "alf_escalated": 31,
-  "agent_only": 18,
-  "workflow_only": 14,
-  "curr_solo_rate": 51.4,
+  "total": 134,
+  "agent_assigned": 52,
+  "avg_response_min": 32.2,
+  "alf_triggered": 104,
+  "alf_solo": 69,
+  "alf_escalated": 33,
+  "agent_only": 19,
+  "workflow_only": 13,
+  "curr_solo_rate": 51.5,
   "prev_solo_rate": 51,
   "prev_total": 147,
   "prev_total_real": 147,
@@ -17,7 +17,7 @@
     28,
     6,
     24,
-    27,
+    26,
     10,
     8
   ],
@@ -106,6 +106,10 @@
       "count": 3
     },
     {
+      "tag": "실물/이상주장/키링캠",
+      "count": 2
+    },
+    {
       "tag": "다재다능케이스",
       "count": 2
     },
@@ -118,19 +122,15 @@
       "count": 2
     },
     {
+      "tag": "실물/제품문의/타이머",
+      "count": 1
+    },
+    {
       "tag": "취소문의",
       "count": 1
     },
     {
       "tag": "배송/배송문의/일정문의",
-      "count": 1
-    },
-    {
-      "tag": "실물/제품문의/펜촉",
-      "count": 1
-    },
-    {
-      "tag": "쿠팡",
       "count": 1
     }
   ],
@@ -195,15 +195,15 @@
       "total": 30,
       "prev": 30,
       "delta": 0,
-      "curr_pct": 22.2,
+      "curr_pct": 22.4,
       "prev_pct": 0
     },
     {
       "name": "낼나 타이머",
-      "total": 17,
+      "total": 18,
       "prev": 17,
-      "delta": 0,
-      "curr_pct": 12.6,
+      "delta": 1,
+      "curr_pct": 13.4,
       "prev_pct": 0
     },
     {
@@ -211,15 +211,15 @@
       "total": 13,
       "prev": 13,
       "delta": 0,
-      "curr_pct": 9.6,
+      "curr_pct": 9.7,
       "prev_pct": 0
     },
     {
       "name": "낼나 키링캠",
-      "total": 5,
+      "total": 6,
       "prev": 5,
-      "delta": 0,
-      "curr_pct": 3.7,
+      "delta": 1,
+      "curr_pct": 4.5,
       "prev_pct": 0
     },
     {
@@ -244,11 +244,11 @@
   "mon_date": "",
   "mon_prev": 0,
   "mon_curr": 0,
-  "no_alf_direct": 13,
+  "no_alf_direct": 14,
   "no_alf_reopen": 3,
   "no_alf_total": 30,
-  "no_alf_agent": 16,
-  "no_alf_work": 14,
+  "no_alf_agent": 17,
+  "no_alf_work": 13,
   "no_alf_tags": [
     {
       "tag": "톡톡/알프인입X",
@@ -367,12 +367,12 @@
     },
     {
       "dates": "05/30 ~ 06/05",
-      "total": 115,
-      "triggered": 100,
-      "solo": 70,
-      "involveRate": 87,
-      "soloRate": 60.9,
-      "resolveRate": 70
+      "total": 114,
+      "triggered": 99,
+      "solo": 67,
+      "involveRate": 86.8,
+      "soloRate": 58.8,
+      "resolveRate": 67.7
     }
   ],
   "nv_history": [
@@ -540,14 +540,14 @@
     },
     {
       "dates": "05/30 ~ 06/05",
-      "totalCount": 140,
-      "triggeredCount": 105,
-      "soloCount": 72,
-      "involveRate": 75,
-      "soloRate": 51.4,
-      "resolveRate": 68.6,
-      "chInvolve": 87,
-      "chResolve": 70,
+      "totalCount": 134,
+      "triggeredCount": 104,
+      "soloCount": 69,
+      "involveRate": 77.6,
+      "soloRate": 51.5,
+      "resolveRate": 66.3,
+      "chInvolve": 86.8,
+      "chResolve": 67.7,
       "nvInvolve": 40,
       "nvResolve": 62.5,
       "dow": [
@@ -555,7 +555,7 @@
         28,
         6,
         24,
-        27,
+        26,
         10,
         8
       ],
@@ -602,6 +602,8 @@
     "실물/이상주장/타이머": 10,
     "디지털": 5,
     "당근마켓": 1,
+    "실물/이상주장/키링캠": 3,
+    "실물/제품문의/타이머": 1,
     "디지털/오류문의/가계부": 7,
     "실물/제품문의/필름": 6,
     "실물/제품문의/케이블커버": 1,
@@ -630,7 +632,6 @@
     "실물/사용방법/키링캠": 1,
     "쿠팡": 1,
     "배송/배송문의/택배없음": 1,
-    "실물/이상주장/키링캠": 2,
     "3차": 1,
     "2차": 2,
     "교환반품": 4,
@@ -688,12 +689,12 @@
     "디지털/제품문의": 1
   },
   "ch_stat": {
-    "total": 115,
-    "triggered": 100,
-    "solo": 70,
-    "involveRate": 87,
-    "soloRate": 60.9,
-    "resolveRate": 70
+    "total": 114,
+    "triggered": 99,
+    "solo": 67,
+    "involveRate": 86.8,
+    "soloRate": 58.8,
+    "resolveRate": 67.7
   },
   "nv_stat": {
     "total": 20,
@@ -806,6 +807,10 @@
         "count": 3
       },
       {
+        "tag": "실물/이상주장/키링캠",
+        "count": 2
+      },
+      {
         "tag": "다재다능케이스",
         "count": 2
       },
@@ -816,10 +821,6 @@
       {
         "tag": "디지털/오류문의/가계부",
         "count": 2
-      },
-      {
-        "tag": "취소/철회문의/철회",
-        "count": 1
       }
     ],
     "dow": [
