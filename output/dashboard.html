@@ -534,7 +534,7 @@ function handleFile(file){
   const prog=document.getElementById('uploadProgress');
   prog.textContent='⏳ 데이터 처리 중...';prog.style.display='block';
   const reader=new FileReader();
-  reader.onload=async function(e){
+  reader.onload=function(e){
     try{
       const wb=XLSX.read(e.target.result,{type:'array',cellDates:true});
       const ws=wb.Sheets[wb.SheetNames[0]];
@@ -593,15 +593,6 @@ function handleFile(file){
       const _normDates=s=>(s||'').replace(/\s/g,'');
       const _kh=D.kpi_history||[];
       const _prevKpiEntry=_kh.slice().reverse().find(h=>_normDates(h.dates)!==_normDates(currDates))||null;
-      // _prevKpiEntry.prod_ranking이 없으면 직전 주차 파일에서 직접 fetch
-      let _prevProdRanking=_prevKpiEntry&&_prevKpiEntry.prod_ranking?_prevKpiEntry.prod_ranking:null;
-      if(!_prevProdRanking&&_prevKpiEntry){
-        try{
-          const _pk=_prevKpiEntry.dates.replace(/\s*~\s*/,' ~ ').replace(/\//g,'-').replace(' ~ ','-to-');
-          const _pr=await fetch('https://raw.githubusercontent.com/'+GH_OWNER+'/'+GH_REPO+'/'+GH_BRANCH+'/data/'+_pk+'.json');
-          if(_pr.ok){const _pj=await _pr.json();_prevProdRanking=_pj.prod_ranking||null;}
-        }catch(e){}
-      }
       const prevSoloTagMap={};
       if(isSameWeek)(D.curr_solo_top5||[]).forEach(t=>{prevSoloTagMap[t.tag]=t.prev;});
       const soloTop5=Object.entries(soloC).filter(([tag])=>!tag.includes('톡톡/알프인입')).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([tag,curr])=>({tag,curr,prev:isSameWeek?(prevSoloTagMap[tag]||0):((D.solo_tag_counts||{})[tag]||0)}));
@@ -609,7 +600,9 @@ function handleFile(file){
       const incTags=top10.filter(t=>t.total>(prevAllC[t.tag]||0)).map(t=>({tag:t.tag,curr:t.total,prev:prevAllC[t.tag]||0,delta:t.total-(prevAllC[t.tag]||0)})).sort((a,b)=>b.delta-a.delta);
       const prodMap={'낼나 타이머':0,'디지털':0,'낼나 키링캠':0,'낼나 펜슬':0,'데일리 케이블':0};
       df.forEach(r=>{const t=String(r.tags||'');if(t.includes('타이머'))prodMap['낼나 타이머']++;if(t.includes('디지털'))prodMap['디지털']++;if(t.includes('키링캠'))prodMap['낼나 키링캠']++;if(t.includes('낼나펜슬')||t.includes('펜슬'))prodMap['낼나 펜슬']++;if(t.includes('데일리케이블'))prodMap['데일리 케이블']++;});
-      const prevProd=_prevProdRanking?Object.fromEntries(_prevProdRanking.map(p=>[p.name,p.total])):Object.fromEntries((D.prod_ranking||[]).map(p=>[p.name,p.total]));
+      // kpi_history 이전 항목에 prod_ranking 있으면 우선 사용
+      // 없으면 D.prod_ranking에서: 재업로드(isSameWeek)이면 p.prev, 새 주차면 p.total
+      const prevProd=_prevKpiEntry&&_prevKpiEntry.prod_ranking?Object.fromEntries(_prevKpiEntry.prod_ranking.map(p=>[p.name,p.total])):Object.fromEntries((D.prod_ranking||[]).map(p=>[p.name,isSameWeek?(p.prev||0):p.total]));
       const prodRanking=Object.entries(prodMap).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([name,total])=>({name,total,prev:prevProd[name]||0,delta:total-(prevProd[name]||0),curr_pct:+(total/df.length*100).toFixed(1),prev_pct:0}));
       const excMap={},retMap={};
       df.forEach(r=>{String(r.tags||'').split(',').forEach(raw=>{const tag=raw.trim();if(!tag.includes('교환반품'))return;const p=tag.split('/'),s=(p[1]||'').trim(),d=mergeDetail((p[2]||'').trim());if(!d)return;if(s.includes('미수거재발송'))return;if(s.includes('맞교환')||(s.includes('교환')&&!s.includes('반품')))excMap[d]=(excMap[d]||0)+1;else if(s.includes('반품'))retMap[d]=(retMap[d]||0)+1;});});
