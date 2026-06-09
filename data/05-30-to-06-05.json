@@ -201,8 +201,8 @@
     {
       "name": "낼나 타이머",
       "total": 18,
-      "prev": 17,
-      "delta": 1,
+      "prev": 18,
+      "delta": 0,
       "curr_pct": 13.4,
       "prev_pct": 0
     },
@@ -217,8 +217,8 @@
     {
       "name": "낼나 키링캠",
       "total": 6,
-      "prev": 5,
-      "delta": 1,
+      "prev": 6,
+      "delta": 0,
       "curr_pct": 4.5,
       "prev_pct": 0
     },
@@ -783,44 +783,8 @@
     ],
     "chAgentTopTags": [
       {
-        "tag": "교환",
-        "count": 8
-      },
-      {
-        "tag": "미수거재발송",
-        "count": 7
-      },
-      {
         "tag": "디지털",
-        "count": 4
-      },
-      {
-        "tag": "실물/이상주장/낼나펜슬",
-        "count": 4
-      },
-      {
-        "tag": "실물/이상주장/타이머",
-        "count": 3
-      },
-      {
-        "tag": "교환반품",
-        "count": 3
-      },
-      {
-        "tag": "실물/이상주장/키링캠",
-        "count": 2
-      },
-      {
-        "tag": "다재다능케이스",
-        "count": 2
-      },
-      {
-        "tag": "주문/주문문의/주문확인",
-        "count": 2
-      },
-      {
-        "tag": "디지털/오류문의/가계부",
-        "count": 2
+        "count": 1
       }
     ],
     "dow": [
