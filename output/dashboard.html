@@ -589,6 +589,10 @@ function handleFile(file){
       df.filter(soloMask).forEach(r=>{const seen=new Set();iterTags(r.tags).forEach(t=>{if(!seen.has(t)){soloC[t]=(soloC[t]||0)+1;seen.add(t);}});});
       // 같은 주차 재업로드 시 prev 값이 덮이지 않도록 보호
       const isSameWeek=currDates===(D.curr_dates||'');
+      // kpi_history에서 currDates와 다른 가장 최근 항목을 prev 소스로 사용
+      const _normDates=s=>(s||'').replace(/\s/g,'');
+      const _kh=D.kpi_history||[];
+      const _prevKpiEntry=_kh.slice().reverse().find(h=>_normDates(h.dates)!==_normDates(currDates))||null;
       const prevSoloTagMap={};
       if(isSameWeek)(D.curr_solo_top5||[]).forEach(t=>{prevSoloTagMap[t.tag]=t.prev;});
       const soloTop5=Object.entries(soloC).filter(([tag])=>!tag.includes('톡톡/알프인입')).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([tag,curr])=>({tag,curr,prev:isSameWeek?(prevSoloTagMap[tag]||0):((D.solo_tag_counts||{})[tag]||0)}));
@@ -596,7 +600,7 @@ function handleFile(file){
       const incTags=top10.filter(t=>t.total>(prevAllC[t.tag]||0)).map(t=>({tag:t.tag,curr:t.total,prev:prevAllC[t.tag]||0,delta:t.total-(prevAllC[t.tag]||0)})).sort((a,b)=>b.delta-a.delta);
       const prodMap={'낼나 타이머':0,'디지털':0,'낼나 키링캠':0,'낼나 펜슬':0,'데일리 케이블':0};
       df.forEach(r=>{const t=String(r.tags||'');if(t.includes('타이머'))prodMap['낼나 타이머']++;if(t.includes('디지털'))prodMap['디지털']++;if(t.includes('키링캠'))prodMap['낼나 키링캠']++;if(t.includes('낼나펜슬')||t.includes('펜슬'))prodMap['낼나 펜슬']++;if(t.includes('데일리케이블'))prodMap['데일리 케이블']++;});
-      const prevProd=Object.fromEntries((D.prod_ranking||[]).map(p=>[p.name,p.total]));
+      const prevProd=_prevKpiEntry&&_prevKpiEntry.prod_ranking?Object.fromEntries(_prevKpiEntry.prod_ranking.map(p=>[p.name,p.total])):Object.fromEntries((D.prod_ranking||[]).map(p=>[p.name,p.total]));
       const prodRanking=Object.entries(prodMap).sort((a,b)=>b[1]-a[1]).slice(0,5).map(([name,total])=>({name,total,prev:prevProd[name]||0,delta:total-(prevProd[name]||0),curr_pct:+(total/df.length*100).toFixed(1),prev_pct:0}));
       const excMap={},retMap={};
       df.forEach(r=>{String(r.tags||'').split(',').forEach(raw=>{const tag=raw.trim();if(!tag.includes('교환반품'))return;const p=tag.split('/'),s=(p[1]||'').trim(),d=mergeDetail((p[2]||'').trim());if(!d)return;if(s.includes('미수거재발송'))return;if(s.includes('맞교환')||(s.includes('교환')&&!s.includes('반품')))excMap[d]=(excMap[d]||0)+1;else if(s.includes('반품'))retMap[d]=(retMap[d]||0)+1;});});
@@ -661,10 +665,10 @@ function handleFile(file){
       const nvIdx=nvHistory.findIndex(r=>r.dates===currDates);
       if(nvIdx>=0)nvHistory[nvIdx]=newNvRow;else nvHistory.push(newNvRow);
       const kpiHistory=D.kpi_history?[...D.kpi_history]:[];
-      const newKpiRow={dates:currDates,totalCount:total,triggeredCount:triggered,soloCount:alfSolo,involveRate:+(triggered/total*100).toFixed(1),soloRate:+(alfSolo/total*100).toFixed(1),resolveRate:+(alfSolo/triggered*100).toFixed(1),chInvolve:chStat.involveRate,chResolve:chStat.resolveRate,nvInvolve:nvStat.involveRate,nvResolve:nvStat.resolveRate,dow:currDow,solo_tag_counts:soloTagCounts};
+      const newKpiRow={dates:currDates,totalCount:total,triggeredCount:triggered,soloCount:alfSolo,involveRate:+(triggered/total*100).toFixed(1),soloRate:+(alfSolo/total*100).toFixed(1),resolveRate:+(alfSolo/triggered*100).toFixed(1),chInvolve:chStat.involveRate,chResolve:chStat.resolveRate,nvInvolve:nvStat.involveRate,nvResolve:nvStat.resolveRate,dow:currDow,solo_tag_counts:soloTagCounts,prod_ranking:prodRanking};
       const kpiIdx=kpiHistory.findIndex(r=>r.dates===currDates);
       if(kpiIdx>=0)kpiHistory[kpiIdx]=newKpiRow;else kpiHistory.push(newKpiRow);
-      const newD={...D,total,agent_assigned:alfEsc+agentOnly,avg_response_min:avgMin,alf_triggered:triggered,alf_solo:alfSolo,alf_escalated:alfEsc,agent_only:agentOnly,workflow_only:workOnly,curr_solo_rate:+(alfSolo/total*100).toFixed(1),prev_solo_rate:isSameWeek?D.prev_solo_rate:D.curr_solo_rate,prev_total:isSameWeek?(D.prev_total||0):D.total,prev_total_real:isSameWeek?(D.prev_total_real||0):D.total,prev_alf_solo:isSameWeek?D.prev_alf_solo:D.alf_solo,curr_dow:currDow,prev_dow:isSameWeek?D.prev_dow:D.curr_dow,curr_dates:currDates,prev_dates:isSameWeek?D.prev_dates:D.curr_dates,top10_tags:top10,alf_unresolved_tags:alfUnresTags,inc_tags:incTags,curr_solo_top5:soloTop5,prev_solo_top5:soloTop5,prod_ranking:prodRanking,exchange_products:exchangeProducts,return_products:returnProducts,no_alf_direct:direct,no_alf_reopen:reopen,no_alf_total:noAlf.length,no_alf_agent:noAlfAgent.length,no_alf_work:noAlf.filter(r=>!r.assigneeId).length,no_alf_tags:Object.entries(nalfC).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([tag,count])=>({tag,count})),all_tag_counts:allTagCounts,solo_tag_counts:soloTagCounts,ch_stat:chStat,nv_stat:nvStat,nv_inip_stat:nvInipStat,ch_history:chHistory,nv_history:nvHistory,kpi_history:kpiHistory};
+      const newD={...D,total,agent_assigned:alfEsc+agentOnly,avg_response_min:avgMin,alf_triggered:triggered,alf_solo:alfSolo,alf_escalated:alfEsc,agent_only:agentOnly,workflow_only:workOnly,curr_solo_rate:+(alfSolo/total*100).toFixed(1),prev_solo_rate:_prevKpiEntry?(_prevKpiEntry.resolveRate||_prevKpiEntry.soloRate||0):(isSameWeek?D.prev_solo_rate:D.curr_solo_rate),prev_total:_prevKpiEntry?(_prevKpiEntry.totalCount||0):(isSameWeek?(D.prev_total||0):D.total),prev_total_real:_prevKpiEntry?(_prevKpiEntry.totalCount||0):(isSameWeek?(D.prev_total_real||0):D.total),prev_alf_solo:_prevKpiEntry?(_prevKpiEntry.soloCount||0):(isSameWeek?D.prev_alf_solo:D.alf_solo),curr_dow:currDow,prev_dow:_prevKpiEntry&&_prevKpiEntry.dow?_prevKpiEntry.dow:(isSameWeek?D.prev_dow:D.curr_dow),curr_dates:currDates,prev_dates:_prevKpiEntry?_prevKpiEntry.dates:(isSameWeek?D.prev_dates:D.curr_dates),top10_tags:top10,alf_unresolved_tags:alfUnresTags,inc_tags:incTags,curr_solo_top5:soloTop5,prev_solo_top5:soloTop5,prod_ranking:prodRanking,exchange_products:exchangeProducts,return_products:returnProducts,no_alf_direct:direct,no_alf_reopen:reopen,no_alf_total:noAlf.length,no_alf_agent:noAlfAgent.length,no_alf_work:noAlf.filter(r=>!r.assigneeId).length,no_alf_tags:Object.entries(nalfC).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([tag,count])=>({tag,count})),all_tag_counts:allTagCounts,solo_tag_counts:soloTagCounts,ch_stat:chStat,nv_stat:nvStat,nv_inip_stat:nvInipStat,ch_history:chHistory,nv_history:nvHistory,kpi_history:kpiHistory};
       // [보호 3단계] 최종 저장 직전 JSON 문자열에서 개인정보 키 검사 → 감지 시 해당 키만 삭제 후 계속
       const detected=FORBIDDEN_FIELDS.filter(f=>new RegExp('"'+f+'"\\s*:').test(JSON.stringify(newD)));
       if(detected.length){
@@ -791,6 +795,7 @@ async function loadWeekData(weekKey){
           const _pj=await _pr.json();
           if(!_h[_ci-1].dow&&_pj.curr_dow)_h[_ci-1].dow=_pj.curr_dow;
           if(!_h[_ci-1].solo_tag_counts&&_pj.solo_tag_counts)_h[_ci-1].solo_tag_counts=_pj.solo_tag_counts;
+          if(!_h[_ci-1].prod_ranking&&_pj.prod_ranking)_h[_ci-1].prod_ranking=_pj.prod_ranking;
         }
       }catch(e){}
     }
