@@ -1,5 +1,5 @@
 {
-  "total": 145,
+  "total": 117,
   "agent_assigned": 62,
   "avg_response_min": 34.2,
   "alf_triggered": 111,
@@ -7,19 +7,19 @@
   "alf_escalated": 40,
   "agent_only": 22,
   "workflow_only": 18,
-  "curr_solo_rate": 44.8,
+  "curr_solo_rate": 55.6,
   "prev_solo_rate": 66.3,
   "prev_total": 134,
   "prev_total_real": 134,
   "prev_alf_solo": 69,
   "curr_dow": [
-    27,
-    23,
-    26,
-    26,
     21,
+    19,
+    20,
+    22,
+    17,
     7,
-    15
+    11
   ],
   "prev_dow": [
     32,
@@ -134,50 +134,7 @@
       "count": 1
     }
   ],
-  "inc_tags": [
-    {
-      "tag": "실물/이상주장/타이머",
-      "curr": 17,
-      "prev": 10,
-      "delta": 7
-    },
-    {
-      "tag": "반품",
-      "curr": 5,
-      "prev": 1,
-      "delta": 4
-    },
-    {
-      "tag": "실물/제품문의/타이머",
-      "curr": 4,
-      "prev": 1,
-      "delta": 3
-    },
-    {
-      "tag": "교환",
-      "curr": 14,
-      "prev": 12,
-      "delta": 2
-    },
-    {
-      "tag": "쿠폰/사용문의/사용문의",
-      "curr": 5,
-      "prev": 3,
-      "delta": 2
-    },
-    {
-      "tag": "취소문의",
-      "curr": 4,
-      "prev": 2,
-      "delta": 2
-    },
-    {
-      "tag": "실물/AS문의/타이머",
-      "curr": 4,
-      "prev": 2,
-      "delta": 2
-    }
-  ],
+  "inc_tags": [],
   "curr_solo_top5": [
     {
       "tag": "실물/이상주장/타이머",
@@ -235,10 +192,10 @@
   "prod_ranking": [
     {
       "name": "낼나 타이머",
-      "total": 36,
+      "total": 28,
       "prev": 18,
-      "delta": 18,
-      "curr_pct": 24.8,
+      "delta": 10,
+      "curr_pct": 19.3,
       "prev_pct": 0
     },
     {
@@ -251,10 +208,10 @@
     },
     {
       "name": "낼나 펜슬",
-      "total": 11,
+      "total": 9,
       "prev": 13,
-      "delta": -2,
-      "curr_pct": 7.6,
+      "delta": -4,
+      "curr_pct": 6.2,
       "prev_pct": 0
     },
     {
@@ -500,12 +457,12 @@
     },
     {
       "dates": "06/06 ~ 06/12",
-      "total": 36,
-      "triggered": 22,
-      "solo": 14,
-      "involveRate": 61.1,
-      "soloRate": 38.9,
-      "resolveRate": 63.6
+      "total": 8,
+      "triggered": 4,
+      "solo": 1,
+      "involveRate": 50,
+      "soloRate": 12.5,
+      "resolveRate": 25
     }
   ],
   "kpi_history": [
@@ -718,24 +675,24 @@
     },
     {
       "dates": "06/06 ~ 06/12",
-      "totalCount": 145,
+      "totalCount": 117,
       "triggeredCount": 111,
       "soloCount": 65,
-      "involveRate": 76.6,
-      "soloRate": 44.8,
+      "involveRate": 94.9,
+      "soloRate": 55.6,
       "resolveRate": 58.6,
       "chInvolve": 89,
       "chResolve": 60.8,
-      "nvInvolve": 61.1,
-      "nvResolve": 63.6,
+      "nvInvolve": 50,
+      "nvResolve": 25,
       "dow": [
-        27,
-        23,
-        26,
-        26,
         21,
+        19,
+        20,
+        22,
+        17,
         7,
-        15
+        11
       ],
       "solo_tag_counts": {
         "실물/제품문의/필름": 4,
@@ -770,10 +727,10 @@
       "prod_ranking": [
         {
           "name": "낼나 타이머",
-          "total": 36,
+          "total": 28,
           "prev": 18,
-          "delta": 18,
-          "curr_pct": 24.8,
+          "delta": 10,
+          "curr_pct": 19.3,
           "prev_pct": 0
         },
         {
@@ -786,10 +743,10 @@
         },
         {
           "name": "낼나 펜슬",
-          "total": 11,
+          "total": 9,
           "prev": 13,
-          "delta": -2,
-          "curr_pct": 7.6,
+          "delta": -4,
+          "curr_pct": 6.2,
           "prev_pct": 0
         },
         {
@@ -901,26 +858,26 @@
     "resolveRate": 60.8
   },
   "nv_stat": {
-    "total": 36,
-    "triggered": 22,
-    "solo": 14,
-    "involveRate": 61.1,
-    "soloRate": 38.9,
-    "resolveRate": 63.6
+    "total": 8,
+    "triggered": 4,
+    "solo": 1,
+    "involveRate": 50,
+    "soloRate": 12.5,
+    "resolveRate": 25
   },
   "nv_inip_stat": {
-    "total": 16,
+    "total": 12,
     "nvTotal": 36,
-    "solo": 4,
+    "solo": 0,
     "toChannel": 10,
     "other": 2,
-    "involveRate": 44.4,
-    "soloRate": 25,
-    "toChannelRate": 62.5,
+    "involveRate": 33.3,
+    "soloRate": 0,
+    "toChannelRate": 83.3,
     "triggered": 4,
-    "alfSolo": 12,
-    "alfInvolveRate": 25,
-    "alfSoloRate": 300,
+    "alfSolo": 10,
+    "alfInvolveRate": 33.3,
+    "alfSoloRate": 250,
     "topTags": [
       {
         "tag": "실물/이상주장/타이머",
@@ -991,9 +948,9 @@
       4,
       1,
       4,
-      3,
       2,
-      1,
+      0,
+      0,
       1
     ],
     "dowX": [
