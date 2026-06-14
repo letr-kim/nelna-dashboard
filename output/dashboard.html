@@ -545,7 +545,6 @@ function handleFile(file){
       const hasTokTokInipX=r=>String(r.tags||'').includes('톡톡/알프인입X');
       // 알프인입 분석용 raw 톡톡 rows (테스트 제외만 적용, 알프인입·중복 제외 전)
       const nvRowsRaw=rows.filter(r=>!String(r.tags||'').includes('테스트')&&r.mediumName==='appNaverTalk');
-      const nvRowsInip=nvRowsRaw.filter(hasTokTokInip);
       const nvInipXRows=nvRowsRaw.filter(hasTokTokInipX);
       // 메인 df: 테스트·중복 제외 (톡톡/알프인입 포함 — nvRows 분리 처리로 중복 방지)
       const df=rows.filter(r=>!String(r.tags||'').includes('테스트')&&!String(r.tags||'').includes('중복'));
@@ -553,6 +552,10 @@ function handleFile(file){
       df.forEach(r=>FORBIDDEN_FIELDS.forEach(f=>{if(f in r){console.warn('[보안] 개인정보 키 재발견, 강제 삭제:',f);delete r[f];}}));
       console.log('[handleFile] 전체 rows:', rows.length, '/ 테스트 제외 df:', df.length, '/ 첫 행 키:', df.length?Object.keys(df[0]):[]);
       if(!df.length){prog.textContent='❌ 처리할 데이터가 없습니다 (df 비어있음)';return;}
+      const chRows=df.filter(r=>r.mediumType==='native');
+      const nvRows=df.filter(r=>r.mediumName==='appNaverTalk');
+      const nvRowsInip=nvRows.filter(r=>String(r.tags||'').includes('톡톡/알프인입')&&!String(r.tags||'').includes('톡톡/알프인입X'));
+      const nvRowsPure=nvRows.filter(r=>!String(r.tags||'').includes('톡톡/알프인입'));
       const isTrue=v=>['true','1','yes'].includes(String(v||'').toLowerCase());
       const alfTrig=r=>isTrue(r.alfTriggered);
       const soloMask=r=>r.goalState==='waiting'&&alfTrig(r)&&!r.assigneeId;
@@ -570,7 +573,7 @@ function handleFile(file){
       const fmt=d=>(d.getMonth()+1).toString().padStart(2,'0')+'/'+d.getDate().toString().padStart(2,'0');
       const currDates=dates.length?fmt(dates[0])+' ~ '+fmt(dates[dates.length-1]):'';
       const currDow=[0,0,0,0,0,0,0];
-      df.forEach(r=>{const d=new Date(r.createdAt);if(!isNaN(d))currDow[d.getDay()===0?6:d.getDay()-1]++;});
+      [...chRows,...nvRowsPure].forEach(r=>{const d=new Date(r.createdAt);if(!isNaN(d))currDow[d.getDay()===0?6:d.getDay()-1]++;});
       const soloIds=new Set(df.filter(soloMask).map(r=>String(r.id)));
       const tagC={};
       df.forEach(r=>{
@@ -599,7 +602,7 @@ function handleFile(file){
       const prevAllC=D.all_tag_counts||{};
       const incTags=top10.filter(t=>t.total>(prevAllC[t.tag]||0)).map(t=>({tag:t.tag,curr:t.total,prev:prevAllC[t.tag]||0,delta:t.total-(prevAllC[t.tag]||0)})).sort((a,b)=>b.delta-a.delta);
       const prodMap={'낼나 타이머':0,'디지털':0,'낼나 키링캠':0,'낼나 펜슬':0,'데일리 케이블':0};
-      df.forEach(r=>{const t=String(r.tags||'');if(t.includes('타이머'))prodMap['낼나 타이머']++;if(t.includes('디지털'))prodMap['디지털']++;if(t.includes('키링캠'))prodMap['낼나 키링캠']++;if(t.includes('낼나펜슬')||t.includes('펜슬'))prodMap['낼나 펜슬']++;if(t.includes('데일리케이블'))prodMap['데일리 케이블']++;});
+      [...chRows,...nvRowsPure].forEach(r=>{const t=String(r.tags||'');if(t.includes('타이머'))prodMap['낼나 타이머']++;if(t.includes('디지털'))prodMap['디지털']++;if(t.includes('키링캠'))prodMap['낼나 키링캠']++;if(t.includes('낼나펜슬')||t.includes('펜슬'))prodMap['낼나 펜슬']++;if(t.includes('데일리케이블'))prodMap['데일리 케이블']++;});
       // kpi_history 이전 항목에 prod_ranking 있으면 우선 사용
       // 없으면 D.prod_ranking에서: 재업로드(isSameWeek)이면 p.prev, 새 주차면 p.total
       const prevProd=_prevKpiEntry&&_prevKpiEntry.prod_ranking?Object.fromEntries(_prevKpiEntry.prod_ranking.map(p=>[p.name,p.total])):Object.fromEntries((D.prod_ranking||[]).map(p=>[p.name,isSameWeek?(p.prev||0):p.total]));
@@ -622,12 +625,8 @@ function handleFile(file){
         const t=rows.length,trig=rows.filter(alfTrig).length,solo=rows.filter(soloMask).length;
         return{total:t,triggered:trig,solo,involveRate:pct(trig,t),soloRate:pct(solo,t),resolveRate:pct(solo,trig)};
       }
-      const chRows=df.filter(r=>r.mediumType==='native');
-      // nvRows: 테스트·중복 모두 제외된 기준 (df 기반)
-      const nvRows=df.filter(r=>r.mediumName==='appNaverTalk');
-      // total: 채널톡(native) + 네이버톡톡(appNaverTalk) 합산
-      // chRows에 톡톡/알프인입 재인입 건이 포함되나, nvRows는 mediumName 기준이라 중복 없음
-      const total=chRows.length+nvRows.length;
+      // total: 채널톡(native) + 네이버톡톡 순수건(톡톡/알프인입 제외) 합산
+      const total=chRows.length+nvRowsPure.length;
       function nvChStats(rows){
         const t=rows.length;
         const nvTrig=r=>hasTokTokInip(r)||alfTrig(r);
@@ -636,7 +635,7 @@ function handleFile(file){
         return{total:t,triggered:trig,solo,involveRate:pct(trig,t),soloRate:pct(solo,t),resolveRate:pct(solo,trig)};
       }
       const chStat=chStats(chRows);
-      const nvStat=nvChStats(nvRows);
+      const nvStat=nvChStats(nvRowsPure);
       const nvInipTotal=nvRowsInip.length;
       const nvInipSolo=nvRowsInip.filter(r=>hasDuplicate(r)).length;
       const nvInipToChannel=chRows.filter(r=>hasTokTokInip(r)).length;
