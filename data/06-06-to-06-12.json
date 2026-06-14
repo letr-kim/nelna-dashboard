@@ -1,13 +1,13 @@
 {
   "total": 145,
-  "agent_assigned": 56,
-  "avg_response_min": 36,
+  "agent_assigned": 62,
+  "avg_response_min": 34.2,
   "alf_triggered": 111,
-  "alf_solo": 70,
+  "alf_solo": 65,
   "alf_escalated": 40,
-  "agent_only": 16,
-  "workflow_only": 19,
-  "curr_solo_rate": 48.3,
+  "agent_only": 22,
+  "workflow_only": 18,
+  "curr_solo_rate": 44.8,
   "prev_solo_rate": 66.3,
   "prev_total": 134,
   "prev_total_real": 134,
@@ -134,50 +134,7 @@
       "count": 1
     }
   ],
-  "inc_tags": [
-    {
-      "tag": "실물/이상주장/타이머",
-      "curr": 17,
-      "prev": 10,
-      "delta": 7
-    },
-    {
-      "tag": "반품",
-      "curr": 5,
-      "prev": 1,
-      "delta": 4
-    },
-    {
-      "tag": "실물/제품문의/타이머",
-      "curr": 4,
-      "prev": 1,
-      "delta": 3
-    },
-    {
-      "tag": "교환",
-      "curr": 14,
-      "prev": 12,
-      "delta": 2
-    },
-    {
-      "tag": "쿠폰/사용문의/사용문의",
-      "curr": 5,
-      "prev": 3,
-      "delta": 2
-    },
-    {
-      "tag": "취소문의",
-      "curr": 4,
-      "prev": 2,
-      "delta": 2
-    },
-    {
-      "tag": "실물/AS문의/타이머",
-      "curr": 4,
-      "prev": 2,
-      "delta": 2
-    }
-  ],
+  "inc_tags": [],
   "curr_solo_top5": [
     {
       "tag": "실물/이상주장/타이머",
@@ -243,10 +200,10 @@
     },
     {
       "name": "디지털",
-      "total": 15,
+      "total": 16,
       "prev": 30,
-      "delta": -15,
-      "curr_pct": 10.3,
+      "delta": -14,
+      "curr_pct": 11,
       "prev_pct": 0
     },
     {
@@ -287,11 +244,11 @@
   "mon_date": "",
   "mon_prev": 0,
   "mon_curr": 0,
-  "no_alf_direct": 15,
+  "no_alf_direct": 16,
   "no_alf_reopen": 0,
   "no_alf_total": 34,
-  "no_alf_agent": 15,
-  "no_alf_work": 19,
+  "no_alf_agent": 16,
+  "no_alf_work": 18,
   "no_alf_tags": [
     {
       "tag": "톡톡/알프인입X",
@@ -437,10 +394,10 @@
       "dates": "06/06 ~ 06/12",
       "total": 109,
       "triggered": 97,
-      "solo": 62,
+      "solo": 59,
       "involveRate": 89,
-      "soloRate": 56.9,
-      "resolveRate": 63.9
+      "soloRate": 54.1,
+      "resolveRate": 60.8
     }
   ],
   "nv_history": [
@@ -502,10 +459,10 @@
       "dates": "06/06 ~ 06/12",
       "total": 36,
       "triggered": 22,
-      "solo": 16,
+      "solo": 14,
       "involveRate": 61.1,
-      "soloRate": 44.4,
-      "resolveRate": 72.7
+      "soloRate": 38.9,
+      "resolveRate": 63.6
     }
   ],
   "kpi_history": [
@@ -720,14 +677,14 @@
       "dates": "06/06 ~ 06/12",
       "totalCount": 145,
       "triggeredCount": 111,
-      "soloCount": 70,
+      "soloCount": 65,
       "involveRate": 76.6,
-      "soloRate": 48.3,
-      "resolveRate": 63.1,
+      "soloRate": 44.8,
+      "resolveRate": 58.6,
       "chInvolve": 89,
-      "chResolve": 63.9,
+      "chResolve": 60.8,
       "nvInvolve": 61.1,
-      "nvResolve": 72.7,
+      "nvResolve": 63.6,
       "dow": [
         27,
         23,
@@ -742,6 +699,7 @@
         "배송/배송문의/기타": 1,
         "실물/제품문의/펜촉": 1,
         "실물/제품문의/낼나펜슬": 3,
+        "디지털/사용문의/라이프로그": 1,
         "톡톡/알프인입": 8,
         "실물/이상주장/타이머": 10,
         "실물/사용방법/키링캠": 1,
@@ -777,10 +735,10 @@
         },
         {
           "name": "디지털",
-          "total": 15,
+          "total": 16,
           "prev": 30,
-          "delta": -15,
-          "curr_pct": 10.3,
+          "delta": -14,
+          "curr_pct": 11,
           "prev_pct": 0
         },
         {
@@ -820,6 +778,7 @@
     "실물/제품문의/펜촉": 2,
     "실물/제품문의/낼나펜슬": 3,
     "실물/이상주장/종이필름": 1,
+    "디지털/사용문의/라이프로그": 1,
     "미수거재발송": 7,
     "톡톡/알프인입": 22,
     "반품": 5,
@@ -865,6 +824,7 @@
     "배송/배송문의/기타": 1,
     "실물/제품문의/펜촉": 1,
     "실물/제품문의/낼나펜슬": 3,
+    "디지털/사용문의/라이프로그": 1,
     "톡톡/알프인입": 8,
     "실물/이상주장/타이머": 10,
     "실물/사용방법/키링캠": 1,
@@ -892,18 +852,18 @@
   "ch_stat": {
     "total": 109,
     "triggered": 97,
-    "solo": 62,
+    "solo": 59,
     "involveRate": 89,
-    "soloRate": 56.9,
-    "resolveRate": 63.9
+    "soloRate": 54.1,
+    "resolveRate": 60.8
   },
   "nv_stat": {
     "total": 36,
     "triggered": 22,
-    "solo": 16,
+    "solo": 14,
     "involveRate": 61.1,
-    "soloRate": 44.4,
-    "resolveRate": 72.7
+    "soloRate": 38.9,
+    "resolveRate": 63.6
   },
   "nv_inip_stat": {
     "total": 16,
