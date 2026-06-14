@@ -134,7 +134,50 @@
       "count": 1
     }
   ],
-  "inc_tags": [],
+  "inc_tags": [
+    {
+      "tag": "실물/이상주장/타이머",
+      "curr": 17,
+      "prev": 10,
+      "delta": 7
+    },
+    {
+      "tag": "반품",
+      "curr": 5,
+      "prev": 1,
+      "delta": 4
+    },
+    {
+      "tag": "실물/제품문의/타이머",
+      "curr": 4,
+      "prev": 1,
+      "delta": 3
+    },
+    {
+      "tag": "교환",
+      "curr": 14,
+      "prev": 12,
+      "delta": 2
+    },
+    {
+      "tag": "쿠폰/사용문의/사용문의",
+      "curr": 5,
+      "prev": 3,
+      "delta": 2
+    },
+    {
+      "tag": "취소문의",
+      "curr": 4,
+      "prev": 2,
+      "delta": 2
+    },
+    {
+      "tag": "실물/AS문의/타이머",
+      "curr": 4,
+      "prev": 2,
+      "delta": 2
+    }
+  ],
   "curr_solo_top5": [
     {
       "tag": "실물/이상주장/타이머",
