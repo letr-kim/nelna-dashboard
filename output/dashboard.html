@@ -631,9 +631,7 @@ function handleFile(file){
       const total=chRows.length+nvRowsPure.length;
       function nvChStats(rows){
         const t=rows.length;
-        const nvTrig=r=>hasTokTokInip(r)||alfTrig(r);
-        const nvSolo=r=>hasTokTokInip(r)?(r.goalState==='waiting'&&!r.assigneeId):soloMask(r);
-        const trig=rows.filter(nvTrig).length,solo=rows.filter(nvSolo).length;
+        const trig=rows.filter(alfTrig).length,solo=rows.filter(soloMask).length;
         return{total:t,triggered:trig,solo,involveRate:pct(trig,t),soloRate:pct(solo,t),resolveRate:pct(solo,trig)};
       }
       const chStat=chStats(chRows);
