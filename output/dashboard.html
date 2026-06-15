@@ -558,7 +558,8 @@ function handleFile(file){
       const chRows=df.filter(r=>r.mediumType==='native');
       const nvRows=df.filter(r=>r.mediumName==='appNaverTalk');
       const nvRowsInip=nvRows.filter(r=>String(r.tags||'').includes('톡톡/알프인입')&&!String(r.tags||'').includes('톡톡/알프인입X'));
-      const nvRowsPure=nvRows.filter(r=>!hasTokTokInip(r));
+      const nvRowsPure=nvRows.filter(r=>!(String(r.tags||'').includes('톡톡/알프인입')&&!String(r.tags||'').includes('톡톡/알프인입X')));
+      console.log('[DEBUG nvRows]', nvRows.length, '알프인입:', nvRows.filter(r=>String(r.tags||'').includes('톡톡/알프인입')&&!String(r.tags||'').includes('톡톡/알프인입X')).length, 'pure:', nvRows.filter(r=>!(String(r.tags||'').includes('톡톡/알프인입')&&!String(r.tags||'').includes('톡톡/알프인입X'))).length);
       const isTrue=v=>['true','1','yes'].includes(String(v||'').toLowerCase());
       const alfTrig=r=>isTrue(r.alfTriggered);
       const soloMask=r=>r.goalState==='waiting'&&alfTrig(r)&&!r.assigneeId;
