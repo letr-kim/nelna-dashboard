@@ -497,6 +497,7 @@ async function saveToGitHub(newD,currDates,prog){
     return res;
   }
   try{
+    console.log('[DEBUG] saving total:', newD.total);
     // weekKey.json 저장
     const weekPath=apiBase+weekKey+'.json';
     let weekSha='';
@@ -629,6 +630,7 @@ function handleFile(file){
       }
       // total: 채널톡(native) + 네이버톡톡 순수건(톡톡/알프인입 제외) 합산
       const total=chRows.length+nvRowsPure.length;
+      console.log('[DEBUG] total:', total, 'chRows:', chRows.length, 'nvRowsPure:', nvRowsPure ? nvRowsPure.length : 'undefined');
       function nvChStats(rows){
         const t=rows.length;
         const trig=rows.filter(alfTrig).length,solo=rows.filter(soloMask).length;
