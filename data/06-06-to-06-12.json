@@ -1,5 +1,5 @@
 {
-  "total": 117,
+  "total": 133,
   "agent_assigned": 62,
   "avg_response_min": 34.2,
   "alf_triggered": 111,
@@ -7,19 +7,19 @@
   "alf_escalated": 40,
   "agent_only": 22,
   "workflow_only": 18,
-  "curr_solo_rate": 55.6,
+  "curr_solo_rate": 48.9,
   "prev_solo_rate": 66.3,
   "prev_total": 134,
   "prev_total_real": 134,
   "prev_alf_solo": 69,
   "curr_dow": [
-    21,
-    19,
-    20,
+    23,
     22,
-    17,
+    22,
+    24,
+    21,
     7,
-    11
+    14
   ],
   "prev_dow": [
     32,
@@ -192,10 +192,10 @@
   "prod_ranking": [
     {
       "name": "낼나 타이머",
-      "total": 28,
+      "total": 35,
       "prev": 18,
-      "delta": 10,
-      "curr_pct": 19.3,
+      "delta": 17,
+      "curr_pct": 24.1,
       "prev_pct": 0
     },
     {
@@ -208,10 +208,10 @@
     },
     {
       "name": "낼나 펜슬",
-      "total": 9,
+      "total": 10,
       "prev": 13,
-      "delta": -4,
-      "curr_pct": 6.2,
+      "delta": -3,
+      "curr_pct": 6.9,
       "prev_pct": 0
     },
     {
@@ -457,12 +457,12 @@
     },
     {
       "dates": "06/06 ~ 06/12",
-      "total": 8,
-      "triggered": 4,
-      "solo": 1,
-      "involveRate": 50,
-      "soloRate": 12.5,
-      "resolveRate": 25
+      "total": 24,
+      "triggered": 10,
+      "solo": 4,
+      "involveRate": 41.7,
+      "soloRate": 16.7,
+      "resolveRate": 40
     }
   ],
   "kpi_history": [
@@ -675,24 +675,24 @@
     },
     {
       "dates": "06/06 ~ 06/12",
-      "totalCount": 117,
+      "totalCount": 133,
       "triggeredCount": 111,
       "soloCount": 65,
-      "involveRate": 94.9,
-      "soloRate": 55.6,
+      "involveRate": 83.5,
+      "soloRate": 48.9,
       "resolveRate": 58.6,
       "chInvolve": 89,
       "chResolve": 60.8,
-      "nvInvolve": 50,
-      "nvResolve": 25,
+      "nvInvolve": 41.7,
+      "nvResolve": 40,
       "dow": [
-        21,
-        19,
-        20,
+        23,
         22,
-        17,
+        22,
+        24,
+        21,
         7,
-        11
+        14
       ],
       "solo_tag_counts": {
         "실물/제품문의/필름": 4,
@@ -727,10 +727,10 @@
       "prod_ranking": [
         {
           "name": "낼나 타이머",
-          "total": 28,
+          "total": 35,
           "prev": 18,
-          "delta": 10,
-          "curr_pct": 19.3,
+          "delta": 17,
+          "curr_pct": 24.1,
           "prev_pct": 0
         },
         {
@@ -743,10 +743,10 @@
         },
         {
           "name": "낼나 펜슬",
-          "total": 9,
+          "total": 10,
           "prev": 13,
-          "delta": -4,
-          "curr_pct": 6.2,
+          "delta": -3,
+          "curr_pct": 6.9,
           "prev_pct": 0
         },
         {
@@ -858,12 +858,12 @@
     "resolveRate": 60.8
   },
   "nv_stat": {
-    "total": 8,
-    "triggered": 4,
-    "solo": 1,
-    "involveRate": 50,
-    "soloRate": 12.5,
-    "resolveRate": 25
+    "total": 24,
+    "triggered": 10,
+    "solo": 4,
+    "involveRate": 41.7,
+    "soloRate": 16.7,
+    "resolveRate": 40
   },
   "nv_inip_stat": {
     "total": 12,
