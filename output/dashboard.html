@@ -683,6 +683,7 @@ function handleFile(file){
       console.log('[handleFile] renderDashboard 완료. D.total='+D.total+', D.curr_dates='+D.curr_dates);
       // GitHub 자동 저장
       if(getToken()){
+        console.log('[DEBUG2] before save - newD.total:', newD.total, 'token:', getToken() ? '있음' : '없음');
         saveToGitHub(newD,currDates,prog);
       }else{
         prog.textContent='✅ 업로드 완료! (GitHub 미저장)';
