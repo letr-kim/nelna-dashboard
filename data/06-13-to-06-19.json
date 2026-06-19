@@ -1,0 +1,1076 @@
+{
+  "total": 87,
+  "agent_assigned": 53,
+  "avg_response_min": 25.2,
+  "alf_triggered": 68,
+  "alf_solo": 28,
+  "alf_escalated": 39,
+  "agent_only": 14,
+  "workflow_only": 9,
+  "curr_solo_rate": 32.2,
+  "prev_solo_rate": 58.6,
+  "prev_total": 133,
+  "prev_total_real": 133,
+  "prev_alf_solo": 65,
+  "curr_dow": [
+    26,
+    19,
+    9,
+    12,
+    3,
+    5,
+    13
+  ],
+  "prev_dow": [
+    23,
+    22,
+    22,
+    24,
+    21,
+    7,
+    14
+  ],
+  "top10_tags": [
+    {
+      "tag": "교환",
+      "total": 15,
+      "alf": 0,
+      "agent": 15
+    },
+    {
+      "tag": "미수거재발송",
+      "total": 5,
+      "alf": 0,
+      "agent": 5
+    },
+    {
+      "tag": "실물/이상주장/낼나펜슬",
+      "total": 4,
+      "alf": 2,
+      "agent": 2
+    },
+    {
+      "tag": "실물/이상주장/키링캠",
+      "total": 4,
+      "alf": 3,
+      "agent": 1
+    },
+    {
+      "tag": "디지털/오류문의/가계부",
+      "total": 4,
+      "alf": 1,
+      "agent": 3
+    },
+    {
+      "tag": "디지털/사용문의/가계부",
+      "total": 4,
+      "alf": 1,
+      "agent": 3
+    },
+    {
+      "tag": "실물/이상주장/타이머",
+      "total": 4,
+      "alf": 2,
+      "agent": 2
+    },
+    {
+      "tag": "배송/배송문의/일정문의",
+      "total": 3,
+      "alf": 2,
+      "agent": 1
+    },
+    {
+      "tag": "실물/제품문의/입고품절",
+      "total": 3,
+      "alf": 2,
+      "agent": 1
+    },
+    {
+      "tag": "반품",
+      "total": 3,
+      "alf": 1,
+      "agent": 2
+    }
+  ],
+  "alf_unresolved_tags": [
+    {
+      "tag": "교환",
+      "count": 11
+    },
+    {
+      "tag": "디지털/오류문의/가계부",
+      "count": 3
+    },
+    {
+      "tag": "미수거재발송",
+      "count": 3
+    },
+    {
+      "tag": "디지털/사용문의/가계부",
+      "count": 3
+    },
+    {
+      "tag": "톡톡/알프인입",
+      "count": 3
+    },
+    {
+      "tag": "실물/이상주장/타이머",
+      "count": 2
+    },
+    {
+      "tag": "2차",
+      "count": 2
+    },
+    {
+      "tag": "2026인벤타리오",
+      "count": 2
+    },
+    {
+      "tag": "디지털/오류문의/라이프로그",
+      "count": 2
+    },
+    {
+      "tag": "실물/이상주장/낼나펜슬",
+      "count": 1
+    }
+  ],
+  "inc_tags": [
+    {
+      "tag": "실물/이상주장/키링캠",
+      "curr": 4,
+      "prev": 0,
+      "delta": 4
+    },
+    {
+      "tag": "디지털/오류문의/가계부",
+      "curr": 4,
+      "prev": 2,
+      "delta": 2
+    },
+    {
+      "tag": "배송/배송문의/일정문의",
+      "curr": 3,
+      "prev": 1,
+      "delta": 2
+    },
+    {
+      "tag": "교환",
+      "curr": 15,
+      "prev": 14,
+      "delta": 1
+    },
+    {
+      "tag": "실물/이상주장/낼나펜슬",
+      "curr": 4,
+      "prev": 3,
+      "delta": 1
+    }
+  ],
+  "curr_solo_top5": [
+    {
+      "tag": "실물/이상주장/키링캠",
+      "curr": 3,
+      "prev": 0
+    },
+    {
+      "tag": "배송/배송문의/일정문의",
+      "curr": 2,
+      "prev": 1
+    },
+    {
+      "tag": "실물/이상주장/낼나펜슬",
+      "curr": 2,
+      "prev": 1
+    },
+    {
+      "tag": "회원/멤버십/패스포트",
+      "curr": 2,
+      "prev": 0
+    },
+    {
+      "tag": "실물/제품문의/입고품절",
+      "curr": 2,
+      "prev": 4
+    }
+  ],
+  "prev_solo_top5": [
+    {
+      "tag": "실물/이상주장/키링캠",
+      "curr": 3,
+      "prev": 0
+    },
+    {
+      "tag": "배송/배송문의/일정문의",
+      "curr": 2,
+      "prev": 1
+    },
+    {
+      "tag": "실물/이상주장/낼나펜슬",
+      "curr": 2,
+      "prev": 1
+    },
+    {
+      "tag": "회원/멤버십/패스포트",
+      "curr": 2,
+      "prev": 0
+    },
+    {
+      "tag": "실물/제품문의/입고품절",
+      "curr": 2,
+      "prev": 4
+    }
+  ],
+  "prod_ranking": [
+    {
+      "name": "낼나 타이머",
+      "total": 17,
+      "prev": 35,
+      "delta": -18,
+      "curr_pct": 18.9,
+      "prev_pct": 0
+    },
+    {
+      "name": "디지털",
+      "total": 12,
+      "prev": 16,
+      "delta": -4,
+      "curr_pct": 13.3,
+      "prev_pct": 0
+    },
+    {
+      "name": "낼나 펜슬",
+      "total": 12,
+      "prev": 10,
+      "delta": 2,
+      "curr_pct": 13.3,
+      "prev_pct": 0
+    },
+    {
+      "name": "낼나 키링캠",
+      "total": 4,
+      "prev": 2,
+      "delta": 2,
+      "curr_pct": 4.4,
+      "prev_pct": 0
+    },
+    {
+      "name": "데일리 케이블",
+      "total": 0,
+      "prev": 0,
+      "delta": 0,
+      "curr_pct": 0,
+      "prev_pct": 0
+    }
+  ],
+  "curr_dates": "06/13 ~ 06/19",
+  "prev_dates": "06/06 ~ 06/12",
+  "channelio_solo": 72,
+  "channelio_triggered": 107,
+  "channelio_rate": 67.3,
+  "mon_top6": [],
+  "mon_agent": 0,
+  "mon_alf_esc": 0,
+  "mon_direct": 0,
+  "mon_pct": 0,
+  "mon_date": "",
+  "mon_prev": 0,
+  "mon_curr": 0,
+  "no_alf_direct": 11,
+  "no_alf_reopen": 2,
+  "no_alf_total": 22,
+  "no_alf_agent": 13,
+  "no_alf_work": 9,
+  "no_alf_tags": [
+    {
+      "tag": "교환",
+      "count": 4
+    },
+    {
+      "tag": "미수거재발송",
+      "count": 2
+    },
+    {
+      "tag": "톡톡/알프인입X",
+      "count": 2
+    },
+    {
+      "tag": "실물/이상주장/낼나펜슬",
+      "count": 1
+    },
+    {
+      "tag": "실물/제품문의/펜촉",
+      "count": 1
+    },
+    {
+      "tag": "반품",
+      "count": 1
+    },
+    {
+      "tag": "2차",
+      "count": 1
+    },
+    {
+      "tag": "배송/배송문의/일정문의",
+      "count": 1
+    },
+    {
+      "tag": "디지털",
+      "count": 1
+    },
+    {
+      "tag": "결제/구매문의",
+      "count": 1
+    }
+  ],
+  "exchange_products": [
+    {
+      "product": "낼나펜슬",
+      "count": 5
+    },
+    {
+      "product": "타이머-기능정지",
+      "count": 3
+    },
+    {
+      "product": "타이머클래식-외관필름인쇄",
+      "count": 2
+    },
+    {
+      "product": "타이머버터-외관필름인쇄",
+      "count": 2
+    },
+    {
+      "product": "타이머클래식-기능라이트",
+      "count": 1
+    },
+    {
+      "product": "타이머클래식-외관부품",
+      "count": 1
+    }
+  ],
+  "return_products": [
+    {
+      "product": "일정문의",
+      "count": 1
+    },
+    {
+      "product": "낼나펜슬",
+      "count": 1
+    },
+    {
+      "product": "고객사유",
+      "count": 1
+    }
+  ],
+  "ch_history": [
+    {
+      "dates": "04/25 ~ 05/01",
+      "total": 138,
+      "triggered": 110,
+      "solo": 73,
+      "involveRate": 79.7,
+      "soloRate": 52.9,
+      "resolveRate": 66.4
+    },
+    {
+      "dates": "05/02 ~ 05/08",
+      "total": 89,
+      "triggered": 77,
+      "solo": 42,
+      "involveRate": 86.5,
+      "soloRate": 47.2,
+      "resolveRate": 54.5
+    },
+    {
+      "dates": "05/09 ~ 05/15",
+      "total": 127,
+      "triggered": 107,
+      "solo": 72,
+      "involveRate": 84.3,
+      "soloRate": 56.7,
+      "resolveRate": 67.3
+    },
+    {
+      "dates": "05/16 ~ 05/22",
+      "total": 132,
+      "triggered": 112,
+      "solo": 77,
+      "involveRate": 84.8,
+      "soloRate": 58.3,
+      "resolveRate": 68.8
+    },
+    {
+      "dates": "05/23 ~ 05/29",
+      "total": 96,
+      "triggered": 79,
+      "solo": 42,
+      "involveRate": 82.3,
+      "soloRate": 43.8,
+      "resolveRate": 53.2
+    },
+    {
+      "dates": "05/30 ~ 06/05",
+      "total": 114,
+      "triggered": 99,
+      "solo": 67,
+      "involveRate": 86.8,
+      "soloRate": 58.8,
+      "resolveRate": 67.7
+    },
+    {
+      "dates": "06/06 ~ 06/12",
+      "total": 109,
+      "triggered": 97,
+      "solo": 59,
+      "involveRate": 89,
+      "soloRate": 54.1,
+      "resolveRate": 60.8
+    },
+    {
+      "dates": "06/13 ~ 06/19",
+      "total": 75,
+      "triggered": 66,
+      "solo": 27,
+      "involveRate": 88,
+      "soloRate": 36,
+      "resolveRate": 40.9
+    }
+  ],
+  "nv_history": [
+    {
+      "dates": "04/25 ~ 05/01",
+      "total": 33,
+      "triggered": 16,
+      "solo": 8,
+      "involveRate": 48.5,
+      "soloRate": 24.2,
+      "resolveRate": 50
+    },
+    {
+      "dates": "05/02 ~ 05/08",
+      "total": 25,
+      "triggered": 14,
+      "solo": 5,
+      "involveRate": 56,
+      "soloRate": 20,
+      "resolveRate": 35.7
+    },
+    {
+      "dates": "05/09 ~ 05/15",
+      "total": 29,
+      "triggered": 16,
+      "solo": 7,
+      "involveRate": 55.2,
+      "soloRate": 24.1,
+      "resolveRate": 43.8
+    },
+    {
+      "dates": "05/16 ~ 05/22",
+      "total": 41,
+      "triggered": 20,
+      "solo": 5,
+      "involveRate": 48.8,
+      "soloRate": 12.2,
+      "resolveRate": 25
+    },
+    {
+      "dates": "05/23 ~ 05/29",
+      "total": 24,
+      "triggered": 10,
+      "solo": 3,
+      "involveRate": 41.7,
+      "soloRate": 12.5,
+      "resolveRate": 30
+    },
+    {
+      "dates": "05/30 ~ 06/05",
+      "total": 20,
+      "triggered": 8,
+      "solo": 5,
+      "involveRate": 40,
+      "soloRate": 25,
+      "resolveRate": 62.5
+    },
+    {
+      "dates": "06/06 ~ 06/12",
+      "total": 24,
+      "triggered": 10,
+      "solo": 4,
+      "involveRate": 41.7,
+      "soloRate": 16.7,
+      "resolveRate": 40
+    },
+    {
+      "dates": "06/13 ~ 06/19",
+      "total": 12,
+      "triggered": 2,
+      "solo": 1,
+      "involveRate": 16.7,
+      "soloRate": 8.3,
+      "resolveRate": 50
+    }
+  ],
+  "kpi_history": [
+    {
+      "dates": "04/18~04/24",
+      "involveRate": 82.7,
+      "resolveRate": 61.5,
+      "chInvolve": 83.1,
+      "chResolve": 66.4,
+      "nvInvolve": 50,
+      "nvResolve": 34.8,
+      "totalCount": 255,
+      "triggeredCount": 211,
+      "soloCount": 106,
+      "soloRate": 41.6
+    },
+    {
+      "dates": "04/25~05/01",
+      "involveRate": 77,
+      "resolveRate": 66.4,
+      "chInvolve": 79.7,
+      "chResolve": 66.4,
+      "nvInvolve": 48.5,
+      "nvResolve": 50,
+      "totalCount": 171,
+      "triggeredCount": 132,
+      "soloCount": 80,
+      "soloRate": 46.8
+    },
+    {
+      "dates": "05/02~05/08",
+      "involveRate": 73.7,
+      "resolveRate": 54.5,
+      "chInvolve": 86.5,
+      "chResolve": 54.5,
+      "nvInvolve": 56,
+      "nvResolve": 35.7,
+      "totalCount": 114,
+      "triggeredCount": 84,
+      "soloCount": 46,
+      "soloRate": 40.4
+    },
+    {
+      "dates": "05/09~05/15",
+      "involveRate": 78.8,
+      "resolveRate": 64.2,
+      "chInvolve": 84.3,
+      "chResolve": 67.3,
+      "nvInvolve": 55.2,
+      "nvResolve": 43.8,
+      "totalCount": 156,
+      "triggeredCount": 123,
+      "soloCount": 79,
+      "soloRate": 50.6
+    },
+    {
+      "dates": "05/16 ~ 05/22",
+      "involveRate": 76.3,
+      "resolveRate": 62.1,
+      "chInvolve": 84.8,
+      "chResolve": 68.8,
+      "nvInvolve": 48.8,
+      "nvResolve": 25,
+      "totalCount": 173,
+      "triggeredCount": 132,
+      "soloCount": 82,
+      "soloRate": 47.4
+    },
+    {
+      "dates": "05/23 ~ 05/29",
+      "totalCount": 120,
+      "triggeredCount": 89,
+      "soloCount": 45,
+      "involveRate": 74.2,
+      "soloRate": 37.5,
+      "resolveRate": 50.6,
+      "chInvolve": 82.3,
+      "chResolve": 53.2,
+      "nvInvolve": 41.7,
+      "nvResolve": 30,
+      "dow": [
+        11,
+        19,
+        23,
+        29,
+        27,
+        4,
+        7
+      ],
+      "solo_tag_counts": {
+        "태스크/주문조회/상담사연결": 1,
+        "배송/배송문의/일정문의": 3,
+        "실물/제품문의/낼나펜슬": 2,
+        "실물/제품문의/입고품절": 5,
+        "실물/제품문의/필름": 1,
+        "결제/결제문의/기타": 3,
+        "디지털/사용문의/가계부": 4,
+        "실물/제품문의/키링캠": 3,
+        "태그홀더": 1,
+        "실물/제품문의/키링캠구성품": 2,
+        "쿠폰/사용문의/사용문의": 3,
+        "실물/제품문의/케이블스트랩": 2,
+        "기타/기타/기타": 1,
+        "실물/이상주장/타이머": 2,
+        "실물/이상주장/키링캠": 1,
+        "실물/AS문의/타이머": 1,
+        "키링캠": 1
+      }
+    },
+    {
+      "dates": "05/30 ~ 06/05",
+      "totalCount": 134,
+      "triggeredCount": 104,
+      "soloCount": 69,
+      "involveRate": 77.6,
+      "soloRate": 51.5,
+      "resolveRate": 66.3,
+      "chInvolve": 86.8,
+      "chResolve": 67.7,
+      "nvInvolve": 40,
+      "nvResolve": 62.5,
+      "dow": [
+        32,
+        28,
+        6,
+        24,
+        26,
+        10,
+        8
+      ],
+      "solo_tag_counts": {
+        "실물/이상주장/타이머": 7,
+        "디지털": 1,
+        "당근마켓": 1,
+        "디지털/오류문의/가계부": 5,
+        "실물/제품문의/필름": 6,
+        "실물/제품문의/케이블커버": 1,
+        "실물/제품문의/낼나펜슬": 2,
+        "결제/결제문의/국가선택": 4,
+        "디지털/사용문의/가계부": 16,
+        "실물/제품문의/O링": 1,
+        "톡톡/알프인입": 5,
+        "실물/제품문의/케이블스트랩구성품": 1,
+        "태그홀더": 1,
+        "실물/제품문의/케이블스트랩": 1,
+        "실물/제품문의/키링캠": 1,
+        "배송/배송문의/일정문의": 2,
+        "태스크/주문조회": 1,
+        "실물/사용방법/키링캠": 1,
+        "B2B/구매문의/구매문의": 1,
+        "톡톡/알프인입X": 1,
+        "실물/제품문의/펜촉": 1,
+        "쿠폰/사용문의/사용문의": 2,
+        "결제/결제문의/기타": 1,
+        "실물/제품문의/제도샤프커버": 1,
+        "실물/이상주장/펜촉": 1,
+        "실물/이상주장/낼나펜슬": 2,
+        "회원/멤버십/패스포트": 2,
+        "배송/배송문의/배송지변경": 1,
+        "교환": 1,
+        "실물/이상주장/키링캠": 1,
+        "실물/제품문의/입고품절": 1,
+        "취소문의": 1,
+        "배송/배송문의/송장번호문의": 1,
+        "결제/구매문의": 1,
+        "디지털/제품문의": 1
+      },
+      "prod_ranking": [
+        {
+          "name": "디지털",
+          "total": 30,
+          "prev": 9,
+          "delta": 21,
+          "curr_pct": 22.4,
+          "prev_pct": 0
+        },
+        {
+          "name": "낼나 타이머",
+          "total": 18,
+          "prev": 18,
+          "delta": 0,
+          "curr_pct": 13.4,
+          "prev_pct": 0
+        },
+        {
+          "name": "낼나 펜슬",
+          "total": 13,
+          "prev": 9,
+          "delta": 4,
+          "curr_pct": 9.7,
+          "prev_pct": 0
+        },
+        {
+          "name": "낼나 키링캠",
+          "total": 6,
+          "prev": 13,
+          "delta": -7,
+          "curr_pct": 4.5,
+          "prev_pct": 0
+        },
+        {
+          "name": "데일리 케이블",
+          "total": 0,
+          "prev": 0,
+          "delta": 0,
+          "curr_pct": 0,
+          "prev_pct": 0
+        }
+      ]
+    },
+    {
+      "dates": "06/06 ~ 06/12",
+      "totalCount": 133,
+      "triggeredCount": 111,
+      "soloCount": 65,
+      "involveRate": 83.5,
+      "soloRate": 48.9,
+      "resolveRate": 58.6,
+      "chInvolve": 89,
+      "chResolve": 60.8,
+      "nvInvolve": 41.7,
+      "nvResolve": 40,
+      "dow": [
+        23,
+        22,
+        22,
+        24,
+        21,
+        7,
+        14
+      ],
+      "solo_tag_counts": {
+        "실물/제품문의/필름": 4,
+        "배송/배송문의/기타": 1,
+        "실물/제품문의/펜촉": 1,
+        "실물/제품문의/낼나펜슬": 3,
+        "디지털/사용문의/라이프로그": 1,
+        "톡톡/알프인입": 8,
+        "실물/이상주장/타이머": 10,
+        "실물/사용방법/키링캠": 1,
+        "디지털/사용문의/가계부": 8,
+        "결제/결제문의/기타": 1,
+        "실물/이상주장/케이블스트랩": 1,
+        "디지털/제품문의": 1,
+        "실물/제품문의/타이머": 4,
+        "실물/AS문의/타이머": 3,
+        "결제/결제문의/국가선택": 1,
+        "실물/이상주장/기타": 1,
+        "쿠폰/사용문의/다운로드": 2,
+        "실물/제품문의/입고품절": 4,
+        "쿠폰/사용문의/사용문의": 2,
+        "디지털/오류문의/가계부": 1,
+        "실물/이상주장/낼나펜슬": 1,
+        "와디즈": 1,
+        "예스24": 2,
+        "톡톡/알프인입X": 3,
+        "배송/배송문의/일정문의": 1,
+        "실물/제품문의/케이블스트랩": 1,
+        "취소문의": 3,
+        "실물/제품문의/키링캠구성품": 1
+      },
+      "prod_ranking": [
+        {
+          "name": "낼나 타이머",
+          "total": 35,
+          "prev": 18,
+          "delta": 17,
+          "curr_pct": 24.1,
+          "prev_pct": 0
+        },
+        {
+          "name": "디지털",
+          "total": 16,
+          "prev": 30,
+          "delta": -14,
+          "curr_pct": 11,
+          "prev_pct": 0
+        },
+        {
+          "name": "낼나 펜슬",
+          "total": 10,
+          "prev": 13,
+          "delta": -3,
+          "curr_pct": 6.9,
+          "prev_pct": 0
+        },
+        {
+          "name": "낼나 키링캠",
+          "total": 2,
+          "prev": 6,
+          "delta": -4,
+          "curr_pct": 1.4,
+          "prev_pct": 0
+        },
+        {
+          "name": "데일리 케이블",
+          "total": 0,
+          "prev": 0,
+          "delta": 0,
+          "curr_pct": 0,
+          "prev_pct": 0
+        }
+      ]
+    },
+    {
+      "dates": "06/13 ~ 06/19",
+      "totalCount": 87,
+      "triggeredCount": 68,
+      "soloCount": 28,
+      "involveRate": 78.2,
+      "soloRate": 32.2,
+      "resolveRate": 41.2,
+      "chInvolve": 88,
+      "chResolve": 40.9,
+      "nvInvolve": 16.7,
+      "nvResolve": 50,
+      "dow": [
+        26,
+        19,
+        9,
+        12,
+        3,
+        5,
+        13
+      ],
+      "solo_tag_counts": {
+        "배송/배송문의/일정문의": 2,
+        "실물/이상주장/키링캠": 3,
+        "실물/제품문의/타이머": 1,
+        "실물/이상주장/낼나펜슬": 2,
+        "디지털/오류문의/가계부": 1,
+        "회원/멤버십/패스포트": 2,
+        "실물/제품문의/입고품절": 2,
+        "반품": 1,
+        "톡톡/알프인입X": 1,
+        "실물/제품문의/펜촉": 1,
+        "실물/AS문의/타이머": 1,
+        "디지털/사용문의/가계부": 1,
+        "실물/제품문의/필름": 2,
+        "실물/이상주장/타이머": 2,
+        "쿠폰/사용문의/사용문의": 1,
+        "2026인벤타리오": 1,
+        "교환반품": 1,
+        "회원/로그인": 1,
+        "가입": 1
+      },
+      "prod_ranking": [
+        {
+          "name": "낼나 타이머",
+          "total": 17,
+          "prev": 35,
+          "delta": -18,
+          "curr_pct": 18.9,
+          "prev_pct": 0
+        },
+        {
+          "name": "디지털",
+          "total": 12,
+          "prev": 16,
+          "delta": -4,
+          "curr_pct": 13.3,
+          "prev_pct": 0
+        },
+        {
+          "name": "낼나 펜슬",
+          "total": 12,
+          "prev": 10,
+          "delta": 2,
+          "curr_pct": 13.3,
+          "prev_pct": 0
+        },
+        {
+          "name": "낼나 키링캠",
+          "total": 4,
+          "prev": 2,
+          "delta": 2,
+          "curr_pct": 4.4,
+          "prev_pct": 0
+        },
+        {
+          "name": "데일리 케이블",
+          "total": 0,
+          "prev": 0,
+          "delta": 0,
+          "curr_pct": 0,
+          "prev_pct": 0
+        }
+      ]
+    }
+  ],
+  "all_tag_counts": {
+    "실물/이상주장/낼나펜슬": 4,
+    "미수거재발송": 5,
+    "실물/제품문의/낼나펜슬": 1,
+    "배송/배송문의/일정문의": 3,
+    "실물/이상주장/키링캠": 4,
+    "AK홍대팝업": 1,
+    "실물/제품문의": 1,
+    "클리커": 1,
+    "실물/제품문의/타이머": 1,
+    "디지털/오류문의/가계부": 4,
+    "디지털/사용문의/가계부": 4,
+    "광고스팸메시지": 2,
+    "교환": 15,
+    "회원/멤버십/패스포트": 2,
+    "리뷰/포인트": 1,
+    "실물/제품문의/입고품절": 3,
+    "톡톡/알프인입X": 3,
+    "실물/제품문의/펜촉": 2,
+    "반품": 3,
+    "취소문의": 1,
+    "낼나펜슬": 1,
+    "2차": 3,
+    "디지털/사용문의/PDF": 1,
+    "실물/이상주장/타이머": 4,
+    "실물/AS문의/타이머": 1,
+    "배송/배송문의/배송지변경": 1,
+    "톡톡/알프인입": 6,
+    "타이머": 1,
+    "실물/제품문의/필름": 3,
+    "태그홀더": 2,
+    "2026인벤타리오": 3,
+    "디지털/오류문의/라이프로그": 2,
+    "쿠폰/사용문의/사용문의": 2,
+    "교환반품": 1,
+    "디지털": 1,
+    "결제/구매문의": 1,
+    "회원/로그인": 1,
+    "가입": 1
+  },
+  "solo_tag_counts": {
+    "배송/배송문의/일정문의": 2,
+    "실물/이상주장/키링캠": 3,
+    "실물/제품문의/타이머": 1,
+    "실물/이상주장/낼나펜슬": 2,
+    "디지털/오류문의/가계부": 1,
+    "회원/멤버십/패스포트": 2,
+    "실물/제품문의/입고품절": 2,
+    "반품": 1,
+    "톡톡/알프인입X": 1,
+    "실물/제품문의/펜촉": 1,
+    "실물/AS문의/타이머": 1,
+    "디지털/사용문의/가계부": 1,
+    "실물/제품문의/필름": 2,
+    "실물/이상주장/타이머": 2,
+    "쿠폰/사용문의/사용문의": 1,
+    "2026인벤타리오": 1,
+    "교환반품": 1,
+    "회원/로그인": 1,
+    "가입": 1
+  },
+  "ch_stat": {
+    "total": 75,
+    "triggered": 66,
+    "solo": 27,
+    "involveRate": 88,
+    "soloRate": 36,
+    "resolveRate": 40.9
+  },
+  "nv_stat": {
+    "total": 12,
+    "triggered": 2,
+    "solo": 1,
+    "involveRate": 16.7,
+    "soloRate": 8.3,
+    "resolveRate": 50
+  },
+  "nv_inip_stat": {
+    "total": 3,
+    "nvTotal": 15,
+    "solo": 0,
+    "toChannel": 3,
+    "other": 0,
+    "involveRate": 20,
+    "soloRate": 0,
+    "toChannelRate": 100,
+    "triggered": 0,
+    "alfSolo": 3,
+    "alfInvolveRate": 0,
+    "alfSoloRate": 0,
+    "topTags": [
+      {
+        "tag": "광고스팸메시지",
+        "count": 2
+      },
+      {
+        "tag": "교환",
+        "count": 2
+      },
+      {
+        "tag": "실물/제품문의/펜촉",
+        "count": 1
+      },
+      {
+        "tag": "실물/제품문의/입고품절",
+        "count": 1
+      },
+      {
+        "tag": "배송/배송문의/일정문의",
+        "count": 1
+      },
+      {
+        "tag": "디지털",
+        "count": 1
+      },
+      {
+        "tag": "결제/구매문의",
+        "count": 1
+      },
+      {
+        "tag": "태그홀더",
+        "count": 1
+      },
+      {
+        "tag": "실물/제품문의/필름",
+        "count": 1
+      },
+      {
+        "tag": "미수거재발송",
+        "count": 1
+      }
+    ],
+    "chInipSoloTopTags": [],
+    "chAgentTopTags": [
+      {
+        "tag": "반품",
+        "count": 1
+      },
+      {
+        "tag": "타이머",
+        "count": 1
+      },
+      {
+        "tag": "교환",
+        "count": 1
+      }
+    ],
+    "dow": [
+      3,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "dowX": [
+      0,
+      3,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "nvTotalDow": [
+      6,
+      4,
+      1,
+      0,
+      0,
+      2,
+      2
+    ]
+  }
+}
