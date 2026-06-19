@@ -179,12 +179,6 @@ body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#f5
       <div class="alf-stat"><div class="alf-stat-num" style="color:#dc2626" id="bEsc"></div><div class="alf-stat-label">알프 이관</div></div>
       <div style="font-size:18px;color:#ccc">+</div>
       <div class="alf-stat"><div class="alf-stat-num" style="color:#d97706" id="bAgent"></div><div class="alf-stat-label">상담원 배정</div></div>
-      <div style="font-size:18px;color:#ccc">+</div>
-      <div class="alf-stat" style="text-align:center">
-        <div class="alf-stat-num" style="color:#aaa" id="bEtc"></div>
-        <div class="alf-stat-label" style="color:#aaa">문의 미진행</div>
-        <div style="font-size:10px;color:#bbb;margin-top:3px;max-width:120px;line-height:1.4;text-align:center">채팅창 아이콘 클릭 후<br>추가 문의 없이 종료</div>
-      </div>
       <div class="alf-verify" id="bVerify"></div>
     </div>
   </div>
@@ -416,7 +410,7 @@ body{font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;background:#f5
 <div class="section">
   <div class="section-title">알프 미관여 분석 <span class="badge" id="noAlfBadge">23건</span></div>
   <div class="def-box" id="noAlfText">
-    알프가 관여하지 못한 건은 총 <strong>23건</strong>으로, <strong>상담원 배정 20건</strong>과 <strong>문의 미진행 3건</strong>으로 나뉩니다.<br>
+    알프가 관여하지 못한 건은 총 <strong>23건</strong>으로, 전부 <strong>상담원 배정 20건</strong>입니다.<br>
     알프 개입 없이 바로 1:1 상담으로 시작된 케이스로, 재오픈 상담·외부 채널 유입·수동 배정 등이 주요 원인입니다.
   </div>
   <div class="grid-2">
@@ -569,7 +563,6 @@ function handleFile(file){
       const alfSolo=df.filter(soloMask).length;
       const alfEsc=df.filter(escMask).length;
       const agentOnly=df.filter(agentMask).length;
-      const workOnly=df.filter(r=>!alfMask(r)&&!r.assigneeId).length;
       const triggered=df.filter(alfTrig).length;
       const times=df.filter(r=>agentMask(r)||escMask(r)).map(r=>parseFloat(r.firstMemberHandlingTimeInOperation)).filter(v=>!isNaN(v));
       const avgMin=times.length?+(times.reduce((a,b)=>a+b,0)/times.length/60).toFixed(1):0;
@@ -577,10 +570,13 @@ function handleFile(file){
       const fmt=d=>(d.getMonth()+1).toString().padStart(2,'0')+'/'+d.getDate().toString().padStart(2,'0');
       const currDates=dates.length?fmt(dates[0])+' ~ '+fmt(dates[dates.length-1]):'';
       const currDow=[0,0,0,0,0,0,0];
-      [...chRows,...nvRowsPure].forEach(r=>{const d=new Date(r.createdAt);if(!isNaN(d))currDow[d.getDay()===0?6:d.getDay()-1]++;});
+      const combined=[...chRows,...nvRowsPure];
+      const workMaskFn=r=>{const am=soloMask(r)||escMask(r);return !am&&!r.assigneeId;};
+      const validRows=combined.filter(r=>!workMaskFn(r));
+      validRows.forEach(r=>{const d=new Date(r.createdAt);if(!isNaN(d))currDow[d.getDay()===0?6:d.getDay()-1]++;});
       const soloIds=new Set(df.filter(soloMask).map(r=>String(r.id)));
       const tagC={};
-      df.forEach(r=>{
+      validRows.forEach(r=>{
         const isAlf=soloIds.has(String(r.id));const seen=new Set();
         iterTags(r.tags).forEach(t=>{
           if(seen.has(t))return;seen.add(t);
@@ -606,7 +602,7 @@ function handleFile(file){
       const prevAllC=D.all_tag_counts||{};
       const incTags=top10.filter(t=>t.total>(prevAllC[t.tag]||0)).map(t=>({tag:t.tag,curr:t.total,prev:prevAllC[t.tag]||0,delta:t.total-(prevAllC[t.tag]||0)})).sort((a,b)=>b.delta-a.delta);
       const prodMap={'낼나 타이머':0,'디지털':0,'낼나 키링캠':0,'낼나 펜슬':0,'데일리 케이블':0};
-      [...chRows,...nvRowsPure].forEach(r=>{const t=String(r.tags||'');if(t.includes('타이머'))prodMap['낼나 타이머']++;if(t.includes('디지털'))prodMap['디지털']++;if(t.includes('키링캠'))prodMap['낼나 키링캠']++;if(t.includes('낼나펜슬')||t.includes('펜슬'))prodMap['낼나 펜슬']++;if(t.includes('데일리케이블'))prodMap['데일리 케이블']++;});
+      validRows.forEach(r=>{const t=String(r.tags||'');if(t.includes('타이머'))prodMap['낼나 타이머']++;if(t.includes('디지털'))prodMap['디지털']++;if(t.includes('키링캠'))prodMap['낼나 키링캠']++;if(t.includes('낼나펜슬')||t.includes('펜슬'))prodMap['낼나 펜슬']++;if(t.includes('데일리케이블'))prodMap['데일리 케이블']++;});
       // kpi_history 이전 항목에 prod_ranking 있으면 우선 사용
       // 없으면 D.prod_ranking에서: 재업로드(isSameWeek)이면 p.prev, 새 주차면 p.total
       const prevProd=_prevKpiEntry&&_prevKpiEntry.prod_ranking?Object.fromEntries(_prevKpiEntry.prod_ranking.map(p=>[p.name,p.total])):Object.fromEntries((D.prod_ranking||[]).map(p=>[p.name,isSameWeek?(p.prev||0):p.total]));
@@ -629,8 +625,7 @@ function handleFile(file){
         const t=rows.length,trig=rows.filter(alfTrig).length,solo=rows.filter(soloMask).length;
         return{total:t,triggered:trig,solo,involveRate:pct(trig,t),soloRate:pct(solo,t),resolveRate:pct(solo,trig)};
       }
-      // total: 채널톡(native) + 네이버톡톡 순수건(톡톡/알프인입 제외) 합산
-      const total=chRows.length+nvRowsPure.length;
+      const total=validRows.length;
       console.log('[DEBUG] total:', total, 'chRows:', chRows.length, 'nvRowsPure:', nvRowsPure ? nvRowsPure.length : 'undefined');
       function nvChStats(rows){
         const t=rows.length;
@@ -672,7 +667,7 @@ function handleFile(file){
       const newKpiRow={dates:currDates,totalCount:total,triggeredCount:triggered,soloCount:alfSolo,involveRate:+(triggered/total*100).toFixed(1),soloRate:+(alfSolo/total*100).toFixed(1),resolveRate:+(alfSolo/triggered*100).toFixed(1),chInvolve:chStat.involveRate,chResolve:chStat.resolveRate,nvInvolve:nvStat.involveRate,nvResolve:nvStat.resolveRate,dow:currDow,solo_tag_counts:soloTagCounts,prod_ranking:prodRanking};
       const kpiIdx=kpiHistory.findIndex(r=>r.dates===currDates);
       if(kpiIdx>=0)kpiHistory[kpiIdx]=newKpiRow;else kpiHistory.push(newKpiRow);
-      const newD={...D,total,agent_assigned:alfEsc+agentOnly,avg_response_min:avgMin,alf_triggered:triggered,alf_solo:alfSolo,alf_escalated:alfEsc,agent_only:agentOnly,workflow_only:workOnly,curr_solo_rate:+(alfSolo/total*100).toFixed(1),prev_solo_rate:_prevKpiEntry?(_prevKpiEntry.resolveRate||_prevKpiEntry.soloRate||0):(isSameWeek?D.prev_solo_rate:D.curr_solo_rate),prev_total:_prevKpiEntry?(_prevKpiEntry.totalCount||0):(isSameWeek?(D.prev_total||0):D.total),prev_total_real:_prevKpiEntry?(_prevKpiEntry.totalCount||0):(isSameWeek?(D.prev_total_real||0):D.total),prev_alf_solo:_prevKpiEntry?(_prevKpiEntry.soloCount||0):(isSameWeek?D.prev_alf_solo:D.alf_solo),curr_dow:currDow,prev_dow:_prevKpiEntry&&_prevKpiEntry.dow?_prevKpiEntry.dow:(isSameWeek?D.prev_dow:D.curr_dow),curr_dates:currDates,prev_dates:_prevKpiEntry?_prevKpiEntry.dates:(isSameWeek?D.prev_dates:D.curr_dates),top10_tags:top10,alf_unresolved_tags:alfUnresTags,inc_tags:incTags,curr_solo_top5:soloTop5,prev_solo_top5:soloTop5,prod_ranking:prodRanking,exchange_products:exchangeProducts,return_products:returnProducts,no_alf_direct:direct,no_alf_reopen:reopen,no_alf_total:noAlf.length,no_alf_agent:noAlfAgent.length,no_alf_work:noAlf.filter(r=>!r.assigneeId).length,no_alf_tags:Object.entries(nalfC).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([tag,count])=>({tag,count})),all_tag_counts:allTagCounts,solo_tag_counts:soloTagCounts,ch_stat:chStat,nv_stat:nvStat,nv_inip_stat:nvInipStat,ch_history:chHistory,nv_history:nvHistory,kpi_history:kpiHistory};
+      const newD={...D,total,agent_assigned:alfEsc+agentOnly,avg_response_min:avgMin,alf_triggered:triggered,alf_solo:alfSolo,alf_escalated:alfEsc,agent_only:agentOnly,curr_solo_rate:+(alfSolo/total*100).toFixed(1),prev_solo_rate:_prevKpiEntry?(_prevKpiEntry.resolveRate||_prevKpiEntry.soloRate||0):(isSameWeek?D.prev_solo_rate:D.curr_solo_rate),prev_total:_prevKpiEntry?(_prevKpiEntry.totalCount||0):(isSameWeek?(D.prev_total||0):D.total),prev_total_real:_prevKpiEntry?(_prevKpiEntry.totalCount||0):(isSameWeek?(D.prev_total_real||0):D.total),prev_alf_solo:_prevKpiEntry?(_prevKpiEntry.soloCount||0):(isSameWeek?D.prev_alf_solo:D.alf_solo),curr_dow:currDow,prev_dow:_prevKpiEntry&&_prevKpiEntry.dow?_prevKpiEntry.dow:(isSameWeek?D.prev_dow:D.curr_dow),curr_dates:currDates,prev_dates:_prevKpiEntry?_prevKpiEntry.dates:(isSameWeek?D.prev_dates:D.curr_dates),top10_tags:top10,alf_unresolved_tags:alfUnresTags,inc_tags:incTags,curr_solo_top5:soloTop5,prev_solo_top5:soloTop5,prod_ranking:prodRanking,exchange_products:exchangeProducts,return_products:returnProducts,no_alf_direct:direct,no_alf_reopen:reopen,no_alf_total:noAlf.length,no_alf_agent:noAlfAgent.length,no_alf_work:noAlf.filter(r=>!r.assigneeId).length,no_alf_tags:Object.entries(nalfC).sort((a,b)=>b[1]-a[1]).slice(0,10).map(([tag,count])=>({tag,count})),all_tag_counts:allTagCounts,solo_tag_counts:soloTagCounts,ch_stat:chStat,nv_stat:nvStat,nv_inip_stat:nvInipStat,ch_history:chHistory,nv_history:nvHistory,kpi_history:kpiHistory};
       // [보호 3단계] 최종 저장 직전 JSON 문자열에서 개인정보 키 검사 → 감지 시 해당 키만 삭제 후 계속
       const detected=FORBIDDEN_FIELDS.filter(f=>new RegExp('"'+f+'"\\s*:').test(JSON.stringify(newD)));
       if(detected.length){
@@ -858,7 +853,6 @@ async function mergeAndRender(weekKeys,label){
   merged.alf_solo=valid.reduce((s,d)=>s+d.alf_solo,0);
   merged.alf_escalated=valid.reduce((s,d)=>s+d.alf_escalated,0);
   merged.agent_only=valid.reduce((s,d)=>s+d.agent_only,0);
-  merged.workflow_only=valid.reduce((s,d)=>s+d.workflow_only,0);
   merged.alf_triggered=valid.reduce((s,d)=>s+d.alf_triggered,0);
   merged.agent_assigned=valid.reduce((s,d)=>s+d.agent_assigned,0);
   const tot=merged.total;
@@ -997,8 +991,7 @@ function renderDashboard(){
   document.getElementById('bSolo').textContent=D.alf_solo;
   document.getElementById('bEsc').textContent=D.alf_escalated;
   document.getElementById('bAgent').textContent=D.agent_only;
-  document.getElementById('bEtc').textContent=D.workflow_only;
-  document.getElementById('bVerify').textContent='✓ '+D.alf_solo+' + '+D.alf_escalated+' + '+D.agent_only+' + '+D.workflow_only+' = '+(D.alf_solo+D.alf_escalated+D.agent_only+D.workflow_only);
+  document.getElementById('bVerify').textContent='✓ '+D.alf_solo+' + '+D.alf_escalated+' + '+D.agent_only+' = '+(D.alf_solo+D.alf_escalated+D.agent_only);
   document.getElementById('alfBadge').textContent=D.alf_escalated+'건';
   const dow=['월','화','수','목','금','토','일'];
   document.getElementById('dowNote').textContent='직전주: '+prevDates+' / 금주: '+D.curr_dates;
@@ -1037,7 +1030,7 @@ function renderDashboard(){
   // 알프 미관여 분석 업데이트
   document.getElementById('noAlfBadge').textContent = (D.no_alf_total||0)+'건';
   document.getElementById('noAlfText').innerHTML =
-    '알프가 관여하지 못한 건은 총 <strong>'+(D.no_alf_total||0)+'건</strong>으로, <strong>상담원 배정 '+(D.no_alf_agent||0)+'건</strong>과 <strong>문의 미진행 '+(D.no_alf_work||0)+'건</strong>으로 나뉩니다.<br>알프 개입 없이 바로 1:1 상담으로 시작된 케이스로, 재오픈 상담·외부 채널 유입·수동 배정 등이 주요 원인입니다.';
+    '알프가 관여하지 못한 건은 총 <strong>'+(D.no_alf_total||0)+'건</strong>으로, 전부 <strong>상담원 배정 '+(D.no_alf_agent||0)+'건</strong>입니다.<br>알프 개입 없이 바로 1:1 상담으로 시작된 케이스로, 재오픈 상담·외부 채널 유입·수동 배정 등이 주요 원인입니다.';
   document.getElementById('noAlfAgentTitle').textContent = '상담원 배정 '+(D.no_alf_agent||0)+'건 · 태그 TOP10';
   document.getElementById('noAlfDirectCnt').textContent = (D.no_alf_direct||0)+'건';
   document.getElementById('noAlfReopenCnt').textContent = (D.no_alf_reopen||0)+'건';
