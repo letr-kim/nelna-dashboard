@@ -1,21 +1,21 @@
 {
-  "total": 87,
+  "total": 85,
   "agent_assigned": 53,
   "avg_response_min": 25.2,
   "alf_triggered": 68,
   "alf_solo": 28,
   "alf_escalated": 39,
   "agent_only": 14,
-  "workflow_only": 9,
-  "curr_solo_rate": 32.2,
+  "workflow_only": 7,
+  "curr_solo_rate": 32.9,
   "prev_solo_rate": 58.6,
   "prev_total": 133,
   "prev_total_real": 133,
   "prev_alf_solo": 65,
   "curr_dow": [
     26,
-    19,
-    9,
+    18,
+    8,
     12,
     3,
     5,
@@ -134,38 +134,7 @@
       "count": 1
     }
   ],
-  "inc_tags": [
-    {
-      "tag": "실물/이상주장/키링캠",
-      "curr": 4,
-      "prev": 0,
-      "delta": 4
-    },
-    {
-      "tag": "디지털/오류문의/가계부",
-      "curr": 4,
-      "prev": 2,
-      "delta": 2
-    },
-    {
-      "tag": "배송/배송문의/일정문의",
-      "curr": 3,
-      "prev": 1,
-      "delta": 2
-    },
-    {
-      "tag": "교환",
-      "curr": 15,
-      "prev": 14,
-      "delta": 1
-    },
-    {
-      "tag": "실물/이상주장/낼나펜슬",
-      "curr": 4,
-      "prev": 3,
-      "delta": 1
-    }
-  ],
+  "inc_tags": [],
   "curr_solo_top5": [
     {
       "tag": "실물/이상주장/키링캠",
@@ -226,7 +195,7 @@
       "total": 17,
       "prev": 35,
       "delta": -18,
-      "curr_pct": 18.9,
+      "curr_pct": 19.3,
       "prev_pct": 0
     },
     {
@@ -234,7 +203,7 @@
       "total": 12,
       "prev": 16,
       "delta": -4,
-      "curr_pct": 13.3,
+      "curr_pct": 13.6,
       "prev_pct": 0
     },
     {
@@ -242,7 +211,7 @@
       "total": 12,
       "prev": 10,
       "delta": 2,
-      "curr_pct": 13.3,
+      "curr_pct": 13.6,
       "prev_pct": 0
     },
     {
@@ -250,7 +219,7 @@
       "total": 4,
       "prev": 2,
       "delta": 2,
-      "curr_pct": 4.4,
+      "curr_pct": 4.5,
       "prev_pct": 0
     },
     {
@@ -277,9 +246,9 @@
   "mon_curr": 0,
   "no_alf_direct": 11,
   "no_alf_reopen": 2,
-  "no_alf_total": 22,
+  "no_alf_total": 20,
   "no_alf_agent": 13,
-  "no_alf_work": 9,
+  "no_alf_work": 7,
   "no_alf_tags": [
     {
       "tag": "교환",
@@ -502,11 +471,11 @@
     },
     {
       "dates": "06/13 ~ 06/19",
-      "total": 12,
+      "total": 10,
       "triggered": 2,
       "solo": 1,
-      "involveRate": 16.7,
-      "soloRate": 8.3,
+      "involveRate": 20,
+      "soloRate": 10,
       "resolveRate": 50
     }
   ],
@@ -814,20 +783,20 @@
     },
     {
       "dates": "06/13 ~ 06/19",
-      "totalCount": 87,
+      "totalCount": 85,
       "triggeredCount": 68,
       "soloCount": 28,
-      "involveRate": 78.2,
-      "soloRate": 32.2,
+      "involveRate": 80,
+      "soloRate": 32.9,
       "resolveRate": 41.2,
       "chInvolve": 88,
       "chResolve": 40.9,
-      "nvInvolve": 16.7,
+      "nvInvolve": 20,
       "nvResolve": 50,
       "dow": [
         26,
-        19,
-        9,
+        18,
+        8,
         12,
         3,
         5,
@@ -860,7 +829,7 @@
           "total": 17,
           "prev": 35,
           "delta": -18,
-          "curr_pct": 18.9,
+          "curr_pct": 19.3,
           "prev_pct": 0
         },
         {
@@ -868,7 +837,7 @@
           "total": 12,
           "prev": 16,
           "delta": -4,
-          "curr_pct": 13.3,
+          "curr_pct": 13.6,
           "prev_pct": 0
         },
         {
@@ -876,7 +845,7 @@
           "total": 12,
           "prev": 10,
           "delta": 2,
-          "curr_pct": 13.3,
+          "curr_pct": 13.6,
           "prev_pct": 0
         },
         {
@@ -884,7 +853,7 @@
           "total": 4,
           "prev": 2,
           "delta": 2,
-          "curr_pct": 4.4,
+          "curr_pct": 4.5,
           "prev_pct": 0
         },
         {
@@ -910,7 +879,6 @@
     "실물/제품문의/타이머": 1,
     "디지털/오류문의/가계부": 4,
     "디지털/사용문의/가계부": 4,
-    "광고스팸메시지": 2,
     "교환": 15,
     "회원/멤버십/패스포트": 2,
     "리뷰/포인트": 1,
@@ -968,20 +936,20 @@
     "resolveRate": 40.9
   },
   "nv_stat": {
-    "total": 12,
+    "total": 10,
     "triggered": 2,
     "solo": 1,
-    "involveRate": 16.7,
-    "soloRate": 8.3,
+    "involveRate": 20,
+    "soloRate": 10,
     "resolveRate": 50
   },
   "nv_inip_stat": {
     "total": 3,
-    "nvTotal": 15,
+    "nvTotal": 13,
     "solo": 0,
     "toChannel": 3,
     "other": 0,
-    "involveRate": 20,
+    "involveRate": 23.1,
     "soloRate": 0,
     "toChannelRate": 100,
     "triggered": 0,
@@ -989,10 +957,6 @@
     "alfInvolveRate": 0,
     "alfSoloRate": 0,
     "topTags": [
-      {
-        "tag": "광고스팸메시지",
-        "count": 2
-      },
       {
         "tag": "교환",
         "count": 2
@@ -1065,8 +1029,8 @@
     ],
     "nvTotalDow": [
       6,
-      4,
-      1,
+      3,
+      0,
       0,
       0,
       2,
