@@ -544,7 +544,8 @@ function handleFile(file){
       const nvRowsRaw=rows.filter(r=>!String(r.tags||'').includes('테스트')&&r.mediumName==='appNaverTalk');
       const nvInipXRows=nvRowsRaw.filter(hasTokTokInipX);
       // 메인 df: 테스트·중복 제외 (톡톡/알프인입 포함 — nvRows 분리 처리로 중복 방지)
-      const df=rows.filter(r=>!String(r.tags||'').includes('테스트')&&!String(r.tags||'').includes('중복')&&!String(r.tags||'').includes('광고스팸메시지'));
+      const MANUAL_EXCLUDE_IDS=['6a2d87641352ba47a803']; // 톡톡/알프인입 태그 있으나 실제 톡톡에서 진행된 특이 케이스
+      const df=rows.filter(r=>!String(r.tags||'').includes('테스트')&&!String(r.tags||'').includes('중복')&&!String(r.tags||'').includes('광고스팸메시지')&&!MANUAL_EXCLUDE_IDS.includes(String(r.id)));
       // [보호 2단계] 처리 전 각 행의 개인정보 키 잔존 검증 및 강제 삭제
       df.forEach(r=>FORBIDDEN_FIELDS.forEach(f=>{if(f in r){console.warn('[보안] 개인정보 키 재발견, 강제 삭제:',f);delete r[f];}}));
       console.log('[handleFile] 전체 rows:', rows.length, '/ 테스트 제외 df:', df.length, '/ 첫 행 키:', df.length?Object.keys(df[0]):[]);
