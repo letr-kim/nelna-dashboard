@@ -540,9 +540,11 @@ function handleFile(file){
       rows.forEach(sanitizeRow);
       const hasTokTokInip=r=>String(r.tags||'').includes('톡톡/알프인입')&&!String(r.tags||'').includes('톡톡/알프인입X');
       const hasTokTokInipX=r=>String(r.tags||'').includes('톡톡/알프인입X');
+      // nv_inip_stat 전용: 테스트·광고스팸메시지만 제외, 중복 포함 (톡톡/알프인입+중복 케이스 누락 방지)
+      const rowsNoTest=rows.filter(r=>!String(r.tags||'').includes('테스트')&&!String(r.tags||'').includes('광고스팸메시지'));
       // 알프인입 분석용 raw 톡톡 rows (테스트 제외만 적용, 알프인입·중복 제외 전)
       const nvRowsRaw=rows.filter(r=>!String(r.tags||'').includes('테스트')&&r.mediumName==='appNaverTalk');
-      const nvInipXRows=nvRowsRaw.filter(hasTokTokInipX);
+      const nvInipXRows=rowsNoTest.filter(r=>r.mediumName==='appNaverTalk').filter(hasTokTokInipX);
       // 메인 df: 테스트·중복 제외 (톡톡/알프인입 포함 — nvRows 분리 처리로 중복 방지)
       const MANUAL_EXCLUDE_IDS=['6a2d87641352ba47a803']; // 톡톡/알프인입 태그 있으나 실제 톡톡에서 진행된 특이 케이스
       const df=rows.filter(r=>!String(r.tags||'').includes('테스트')&&!String(r.tags||'').includes('중복')&&!String(r.tags||'').includes('광고스팸메시지')&&!MANUAL_EXCLUDE_IDS.includes(String(r.id)));
@@ -552,7 +554,7 @@ function handleFile(file){
       if(!df.length){prog.textContent='❌ 처리할 데이터가 없습니다 (df 비어있음)';return;}
       const chRows=df.filter(r=>r.mediumType==='native');
       const nvRows=df.filter(r=>r.mediumName==='appNaverTalk');
-      const nvRowsInip=nvRows.filter(r=>String(r.tags||'').includes('톡톡/알프인입')&&!String(r.tags||'').includes('톡톡/알프인입X'));
+      const nvRowsInip=rowsNoTest.filter(r=>r.mediumName==='appNaverTalk'&&String(r.tags||'').includes('톡톡/알프인입')&&!String(r.tags||'').includes('톡톡/알프인입X'));
       const nvRowsPure=nvRows.filter(r=>!(String(r.tags||'').includes('톡톡/알프인입')&&!String(r.tags||'').includes('톡톡/알프인입X')));
       console.log('[DEBUG nvRows]', nvRows.length, '알프인입:', nvRows.filter(r=>String(r.tags||'').includes('톡톡/알프인입')&&!String(r.tags||'').includes('톡톡/알프인입X')).length, 'pure:', nvRows.filter(r=>!(String(r.tags||'').includes('톡톡/알프인입')&&!String(r.tags||'').includes('톡톡/알프인입X'))).length);
       const isTrue=v=>['true','1','yes'].includes(String(v||'').toLowerCase());
@@ -654,7 +656,7 @@ function handleFile(file){
       const nvInipXDow=[0,0,0,0,0,0,0];
       nvInipXRows.forEach(r=>{const d=new Date(r.createdAt);if(!isNaN(d))nvInipXDow[d.getDay()===0?6:d.getDay()-1]++;});
       const nvTotalDow=[0,0,0,0,0,0,0];
-      nvRows.forEach(r=>{const d=new Date(r.createdAt);if(!isNaN(d))nvTotalDow[d.getDay()===0?6:d.getDay()-1]++;});
+      rowsNoTest.filter(r=>r.mediumName==='appNaverTalk').forEach(r=>{const d=new Date(r.createdAt);if(!isNaN(d))nvTotalDow[d.getDay()===0?6:d.getDay()-1]++;});
       const nvInipStat={total:nvInipTotal,nvTotal:nvRows.length,solo:nvInipSolo,toChannel:nvInipToChannel,other:Math.max(0,nvInipTotal-nvInipSolo-nvInipToChannel),involveRate:pct(nvInipTotal,nvRows.length),soloRate:pct(nvInipSolo,nvInipTotal),toChannelRate:pct(nvInipToChannel,nvInipTotal),triggered:nvInipTriggered,alfSolo:nvInipAlfSolo,alfInvolveRate:pct(nvInipTriggered,nvInipTotal),alfSoloRate:pct(nvInipAlfSolo,nvInipTriggered),topTags:nvInipTopTags,chInipSoloTopTags,chAgentTopTags,dow:nvInipDow,dowX:nvInipXDow,nvTotalDow:nvTotalDow};
       const chHistory=D.ch_history?[...D.ch_history]:[];
       const nvHistory=D.nv_history?[...D.nv_history]:[];
