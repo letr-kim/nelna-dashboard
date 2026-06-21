@@ -134,44 +134,7 @@
       "count": 2
     }
   ],
-  "inc_tags": [
-    {
-      "tag": "버튼동작변경",
-      "curr": 4,
-      "prev": 0,
-      "delta": 4
-    },
-    {
-      "tag": "실물/이상주장/타이머",
-      "curr": 7,
-      "prev": 4,
-      "delta": 3
-    },
-    {
-      "tag": "실물/제품문의/낼나펜슬",
-      "curr": 4,
-      "prev": 1,
-      "delta": 3
-    },
-    {
-      "tag": "교환",
-      "curr": 17,
-      "prev": 15,
-      "delta": 2
-    },
-    {
-      "tag": "실물/제품문의/필름",
-      "curr": 4,
-      "prev": 3,
-      "delta": 1
-    },
-    {
-      "tag": "배송/배송문의/일정문의",
-      "curr": 4,
-      "prev": 3,
-      "delta": 1
-    }
-  ],
+  "inc_tags": [],
   "curr_solo_top5": [
     {
       "tag": "실물/이상주장/타이머",
